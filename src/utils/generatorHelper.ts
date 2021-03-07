@@ -8,6 +8,9 @@ export interface GeneratorHelperInterface extends ElementHelper {
   isRequired(): boolean;
   hasDefaultValue(): boolean;
   getDefaultValue(): unknown;
+  hasExampleValue(): boolean;
+  getExampleValue(): unknown;
+  isDeprecated(): boolean;
   allowsEmptyValue(): boolean;
   getEnum(): unknown[];
   getFirstItem(): GeneratorHelperInterface | undefined;
@@ -19,6 +22,14 @@ export interface GeneratorHelperInterface extends ElementHelper {
   hasRule(name: string): boolean; //@todo: make more specific method (e.g.: shouldBeUnique, should...)
   getRule(name: string): unknown; // should it still be used?
   getChildren(): Record<string, GeneratorHelperInterface>;
+
+  /**
+   * methods for openapi
+   */
+  hasStyle?(): boolean;
+  getStyle?(): unknown;
+  hasAdditionalProperties?(): boolean;
+  getAdditionalProperties?(): unknown;
 }
 
 export class GeneratorHelper implements GeneratorHelperInterface {
@@ -49,6 +60,24 @@ export class GeneratorHelper implements GeneratorHelperInterface {
 
   getDefaultValue(): unknown {
     return undefined
+  }
+
+  hasExampleValue(): boolean {
+    return false
+  }
+
+  getExampleValue(): unknown {
+    return undefined
+  }
+
+  isDeprecated(): boolean {
+    return false;
+  }
+  hasStyle(): boolean {
+    return false;
+  }
+  getStyle(): unknown {
+    return;
   }
 
   allowsEmptyValue(): boolean {

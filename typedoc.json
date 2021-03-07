@@ -1,0 +1,10 @@
+{
+  "entryPoints": [
+    "src/index.ts", 
+    "src/generators/openapi.ts", 
+    "src/generators/openapi/propertySchema.ts",
+    "src/utils/generatorHelper.ts",
+    "src/utils/joiGeneratorHelper.ts"
+  ],
+  "out": "docs"
+}

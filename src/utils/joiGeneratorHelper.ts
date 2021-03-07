@@ -111,6 +111,78 @@ export class JoiGeneratorHelper implements GeneratorHelperInterface {
     return res;
   }
 
+  hasExampleValue(): boolean {
+    if (!this.isJoi()) {
+      return false;
+    }
+    return this._joi['$_terms']
+      && this._joi['$_terms'].examples
+      && typeof this._joi['$_terms'].examples[0] !== 'undefined' ? true : false;
+  }
+
+  getExampleValue(): unknown {
+    if (!this.isJoi()) {
+      return;
+    }
+    let res;
+    if (this._joi['$_terms'] && this._joi['$_terms'].examples) {
+      res = this._joi['$_terms'].examples[0];
+    }
+    return res;
+  }
+
+  isDeprecated(): boolean {
+    if (!this.isJoi()) {
+      return false;
+    }
+    return this._joi['$_terms']
+      && this._joi['$_terms'].metas
+      && this._joi['$_terms'].metas[0].deprecated ? true : false;
+  }
+
+  hasStyle(): boolean {
+    if (!this.isJoi()) {
+      return false;
+    }
+    return this._joi['$_terms']
+      && this._joi['$_terms'].metas
+      && this._joi['$_terms'].metas[0]
+      && typeof this._joi['$_terms'].metas[0].style === 'string' ? true : false;
+  }
+
+  getStyle(): unknown {
+    if (!this.isJoi()) {
+      return;
+    }
+    return this._joi['$_terms']
+      && this._joi['$_terms'].metas
+      && this._joi['$_terms'].metas[0]
+      && this._joi['$_terms'].metas[0].style;
+  }
+
+  hasAdditionalProperties(): boolean {
+    if (!this.isJoi()) {
+      return false;
+    }
+    return this._joi['$_terms']
+      && this._joi['$_terms'].metas
+      && this._joi['$_terms'].metas[0]
+      && (typeof this._joi['$_terms'].metas[0].additionalProperties === 'boolean' 
+        || (this._joi['$_terms'].metas[0].additionalProperties 
+          && typeof this._joi['$_terms'].metas[0].additionalProperties === 'object'))
+      ? true : false;
+  }
+
+  getAdditionalProperties(): unknown {
+    if (!this.isJoi()) {
+      return;
+    }
+    return this._joi['$_terms']
+      && this._joi['$_terms'].metas
+      && this._joi['$_terms'].metas[0]
+      && this._joi['$_terms'].metas[0].additionalProperties;
+  }
+
   allowsEmptyValue(): boolean {
     let r = false;
     if (!this.isJoi()) {

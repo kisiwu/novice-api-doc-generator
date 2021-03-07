@@ -11,9 +11,11 @@
     "node": ">=10"
   },
   "scripts": {
+    "doc": "typedoc",
     "build": "tsc",
     "lint": "eslint src/**/*.ts",
-    "test": "env TS_NODE_COMPILER_OPTIONS='{\"module\": \"commonjs\" }' kaukau --require ts-node/register --file test --ext .test.ts"
+    "test": "env TS_NODE_COMPILER_OPTIONS='{\"module\": \"commonjs\"}' kaukau --require ts-node/register --file test --ext .test.ts",
+    "testany": "env TS_NODE_COMPILER_OPTIONS='{\"module\": \"commonjs\", \"noImplicitAny\": false}' kaukau --require ts-node/register --file test --ext .test.ts"
   },
   "keywords": [
     "postman",
@@ -26,6 +28,7 @@
   ],
   "license": "MIT",
   "devDependencies": {
+    "@novice1/routing": "^1.0.10",
     "@types/chai": "^4.2.15",
     "@types/mocha": "^8.2.1",
     "@types/node": "^14.14.31",
@@ -34,6 +37,7 @@
     "eslint": "^7.21.0",
     "kaukau": "^0.2.0",
     "ts-node": "^9.1.1",
+    "typedoc": "^0.20.29",
     "typescript": "^4.2.2"
   },
   "dependencies": {

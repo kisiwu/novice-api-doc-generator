@@ -1,0 +1,1 @@
+declare module '@novice1/routing';

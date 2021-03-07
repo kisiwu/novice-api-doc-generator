@@ -10,6 +10,6 @@ describe('create OpenApi instance', () => {
       .that.haveOwnProperty('info')
       .that.is.an('object')
       .that.haveOwnProperty('title').equals('Test');
-    console.log(result);
+    //console.log(result);
   });
 });

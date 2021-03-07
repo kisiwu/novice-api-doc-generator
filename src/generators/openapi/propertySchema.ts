@@ -15,6 +15,7 @@ interface PropertySchemaObjectExplicit {
   maximum?: number;
   format?: string;
   uniqueItems?: boolean;
+  style?: unknown;
 }
 
 export interface PropertySchemaObject extends PropertySchemaObjectExplicit {
@@ -201,6 +202,25 @@ export class PropertySchema {
   setUniqueItems(value: boolean | undefined): PropertySchema {
     this.#param.uniqueItems = value;
     return this;
+  }
+
+  setExplode(value: boolean): PropertySchema {
+    this.#param.explode = value;
+    return this;
+  }
+
+  setDeprecated(value: boolean): PropertySchema {
+    this.#param.deprecated = value;
+    return this;
+  }
+
+  setStyle(value: unknown): PropertySchema {
+    this.#param.style = value;
+    return this;
+  }
+
+  hasStyle(): boolean {
+    return typeof this.#param.style === 'undefined' ? false : true;
   }
 
   set(prop: string, value: unknown): PropertySchema {
