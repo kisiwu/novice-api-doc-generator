@@ -88,6 +88,7 @@ describe('api doc', function () {
     // generate result
     const result = openapi.result();
 
+    /* // uncomment to test locally
     const wStream = fs.createWriteStream('private/result.json', { flags: 'w+' });
 
     if (wStream.destroyed) {
@@ -98,6 +99,7 @@ describe('api doc', function () {
         wStream.close();
       });
     }
+    */
 
     //logger.silly(result);
   });
