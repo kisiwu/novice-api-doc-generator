@@ -90,12 +90,14 @@ describe('api doc', function () {
 
     const wStream = fs.createWriteStream('private/result.json', { flags: 'w+' });
 
-    wStream.write(JSON.stringify(result, null, ' '), (err: unknown) => {
-      if (err) {
-        logger.error(err);
-      }
-      wStream.close();
-    });
+    if (wStream.destroyed) {
+      wStream.write(JSON.stringify(result, null, ' '), (err: unknown) => {
+        if (err) {
+          logger.error(err);
+        }
+        wStream.close();
+      });
+    }
 
     //logger.silly(result);
   });
