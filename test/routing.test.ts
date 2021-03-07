@@ -1,4 +1,4 @@
-import fs from 'fs';
+// import fs from 'fs';
 import routing from '@novice1/routing';
 import { OpenApi } from '../src';
 import Joi from 'joi';
@@ -87,6 +87,8 @@ describe('api doc', function () {
 
     // generate result
     const result = openapi.result();
+
+    logger.silly('openapi:', result.openapi);
 
     /* // uncomment to test locally
     const wStream = fs.createWriteStream('private/result.json', { flags: 'w+' });
