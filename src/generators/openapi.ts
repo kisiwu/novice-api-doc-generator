@@ -4,22 +4,45 @@ const JoiUtils = require('./parameters/joiUtils');
 */
 
 /**
- * @todo: removeRoute(method: string, path: string): boolean
- * @todo: handle "header" (as "params" and "query")
- * @todo: types date, date-time, password, ...
- * @todo: format email, uuid, ...
+ * @todo: dynamically create schema ref ? e.g: if GeneratorHelperInterface.getRef() starts with #/components/schema, 
+ *  check if components.schema[X] exists otherwise create it from generated schema and set $ref
+ * @todo: do the above for:
+ *  - body @done
+ *  - files @done
+ *  - query
+ *  - path
+ *  - headers
+ * @todo: type "alternative" (oneOf)
+ * @todo: removeTags ?
  */
 
 import { GeneratorHelperInterface } from '../utils/generatorHelper'
 import { JoiGeneratorHelper } from '../utils/joiGeneratorHelper';
 import { PropertySchema, PropertySchemaObject } from './openapi/propertySchema';
 
+interface TagObject {
+  name: string;
+  description?: string;
+  externalDocs?: {
+    url: string;
+    description?: string;
+  }
+}
 
 interface OpenAPIResultExplicit {
   info: Record<string, unknown>;
   servers: unknown[];
-  components: Record<string, unknown>;
+  components: {
+    schemas?: {
+      [key: string]: PropertySchemaObject;
+    },
+    requestBodies?: {
+      [key: string]: RequestBody;
+    },
+    [key: string]: unknown;
+  };
   paths: Record<string, Record<string, unknown>>;
+  tags: TagObject[];
 }
 
 interface OpenAPIResult extends OpenAPIResultExplicit {
@@ -31,6 +54,7 @@ interface RouteParametersExplicit {
   body?: Record<string, unknown>;
   query?: Record<string, unknown>;
   files?: Record<string, unknown>;
+  headers?: Record<string, unknown>;
 }
 
 interface RouteParameters extends RouteParametersExplicit {
@@ -65,7 +89,8 @@ interface RouteSchema extends RouteSchemaExplicit {
 }
 
 interface MimeContentExplicit {
-  schema: PropertySchemaObject;
+  schema?: PropertySchemaObject;
+  $ref?: string; // should be string
 }
 
 interface MimeContent extends MimeContentExplicit{
@@ -132,8 +157,37 @@ function formatPath(path: string, params?: Record<string, unknown>): string {
   return path;
 }
 
-function formatType(type: string): string {
-  return type === 'any' ? 'object' : type;
+function formatType(type: string): {type: string, format?: string} {
+  const t: {type: string, format?: string} = {
+    type,
+  };
+  if (type === 'any') {
+    t.type = 'object';
+  }
+  else if (type === 'uuid' || type === 'guid') {
+    t.type = 'string';
+    t.format = 'uuid';
+  }
+  else if (type === 'date-time' || type === 'datetime') {
+    t.type = 'string'
+    t.format = 'date-time'
+  }
+  else if (type === 'password' 
+    || type === 'email' 
+    || type === 'uri' 
+    || type === 'url'
+    || type === 'date'
+    || type === 'byte'
+    || type === 'binary') {
+    t.type = 'string';
+    t.format = type;
+  }
+  else if (type === 'float' || type === 'double') {
+    t.type = 'number'
+    t.format = type
+  }
+
+  return t;
 }
 
 export class OpenApi {
@@ -161,7 +215,8 @@ export class OpenApi {
       },
       servers: [],
       paths: {},
-      components: {}
+      components: {},
+      tags: []
     };
     this.#security = [];
   }
@@ -176,9 +231,41 @@ export class OpenApi {
     return this;
   }
 
-  setDefinitions(v: Record<string, unknown>): OpenApi {
-    this.#result.definitions = v;
+  removeSchema(name: string): OpenApi {
+    if (this.#result.components.schemas) {
+      delete this.#result.components.schemas[name];
+    }
     return this;
+  }
+
+  addRequestBody(name: string, schema: PropertySchemaObject): OpenApi {
+    if (!this.#result.components.requestBodies) {
+      this.#result.components.requestBodies = {}; 
+    }
+    this.#result.components.requestBodies[name] = schema;
+    return this;
+  }
+
+  addSchema(name: string, schema: PropertySchemaObject): OpenApi {
+    if (!this.#result.components.schemas) {
+      this.#result.components.schemas = {}; 
+    }
+    this.#result.components.schemas[name] = schema;
+    return this;
+  }
+
+  setComponent(k: string, v: unknown): OpenApi {
+    this.#result.components[k] = v;
+    return this;
+  }
+
+  setComponents(k: Record<string, unknown>): OpenApi {
+    this.#result.components = k;
+    return this;
+  }
+
+  setDefinitions(v: Record<string, unknown>): OpenApi {
+    return this.setComponents(v);
   }
 
   setSecuritySchemes(v: unknown): OpenApi {
@@ -256,6 +343,28 @@ export class OpenApi {
     return this;
   }
 
+  setTags(tags: TagObject[]): OpenApi {
+    this.#result.tags = tags;
+    return this;
+  }
+
+  addTags(tags: TagObject): OpenApi
+  addTags(tags: TagObject[]): OpenApi;
+  addTags(tags: TagObject[] | TagObject): OpenApi {
+    if (!Array.isArray(tags)) {
+      tags = [tags];
+    }
+    tags.forEach(tag => {
+      const t = this.#result.tags.find(t => t.name === tag.name);
+      if (t) {
+        Object.assign(t, tag);
+      } else {
+        this.#result.tags.push(tag);
+      }
+    });
+    return this;
+  }
+
   /**
    * useless getter
    */
@@ -312,6 +421,35 @@ export class OpenApi {
     });
   
     return results.filter((r) => r);
+  }
+
+  remove(path: string, method?: string): unknown[] {
+    const r: unknown[] = [];
+    if(this.#result.paths[path]) {
+      if (method) {
+        if (this.#result.paths[path][method]) {
+          r.push({
+            path,
+            method,
+            schema: this.#result.paths[path][method]
+          });
+          delete this.#result.paths[path][method];
+        }
+        if (!Object.keys(this.#result.paths[path]).length) {
+          delete this.#result.paths[path];
+        }
+      } else {
+        Object.keys(this.#result.paths[path]).forEach(m => {
+          r.push({
+            path,
+            method: m,
+            schema: this.#result.paths[path][m]
+          });
+        });
+        delete this.#result.paths[path];
+      }
+    }
+    return r;
   }
 
   private _getResponsesSchema(responses?: ResponseSchema): ResponseSchema {
@@ -455,6 +593,11 @@ export class OpenApi {
     // format parameters
     const res: PropertySchemaObject[] = [];
 
+    // @todo: same as "this._formatRequestBody" for parameters
+
+    if(parameters.headers) {
+      this._pushPathParameters('header', parameters.headers, res);
+    }
     if(parameters.params) {
       this._pushPathParameters('params', parameters.params, res);
     }
@@ -469,22 +612,22 @@ export class OpenApi {
     const valueHelper = new this.#helperClass(value);
     let valueHelperType = '';
     
-    let psChildren: Record<string, GeneratorHelperInterface>;
+    let children: Record<string, GeneratorHelperInterface>;
     if (valueHelper.isValid()) {
-      valueHelperType = valueHelper.getType();
-      psChildren = valueHelper.getChildren();
+      valueHelperType = formatType(valueHelper.getType()).type;
+      children = valueHelper.getChildren();
     }
   
-    const psKeys = () => {
-      if (psChildren) {
-        return Object.keys(psChildren);
+    const getChildrenNames = () => {
+      if (children) {
+        return Object.keys(children);
       }
       return Object.keys(value);
     };
   
-    const psChild = (name: string): GeneratorHelperInterface => {
-      if (psChildren) {
-        return psChildren[name];
+    const getChild = (name: string): GeneratorHelperInterface => {
+      if (children) {
+        return children[name];
       }
       return new this.#helperClass(value[name]);
     };
@@ -517,8 +660,8 @@ export class OpenApi {
     };
 
 
-    psKeys().forEach((name: string) => {
-      const helper = psChild(name);
+    getChildrenNames().forEach((name: string) => {
+      const helper = getChild(name);
       handleChild(name, helper);
     });
 
@@ -544,9 +687,7 @@ export class OpenApi {
     defaultSchemaObject?: PropertySchemaObject): PropertySchema {
     const prop = new PropertySchema(defaultSchemaObject)
       .setRequired(helper.isRequired())
-      .setSchema({
-        type: helper.getType(),
-      });
+      .setSchema(formatType(helper.getType()));
   
     this._fillPropertySchema(prop, helper);
   
@@ -586,13 +727,9 @@ export class OpenApi {
       // schema item
       const firstItem = helper.getFirstItem();
       if (firstItem && firstItem.isValid()) {
-        prop.setSchemaProp('items', {
-          type: formatType(firstItem.getType()),
-        });
+        prop.setSchemaProp('items', formatType(firstItem.getType()));
       } else {
-        prop.setSchemaProp('items', {
-          type: formatType('any'),
-        });
+        prop.setSchemaProp('items', formatType('any'));
       }
     }
 
@@ -622,19 +759,45 @@ export class OpenApi {
   // format body methods
   private _formatRequestBody(parameters: RouteParameters, consumes: string[]) {
     // format body
-    const res: RequestBody = {};
+    let res: RequestBody = {};
   
     // body|files
     if (parameters.body || parameters.files) {
       this._pushRequestBody(parameters.body, parameters.files, consumes, res);
+    } else {
+      const bodyHelper = new this.#helperClass(parameters);
+      if(bodyHelper.isValid()) {
+        const children = bodyHelper.getChildren();
+        if( children.body || children.files ) {
+          this._pushRequestBody(children.body, children.files, consumes, res);
+        }
+      }
+      if(bodyHelper.getRef && bodyHelper.hasRef && bodyHelper.hasRef()) {
+        const ref = bodyHelper.getRef();
+        if (ref && typeof ref === 'string') {
+          const innerSchemaPrefix = '#/components/requestBodies/';
+          if (ref.startsWith(innerSchemaPrefix)) {
+            const refName: string = ref.substring(innerSchemaPrefix.length);
+            if (refName) {
+              if (bodyHelper.getDescription()) {
+                res.description = bodyHelper.getDescription();
+              }
+              this.addRequestBody(refName, res);
+              res = {
+                $ref: ref
+              };
+            }
+          }
+        }
+      }
     }
   
     return res;  
   }
 
   private _pushRequestBody(
-    bodyProps: Record<string, unknown> | undefined, 
-    fileProps: Record<string, unknown> | undefined, 
+    bodyProps: Record<string, unknown> | GeneratorHelperInterface | undefined, 
+    fileProps: Record<string, unknown> | GeneratorHelperInterface | undefined, 
     consumes: string[], 
     res: RequestBody) {
 
@@ -646,33 +809,47 @@ export class OpenApi {
   
     const params = [bodyProps, fileProps]
   
+    let ref: unknown = '';
+
     params.forEach(
       (value, i) => {
         if (value) {
-          const valueHelper = new this.#helperClass(value);
-          let psChildren: Record<string, GeneratorHelperInterface>;
+          const valueHelper = value instanceof this.#helperClass ? value : new this.#helperClass(value);
+          let children: Record<string, GeneratorHelperInterface>;
           if(valueHelper.isValid()) {
-            psChildren = valueHelper.getChildren();
+            children = valueHelper.getChildren();
+
+            // check ref
+            if (valueHelper.getRef && valueHelper.hasRef && valueHelper.hasRef()) {
+              if (ref && ref !== valueHelper.getRef()) {
+                ref = '';
+              } else {
+                ref = valueHelper.getRef();
+              }
+            }
           }
       
-          const psKeys = () => {
-            if(psChildren) {
-              return Object.keys(psChildren);
+          const getChildrenNames = () => {
+            if(children) {
+              return Object.keys(children);
             }
             return Object.keys(value);
           }
       
-          const psChild = (name: string) => {
-            if(psChildren) {
-              return psChildren[name];
+          const getChild = (name: string) => {
+            if(children) {
+              return children[name];
+            }
+            if (value instanceof this.#helperClass) {
+              return;
             }
             return new this.#helperClass(value[name]);
           }
 
-          psKeys().forEach((name: string) => {
-            const helper = psChild(name);
+          getChildrenNames().forEach((name: string) => {
+            const helper = getChild(name);
         
-            if (!helper.isValid()) return;
+            if (!helper || !helper.isValid()) return;
             
             this._fillBodyPropertySchema(
               name, 
@@ -689,11 +866,35 @@ export class OpenApi {
       res.required = true
     }
 
+    if (ref && typeof ref === 'string') {
+      const innerSchemaPrefix = '#/components/schemas/';
+      if (ref.startsWith(innerSchemaPrefix)) {
+        const refName: string = ref.substring(innerSchemaPrefix.length);
+        if (refName) {
+          this.addSchema(refName, prop.toObject())
+        } else {
+          ref = '';
+        }
+      } else {
+        ref = '';
+      }
+    } else {
+      ref = '';
+    }
+
     consumes.forEach((mime: string) => {
       if (res.content) {
-        res.content[mime] = {
-          schema: prop.toObject()
-        };
+        if (ref && typeof ref === 'string') {
+          res.content[mime] = {
+            schema: {
+              $ref: ref
+            }
+          }; 
+        } else {
+          res.content[mime] = {
+            schema: prop.toObject()
+          }; 
+        }
       }
     });    
   }
@@ -704,9 +905,7 @@ export class OpenApi {
     propSchema: PropertySchema,
     defaultFormat?: string
   ) {
-    const prop = new PropertySchema({
-      type: formatType(helper.getType())
-    });
+    const prop = new PropertySchema(formatType(helper.getType()));
   
     this._fillPropertySchema(prop, helper, true);
   
@@ -752,9 +951,7 @@ export class OpenApi {
           prop.setItems({});
           this._fillBodyPropertySchema('items', firstItem, prop);
         } else {
-          prop.setItems({
-            type: formatType('any')
-          });
+          prop.setItems(formatType('any'));
         }
       }
     } else if(defaultFormat) {

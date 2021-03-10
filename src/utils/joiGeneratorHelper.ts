@@ -39,6 +39,26 @@ type JoiSchema = Partial<Schema> & {
   'binary'
  */
 
+const VALID_TYPES: string[] = [
+  'number',
+  'string',
+  'byte',
+  'binary',
+  'float',
+  'double',
+  'integer',
+  'date',
+  'date-time',
+  'datetime',
+  'password',
+  'email',
+
+  'guid',
+  'uuid',
+  'uri',
+  'dataUri'
+];
+
 export class JoiGeneratorHelper implements GeneratorHelperInterface {
   _joi: JoiSchema;
 
@@ -46,11 +66,31 @@ export class JoiGeneratorHelper implements GeneratorHelperInterface {
     this._joi = joiObject && typeof joiObject === 'object' ? joiObject : {};
   }
 
-  isJoi(): boolean {
+  private isJoi(): boolean {
     return (this._joi
       && typeof this._joi.type === 'string'
       && this._joi.$_terms
       && this._joi.$) ? true : false;
+  }
+
+  private hasMeta(v: string): boolean {
+    if (!this.isJoi()) {
+      return false;
+    }
+    return this._joi['$_terms']
+      && this._joi['$_terms'].metas
+      && this._joi['$_terms'].metas[0]
+      && this._joi['$_terms'].metas[0][v] ? true : false;
+  }
+
+  private getMeta(v: string): unknown {
+    if (!this.hasMeta(v)) {
+      return;
+    }
+    return this._joi['$_terms']
+      && this._joi['$_terms'].metas
+      && this._joi['$_terms'].metas[0]
+      && this._joi['$_terms'].metas[0][v];
   }
 
   isValid(): boolean {
@@ -65,6 +105,22 @@ export class JoiGeneratorHelper implements GeneratorHelperInterface {
     if (typeof this._joi.type === 'string') {
       res = this._joi.type;
     }
+
+    // find format from 'metas' or '_rules
+    const metaFormat: unknown = this.getMeta('format');
+    if (metaFormat && typeof metaFormat === 'string' && VALID_TYPES.includes(metaFormat)) {
+      res = metaFormat;
+    } else if (this._joi._rules) {
+      const rule = this._joi._rules.find(v => VALID_TYPES.includes(v.name));
+      if (rule) {
+        res = rule.name;
+      }
+    }
+
+    if(res === 'dataUri') {
+      res = 'uri';
+    }
+
     return res;
   }
 
@@ -137,6 +193,7 @@ export class JoiGeneratorHelper implements GeneratorHelperInterface {
     }
     return this._joi['$_terms']
       && this._joi['$_terms'].metas
+      && this._joi['$_terms'].metas[0]
       && this._joi['$_terms'].metas[0].deprecated ? true : false;
   }
 
@@ -147,6 +204,7 @@ export class JoiGeneratorHelper implements GeneratorHelperInterface {
     return this._joi['$_terms']
       && this._joi['$_terms'].metas
       && this._joi['$_terms'].metas[0]
+      && this._joi['$_terms'].metas[0].style
       && typeof this._joi['$_terms'].metas[0].style === 'string' ? true : false;
   }
 
@@ -181,6 +239,27 @@ export class JoiGeneratorHelper implements GeneratorHelperInterface {
       && this._joi['$_terms'].metas
       && this._joi['$_terms'].metas[0]
       && this._joi['$_terms'].metas[0].additionalProperties;
+  }
+
+  hasRef(): boolean {
+    if (!this.isJoi()) {
+      return false;
+    }
+    return this._joi['$_terms']
+      && this._joi['$_terms'].metas
+      && this._joi['$_terms'].metas[0]
+      && this._joi['$_terms'].metas[0].ref
+      && typeof this._joi['$_terms'].metas[0].ref === 'string' ? true : false;
+  }
+
+  getRef(): unknown {
+    if (!this.isJoi()) {
+      return;
+    }
+    return this._joi['$_terms']
+      && this._joi['$_terms'].metas
+      && this._joi['$_terms'].metas[0]
+      && this._joi['$_terms'].metas[0].ref;
   }
 
   allowsEmptyValue(): boolean {
@@ -267,9 +346,9 @@ export class JoiGeneratorHelper implements GeneratorHelperInterface {
     }
     let r;
     if (this.hasMax() && this._joi._singleRules) {
-      const min = this._joi._singleRules.get('max');
-      if (min) {
-        r = min.args.limit;
+      const max = this._joi._singleRules.get('max');
+      if (max) {
+        r = max.args.limit;
       }
     }
     return r;

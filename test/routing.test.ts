@@ -12,22 +12,58 @@ describe('api doc', function () {
     openapi
       .setTitle('api doc')
       .setHost('http://test.kaukau.tst')
-      .setProduces(['application/json', 'text/html', 'text/plain']);
+      .setConsumes(['multipart/form-data', 'application/json'])
+      .setProduces(['application/json', 'text/html', 'text/plain'])
+      .setTags([
+        {
+          name: 'Test',
+          description: 'Testing purpose',
+          externalDocs: { description: 'Find more info here', url: 'https://swagger.io/specification/' }
+        }
+      ])
 
     openapi.responsesProperty = 'openapi';
 
     // router
-    const router = routing().get({
+    const router = routing().post({
       name: 'Test app',
       description: 'testing purpose',
       tags: ['Test'],
       // set parameters
+      /*
       parameters: {
-        query: Joi.object().keys({
+        headers: {
+          token: Joi.array()
+            .items(Joi.number())
+            .description('token to be passed as a header')
+            .required()
+            .example([128, 256])
+        },
+        body: Joi.object().keys({
+          id: Joi.number().integer().required().example(6),
+          custom: Joi.object().keys({
+            lava: Joi.string().description('thunder').required().example('ewf'),
+            lamp: Joi.binary().description('cat')
+          }).description('shark'),
+          email: Joi.string().email().required(),
+          password: Joi.string().meta({format: 'password'}).example('pass'),
+          timestamp: Joi.date().meta({format: 'datetime'}).min(new Date(0)),
           versions: Joi.array().items(
             Joi.number()
             .description('version number').example(4).positive()
           ).meta({
+            allowReserved: false,
+            explode: true,
+            encoding: {
+              headers: {
+                'X-Rate-Limit-Limit': {
+                  description: 'The number of allowed requests in the current period',
+                  schema: {
+                    type: 'integer'
+                  }
+                }
+              }
+            },
             deprecated: true,
             style: 'form'
           }).example([7])
@@ -38,10 +74,93 @@ describe('api doc', function () {
         }).description('anything description').meta({
           additionalProperties: {
             type: 'number'
-          }
+          },
+          ref: '#/components/schemas/Mikamika'
         })
-        .max(6).unknown(true)
-      },
+        .max(6).unknown(true),
+        files: Joi.object()
+        .keys({
+          file: Joi.array()
+            .items(
+              Joi.object()
+                .keys({
+                  mimetype: Joi.string()
+                    .required(),
+                })
+                .options({ stripUnknown: false, allowUnknown: true })
+            )
+            .length(1)
+            .description('File to upload')
+            .required(),
+        })
+        .required(),
+      },*/
+      parameters: Joi.object({
+        headers: {
+          token: Joi.array()
+            .items(Joi.number())
+            .description('token to be passed as a header')
+            .required()
+            .example([128, 256])
+        },
+        body: Joi.object().keys({
+          id: Joi.number().integer().required().example(6),
+          custom: Joi.object().keys({
+            lava: Joi.string().description('thunder').required().example('ewf'),
+            lamp: Joi.binary().description('cat')
+          }).description('shark'),
+          email: Joi.string().email().required(),
+          password: Joi.string().meta({format: 'password'}).example('pass'),
+          timestamp: Joi.date().meta({format: 'datetime'}).min(new Date(0)),
+          versions: Joi.array().items(
+            Joi.number()
+            .description('version number').example(4).positive()
+          ).meta({
+            allowReserved: false,
+            explode: true,
+            encoding: {
+              headers: {
+                'X-Rate-Limit-Limit': {
+                  description: 'The number of allowed requests in the current period',
+                  schema: {
+                    type: 'integer'
+                  }
+                }
+              }
+            },
+            deprecated: true,
+            style: 'form'
+          }).example([7])
+          .max(2)
+          .description('version numbers')
+          .single()
+          .unique()
+        }).description('anything description').meta({
+          additionalProperties: {
+            type: 'number'
+          },
+          ref: '#/components/schemas/Mikamika'
+        })
+        .max(6).unknown(true),
+        files: Joi.object()
+        .keys({
+          file: Joi.array()
+            .items(
+              Joi.object()
+                .keys({
+                  mimetype: Joi.string()
+                    .required(),
+                })
+                .options({ stripUnknown: false, allowUnknown: true })
+            )
+            .length(1)
+            .description('File to upload')
+            .required(),
+        })
+        .required(),
+      }).description('Damn my G').meta({
+        ref: '#/components/requestBodies/AppBody'
+      }),
       path: '/app',
       responses: {
         openapi: {
@@ -90,19 +209,17 @@ describe('api doc', function () {
 
     logger.silly('openapi:', result.openapi);
 
-    /* // uncomment to test locally
+    // uncomment to test locally
+    /*
     const wStream = fs.createWriteStream('private/result.json', { flags: 'w+' });
-
-    if (wStream.destroyed) {
-      wStream.write(JSON.stringify(result, null, ' '), (err: unknown) => {
-        if (err) {
-          logger.error(err);
-        }
-        wStream.close();
-      });
-    }
+    wStream.write(JSON.stringify(result, null, ' '), (err: unknown) => {
+      if (err) {
+        logger.error(err);
+      }
+      wStream.close();
+    });
     */
 
-    //logger.silly(result);
+    //logger.silly(openapi.remove('/app', 'post'));
   });
 });

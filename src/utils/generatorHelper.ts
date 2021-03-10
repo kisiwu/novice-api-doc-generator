@@ -30,6 +30,8 @@ export interface GeneratorHelperInterface extends ElementHelper {
   getStyle?(): unknown;
   hasAdditionalProperties?(): boolean;
   getAdditionalProperties?(): unknown;
+  hasRef?(): boolean;
+  getRef?(): unknown;
 }
 
 export class GeneratorHelper implements GeneratorHelperInterface {

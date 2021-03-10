@@ -249,6 +249,10 @@ export class PropertySchema {
       }
     }
 
+    if (Array.isArray(this.#param.required) && !this.#param.required.length){
+      delete this.#param.required;
+    }
+
     return this.#param;
   }
 } 
