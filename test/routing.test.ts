@@ -1,4 +1,4 @@
-// import fs from 'fs';
+//import fs from 'fs';
 import routing from '@novice1/routing';
 import { OpenApi } from '../src';
 import Joi from 'joi';
@@ -96,12 +96,25 @@ describe('api doc', function () {
         .required(),
       },*/
       parameters: Joi.object({
-        headers: {
+        query: {
+          obj: Joi.object()
+            .keys({
+              ele: Joi.string().example('slow flow')
+            })
+            .description('obj')
+            .meta({
+              ref: '#/components/schemas/Couwery'
+            })
+        },
+        cookies: {
           token: Joi.array()
             .items(Joi.number())
             .description('token to be passed as a header')
             .required()
             .example([128, 256])
+            .meta({
+              ref: '#/components/schemas/RandomTokenCooks'
+            })
         },
         body: Joi.object().keys({
           id: Joi.number().integer().required().example(6),

@@ -235,24 +235,24 @@ export class PropertySchema {
     }
 
     if(typeof this.#min !== 'undefined') {
-      if (this.#param.type === 'array') {
-        this.#param.minItems = this.#min;
+      if (copy.type === 'array') {
+        copy.minItems = this.#min;
       } else {
-        this.#param.minimum = this.#min;
+        copy.minimum = this.#min;
       }
     }
     if(typeof this.#max !== 'undefined') {
-      if (this.#param.type === 'array') {
-        this.#param.maxItems = this.#max;
+      if (copy.type === 'array') {
+        copy.maxItems = this.#max;
       } else {
-        this.#param.maximum = this.#max;
+        copy.maximum = this.#max;
       }
     }
 
-    if (Array.isArray(this.#param.required) && !this.#param.required.length){
-      delete this.#param.required;
+    if (Array.isArray(copy.required) && !copy.required.length){
+      delete copy.required;
     }
 
-    return this.#param;
+    return copy;
   }
 } 
