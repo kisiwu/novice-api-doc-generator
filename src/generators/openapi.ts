@@ -735,6 +735,8 @@ export class OpenApi {
       }
 
       defaultSchemaObject['name'] = name;
+      defaultSchemaObject['in'] = key;
+      /*
       switch (key) {
         case 'files':
           defaultSchemaObject['in'] = 'formData';
@@ -742,7 +744,7 @@ export class OpenApi {
         default:
           defaultSchemaObject['in'] = key;
           break;
-      }
+      }*/
       const propSchema = (this._createPropertySchema(key, helper, defaultSchemaObject)).toObject();
 
       let parameterObject = propSchema;
@@ -790,6 +792,16 @@ export class OpenApi {
     }
   }
 
+  /*
+  private _fillParamsPropertySchema(
+    name: string, 
+    helper: GeneratorHelperInterface, 
+    propSchema: PropertySchema
+  ) {
+
+  }
+  */
+  
   private _createPropertySchema(
     key: string, 
     helper: GeneratorHelperInterface,
@@ -800,13 +812,14 @@ export class OpenApi {
   
     this._fillPropertySchema(prop, helper);
   
+    /*
     switch (key) {
       case 'files':
         prop.setType('file');
         break;
       default:
         break;
-    }
+    }*/
 
     // handle deprecated
     if(helper.isDeprecated()) {
@@ -844,11 +857,27 @@ export class OpenApi {
 
     // object items
     if (prop.getSchemaProp('type') === 'object') {
+      // @todo: deep cover object
+      // @todo: get children and execute function to get schema
+      // check if it has defined keys
+      /*
+      const children = helper.getChildren();
+      if (Object.keys(children).length) {
+        prop.setProperties({});
+        Object.keys(children).forEach((k) => {
+          this._fillBodyPropertySchema(k, children[k], prop);
+        });
+      }
+      */
+
+      // additional properties ?
       if(helper.getAdditionalProperties
         && helper.hasAdditionalProperties
         && helper.hasAdditionalProperties()) {
         prop.setSchemaProp('additionalProperties', helper.getAdditionalProperties());
       }
+
+      // style ?
       if(!prop.hasStyle()) {
         prop.setStyle('deepObject');
       }
@@ -862,6 +891,7 @@ export class OpenApi {
       prop.setSchemaProp('maximum', helper.getMax());
     }
 
+    // @todo: should be checked before most of the things above
     if(helper.getRef && helper.hasRef && helper.hasRef()) {
       const ref = helper.getRef();
       if (ref && typeof ref === 'string') {
@@ -1109,7 +1139,10 @@ export class OpenApi {
 
 
   // other format methods
-  private _fillPropertySchema(prop: PropertySchema, helper: GeneratorHelperInterface, forBody?: boolean) {
+  private _fillPropertySchema(
+    prop: PropertySchema, 
+    helper: GeneratorHelperInterface, 
+    forBody?: boolean) {
     let description = '';
     // description
     if (helper.getDescription()) {
