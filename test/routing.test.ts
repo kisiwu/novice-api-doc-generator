@@ -1,4 +1,4 @@
-import fs from 'fs';
+//import fs from 'fs';
 import routing from '@novice1/routing';
 import { OpenApi } from '../src';
 import Joi from 'joi';
@@ -20,9 +20,23 @@ describe('api doc', function () {
           description: 'Testing purpose',
           externalDocs: { description: 'Find more info here', url: 'https://swagger.io/specification/' }
         }
-      ])
+      ]);
 
     openapi.responsesProperty = 'openapi';
+
+    /*
+    // add components/schema
+    openapi.addSchema('Coule', {
+      type: 'array',
+      example: [
+        'well',
+        'livin'
+      ],
+      items: {
+        type: 'string'
+      }
+     });
+     */
 
     // router
     const router = routing().post({
@@ -96,16 +110,36 @@ describe('api doc', function () {
         .required(),
       },*/
       parameters: Joi.object({
-        query: {
+        query: Joi.object().keys({
           obj: Joi.object()
             .keys({
-              ele: Joi.string().example('slow flow')
+              ele: Joi.string().example('slow flow').required(),
+              customPlus: Joi.object().keys({
+                id: Joi.number().integer().required().example(6),
+                custom: Joi.object().keys({
+                  lava: Joi.string().description('thunder').required().example('ewf'),
+                  lamp: Joi.binary().description('cat')
+                }).description('shark'),
+                email: Joi.string().email().required(),
+                password: Joi.string().meta({format: 'password'}).example('pass'),
+                timestamp: Joi.date().meta({format: 'datetime'}).min(new Date(0)),
+              }).meta({
+                ref: '#/components/schemas/CustomPlus'
+              }),
+              tokenTwo: Joi.array()
+              .items(Joi.number())
+              .description('token to be passed as a header')
+              .example([128, 256])
+              .meta({
+                ref: '#/components/schemas/RandomTokenCooks'
+              })
             })
             .description('obj')
             .meta({
-              ref: '#/components/schemas/Couwery'
+              //ref: '#/components/schemas/Couwery'
+              ref: '#/components/parameters/Couwery'
             })
-        },
+        }),
         cookies: {
           token: Joi.array()
             .items(Joi.number())
@@ -129,6 +163,7 @@ describe('api doc', function () {
             Joi.number()
             .description('version number').example(4).positive()
           ).meta({
+            ref: '#/components/schemas/Versions',
             allowReserved: false,
             explode: true,
             encoding: {
@@ -143,7 +178,7 @@ describe('api doc', function () {
             },
             deprecated: true,
             style: 'form'
-          }).example([7])
+          }).example({$ref: '#/components/examples/Versions'})
           .max(2)
           .description('version numbers')
           .single()
@@ -217,12 +252,16 @@ describe('api doc', function () {
     // add router
     openapi.add(router.getMeta());
 
+    // remove unused definitions
+    //logger.log(openapi.cleanupComponents());
+
     // generate result
     const result = openapi.result();
 
     logger.silly('openapi:', result.openapi);
 
     // uncomment to test locally
+    /*
     const wStream = fs.createWriteStream('private/result.json', { flags: 'w+' });
     wStream.write(JSON.stringify(result, null, ' '), (err: unknown) => {
       if (err) {
@@ -230,6 +269,7 @@ describe('api doc', function () {
       }
       wStream.close();
     });
+    */
 
     //logger.silly(openapi.remove('/app', 'post'));
   });

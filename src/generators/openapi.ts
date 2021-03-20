@@ -2,16 +2,13 @@
 const Log = require('./_log').extend('openapi');
 const JoiUtils = require('./parameters/joiUtils');
 */
-
 /**
- * @todo: schema of type "object" in parameters (query, path, header, cookie) should be 
- *  analysed deeply (properties, sub-properties, ...) 
- * @todo: cleanupComponents -> cleanupSchemas, cleanupRequestBodies, cleanupResponses, cleanupParameters, cleanupHeaders,...
- *  to remove unused entities (#/components/...) 
  * @todo: type "alternative" (oneOf)
  * @todo: removeTags ?
  * @todo: remove useless methods
+ * @todo: change var, method names (eg: _fillBodyPropertySchema, ...)
  * @todo: robust code
+ * @todo: use openapi/defintions
  */
 
 /**
@@ -25,11 +22,23 @@ const JoiUtils = require('./parameters/joiUtils');
  *  - path @done
  *  - header @done
  *  - cookie @done
+ * todo: allow $ref #/components/schemas/... for object properties
+ * todo: cleanupComponents to remove unused entities (#/components/...) 
  */
 
 import { GeneratorHelperInterface } from '../utils/generatorHelper'
 import { JoiGeneratorHelper } from '../utils/joiGeneratorHelper';
 import { PropertySchema, PropertySchemaObject } from './openapi/propertySchema';
+import { 
+  SecuritySchemeObject, 
+  
+  /*ComponentsObject,
+  HeaderObject,
+  ParameterObject,
+  ResponseObject,
+  ReferenceObject*/
+} from './openapi/definitions';
+
 
 interface TagObject {
   name: string;
@@ -43,6 +52,7 @@ interface TagObject {
 interface OpenAPIResultExplicit {
   info: Record<string, unknown>;
   servers: unknown[];
+  //components: ComponentsObject;
   components: {
     schemas?: {
       [key: string]: PropertySchemaObject;
@@ -55,6 +65,19 @@ interface OpenAPIResultExplicit {
     },
     parameters?: {
       [key: string]: PropertySchemaObject;
+    },
+    responses?: {
+      [key: string]: PropertySchemaObject;
+    },
+    examples?: {
+      [key: string]: unknown;
+    },
+    securitySchemes?: Record<string, SecuritySchemeObject>,
+    links?: {
+      [key: string]: unknown;
+    },
+    callbacks?: {
+      [key: string]: unknown;
     },
     [key: string]: unknown;
   };
@@ -249,6 +272,118 @@ export class OpenApi {
     return this;
   }
 
+
+  removeCallback(name: string): unknown {
+    let r: unknown;
+    if (this.#result.components.callbacks) {
+      r = this.#result.components.callbacks[name];
+      delete this.#result.components.callbacks[name];
+    }
+    return r;
+  }
+
+  addCallback(name: string, schema: unknown): OpenApi {
+    if (!this.#result.components.callbacks) {
+      this.#result.components.callbacks = {}; 
+    }
+    this.#result.components.callbacks[name] = schema;
+    return this;
+  }
+
+  /**
+   * 
+   * @returns removed callbacks
+   */
+   cleanupCallbacks(): {[x: string]: unknown;} {
+    const r: {[x: string]: unknown;} = {};
+    const refs = JSON.stringify(this.#result).match(/#\/components\/callbacks\/[^/"]*/g);
+    if (this.#result.components.callbacks) {
+      Object.keys(this.#result.components.callbacks).forEach(name => {
+        if(!refs?.includes(`#/components/callbacks/${name}`)) {
+          if (this.#result.components?.callbacks?.[name]) {
+            r[name] = this.#result.components.callbacks[name];
+            delete this.#result.components.callbacks[name];
+          }
+        }
+      });
+    }
+    return r;
+  }
+
+  removeLink(name: string): unknown {
+    let r: unknown;
+    if (this.#result.components.links) {
+      r = this.#result.components.links[name];
+      delete this.#result.components.links[name];
+    }
+    return r;
+  }
+
+  addLink(name: string, schema: unknown): OpenApi {
+    if (!this.#result.components.links) {
+      this.#result.components.links = {}; 
+    }
+    this.#result.components.links[name] = schema;
+    return this;
+  }
+
+  /**
+   * 
+   * @returns removed links
+   */
+   cleanupLinks(): {[x: string]: unknown;} {
+    const r: {[x: string]: unknown;} = {};
+    const refs = JSON.stringify(this.#result).match(/#\/components\/links\/[^/"]*/g);
+    if (this.#result.components.links) {
+      Object.keys(this.#result.components.links).forEach(name => {
+        if(!refs?.includes(`#/components/links/${name}`)) {
+          if (this.#result.components?.links?.[name]) {
+            r[name] = this.#result.components.links[name];
+            delete this.#result.components.links[name];
+          }
+        }
+      });
+    }
+    return r;
+  }
+
+  removeExample(name: string): unknown {
+    let r: unknown;
+    if (this.#result.components.examples) {
+      r = this.#result.components.examples[name];
+      delete this.#result.components.examples[name];
+    }
+    return r;
+  }
+
+  addExample(name: string, schema: unknown): OpenApi {
+    if (!this.#result.components.examples) {
+      this.#result.components.examples = {}; 
+    }
+    this.#result.components.examples[name] = schema;
+    return this;
+  }
+
+  /**
+   * 
+   * @returns removed examples
+   */
+   cleanupExamples(): {[x: string]: unknown;} {
+    const r: {[x: string]: unknown;} = {};
+    const refs = JSON.stringify(this.#result).match(/#\/components\/examples\/[^/"]*/g);
+    if (this.#result.components.examples) {
+      Object.keys(this.#result.components.examples).forEach(name => {
+        if(!refs?.includes(`#/components/examples/${name}`)) {
+          if (this.#result.components?.examples?.[name]) {
+            r[name] = this.#result.components.examples[name];
+            delete this.#result.components.examples[name];
+          }
+        }
+      });
+    }
+    return r;
+  }
+
   removeSchema(name: string): PropertySchemaObject | undefined {
     let r: PropertySchemaObject | undefined;
     if (this.#result.components.schemas) {
@@ -266,6 +401,45 @@ export class OpenApi {
     return this;
   }
 
+  /**
+   * 
+   * @returns removed schemas
+   */
+  cleanupSchemas(): {[x: string]: PropertySchemaObject;} {
+    const r: {[x: string]: PropertySchemaObject;} = {};
+    const refs = JSON.stringify(this.#result).match(/#\/components\/schemas\/[^/"]*/g);
+    if (this.#result.components.schemas) {
+      Object.keys(this.#result.components.schemas).forEach(name => {
+        if(!refs?.includes(`#/components/schemas/${name}`)) {
+          if (this.#result.components?.schemas?.[name]) {
+            r[name] = this.#result.components.schemas[name];
+            delete this.#result.components.schemas[name];
+          }
+        }
+      });
+    }
+    return r;
+  }
+
+ /*
+  removeHeader(name: string): HeaderObject | ReferenceObject | undefined {
+    let r: HeaderObject | ReferenceObject | undefined;
+    if (this.#result.components.headers) {
+      r = this.#result.components.headers[name];
+      delete this.#result.components.headers[name];
+    }
+    return r;
+  }
+
+  addHeader(name: string, schema: HeaderObject | ReferenceObject): OpenApi {
+    if (!this.#result.components.headers) {
+      this.#result.components.headers = {}; 
+    }
+    this.#result.components.headers[name] = schema;
+    return this;
+  }
+  */
+ 
   removeHeader(name: string): PropertySchemaObject | undefined {
     let r: PropertySchemaObject | undefined;
     if (this.#result.components.headers) {
@@ -281,6 +455,22 @@ export class OpenApi {
     }
     this.#result.components.headers[name] = schema;
     return this;
+  }
+
+   cleanupHeaders(): {[x: string]: PropertySchemaObject;} {
+    const r: {[x: string]: PropertySchemaObject;} = {};
+    const refs = JSON.stringify(this.#result).match(/#\/components\/headers\/[^/"]*/g);
+    if (this.#result.components.headers) {
+      Object.keys(this.#result.components.headers).forEach(name => {
+        if(!refs?.includes(`#/components/headers/${name}`)) {
+          if (this.#result.components?.headers?.[name]) {
+            r[name] = this.#result.components.headers[name];
+            delete this.#result.components.headers[name];
+          }
+        }
+      });
+    }
+    return r;
   }
 
   removeParameter(name: string): PropertySchemaObject | undefined {
@@ -300,6 +490,26 @@ export class OpenApi {
     return this;
   }
 
+  /**
+   * 
+   * @returns removed parameters
+   */
+   cleanupParameters(): {[x: string]: PropertySchemaObject;} {
+    const r: {[x: string]: PropertySchemaObject;} = {};
+    const refs = JSON.stringify(this.#result).match(/#\/components\/parameters\/[^/"]*/g);
+    if (this.#result.components.parameters) {
+      Object.keys(this.#result.components.parameters).forEach(name => {
+        if(!refs?.includes(`#/components/parameters/${name}`)) {
+          if (this.#result.components?.parameters?.[name]) {
+            r[name] = this.#result.components.parameters[name];
+            delete this.#result.components.parameters[name];
+          }
+        }
+      });
+    }
+    return r;
+  }
+
   removeRequestBody(name: string): PropertySchemaObject | undefined {
     let r: PropertySchemaObject | undefined;
     if (this.#result.components.requestBodies) {
@@ -317,6 +527,100 @@ export class OpenApi {
     return this;
   }
 
+  /**
+   * 
+   * @returns removed requestBodies
+   */
+   cleanupRequestBodies(): {[x: string]: PropertySchemaObject;} {
+    const r: {[x: string]: PropertySchemaObject;} = {};
+    const refs = JSON.stringify(this.#result).match(/#\/components\/requestBodies\/[^/"]*/g);
+    if (this.#result.components.requestBodies) {
+      Object.keys(this.#result.components.requestBodies).forEach(name => {
+        if(!refs?.includes(`#/components/requestBodies/${name}`)) {
+          if (this.#result.components?.requestBodies?.[name]) {
+            r[name] = this.#result.components.requestBodies[name];
+            delete this.#result.components.requestBodies[name];
+          }
+        }
+      });
+    }
+    return r;
+  }
+
+  removeResponse(name: string): PropertySchemaObject | undefined {
+    let r: PropertySchemaObject | undefined;
+    if (this.#result.components.responses) {
+      r = this.#result.components.responses[name];
+      delete this.#result.components.responses[name];
+    }
+    return r;
+  }
+
+  addResponse(name: string, schema: PropertySchemaObject): OpenApi {
+    if (!this.#result.components.responses) {
+      this.#result.components.responses = {}; 
+    }
+    this.#result.components.responses[name] = schema;
+    return this;
+  }
+
+  /**
+   * 
+   * @returns removed responses
+   */
+   cleanupResponses(): {[x: string]: PropertySchemaObject;} {
+    const r: {[x: string]: PropertySchemaObject;} = {};
+    const refs = JSON.stringify(this.#result).match(/#\/components\/responses\/[^/"]*/g);
+    if (this.#result.components.responses) {
+      Object.keys(this.#result.components.responses).forEach(name => {
+        if(!refs?.includes(`#/components/responses/${name}`)) {
+          if (this.#result.components?.responses?.[name]) {
+            r[name] = this.#result.components.responses[name];
+            delete this.#result.components.responses[name];
+          }
+        }
+      });
+    }
+    return r;
+  }
+
+  /**
+   * remove unused entities (possibly auto-generated) from components:
+   * - headers
+   * - responses
+   * - requestBodies
+   * - parameters
+   * - schemas
+   */
+  cleanupComponents(): {
+    [x: string]: {[x: string]: PropertySchemaObject;}
+  } {
+    const r: {
+      [x: string]: {[x: string]: PropertySchemaObject;}
+    } = {};
+    const headers = this.cleanupHeaders();
+    const responses = this.cleanupResponses();
+    const requestBodies = this.cleanupRequestBodies();
+    const parameters = this.cleanupParameters();
+    const schemas = this.cleanupSchemas();
+    if (Object.keys(headers).length) {
+      r.header = headers;
+    }
+    if (Object.keys(responses).length) {
+      r.responses = responses;
+    }
+    if (Object.keys(requestBodies).length) {
+      r.requestBodies = requestBodies;
+    }
+    if (Object.keys(parameters).length) {
+      r.parameters = parameters;
+    }
+    if (Object.keys(schemas).length) {
+      r.schemas = schemas;
+    }
+    return r;
+  }
+
   setComponent(k: string, v: unknown): OpenApi {
     this.#result.components[k] = v;
     return this;
@@ -331,13 +635,50 @@ export class OpenApi {
     return this.setComponents(v);
   }
 
-  setSecuritySchemes(v: unknown): OpenApi {
+  setSecuritySchemes(v: Record<string, SecuritySchemeObject>): OpenApi {
     this.#result.components.securitySchemes = v;
     return this;
   }
 
-  setSecurityDefinitions(v: unknown): OpenApi {
+  setSecurityDefinitions(v: Record<string, SecuritySchemeObject>): OpenApi {
     return this.setSecuritySchemes(v);
+  }
+
+  removeSecurityScheme(name: string): unknown {
+    let r: unknown;
+    if (this.#result.components.securitySchemes) {
+      r = this.#result.components.securitySchemes[name];
+      delete this.#result.components.securitySchemes[name];
+    }
+    return r;
+  }
+
+  addSecurityScheme(name: string, schema: SecuritySchemeObject): OpenApi {
+    if (!this.#result.components.securitySchemes) {
+      this.#result.components.securitySchemes = {}; 
+    }
+    this.#result.components.securitySchemes[name] = schema;
+    return this;
+  }
+
+  /**
+   * 
+   * @returns removed securitySchemes
+   */
+   cleanupSecuritySchemes(): {[x: string]: unknown;} {
+    const r: {[x: string]: unknown;} = {};
+    const refs = JSON.stringify(this.#result).match(/#\/components\/securitySchemes\/[^/"]*/g);
+    if (this.#result.components.securitySchemes) {
+      Object.keys(this.#result.components.securitySchemes).forEach(name => {
+        if(!refs?.includes(`#/components/securitySchemes/${name}`)) {
+          if (this.#result.components?.securitySchemes?.[name]) {
+            r[name] = this.#result.components.securitySchemes[name];
+            delete this.#result.components.securitySchemes[name];
+          }
+        }
+      });
+    }
+    return r;
   }
   
   setDefaultSecurity(v: Record<string, unknown>): OpenApi;
@@ -791,16 +1132,6 @@ export class OpenApi {
       }
     }
   }
-
-  /*
-  private _fillParamsPropertySchema(
-    name: string, 
-    helper: GeneratorHelperInterface, 
-    propSchema: PropertySchema
-  ) {
-
-  }
-  */
   
   private _createPropertySchema(
     key: string, 
@@ -857,18 +1188,19 @@ export class OpenApi {
 
     // object items
     if (prop.getSchemaProp('type') === 'object') {
-      // @todo: deep cover object
-      // @todo: get children and execute function to get schema
       // check if it has defined keys
-      /*
       const children = helper.getChildren();
       if (Object.keys(children).length) {
-        prop.setProperties({});
+        const propSchema = new PropertySchema({
+          type: 'object',
+          required: [],
+          properties: {},
+        }).setRequiredToArray();
         Object.keys(children).forEach((k) => {
-          this._fillBodyPropertySchema(k, children[k], prop);
+          this._fillBodyPropertySchema(k, children[k], propSchema);
         });
+        prop.setSchema(propSchema.toObject());
       }
-      */
 
       // additional properties ?
       if(helper.getAdditionalProperties
@@ -891,7 +1223,6 @@ export class OpenApi {
       prop.setSchemaProp('maximum', helper.getMax());
     }
 
-    // @todo: should be checked before most of the things above
     if(helper.getRef && helper.hasRef && helper.hasRef()) {
       const ref = helper.getRef();
       if (ref && typeof ref === 'string') {
@@ -900,6 +1231,7 @@ export class OpenApi {
           const refName: string = ref.substring(innerSchemaPrefix.length);
           const propSchema = prop.toObject().schema;
           if (refName && propSchema) {
+            propSchema.description = prop.getDescription();
             this.addSchema(refName, propSchema)
             prop.setSchema({
               $ref: ref
@@ -974,6 +1306,11 @@ export class OpenApi {
           let children: Record<string, GeneratorHelperInterface>;
           if(valueHelper.isValid()) {
             children = valueHelper.getChildren();
+
+            // description
+            if (valueHelper.getDescription()) {
+              prop.setDescription(valueHelper.getDescription());
+            }
 
             // check ref
             if (valueHelper.getRef && valueHelper.hasRef && valueHelper.hasRef()) {
@@ -1129,11 +1466,32 @@ export class OpenApi {
       }
     }
 
+
+    let schemaObject = prop.toObject();
+
+    // reference object ?
+    if(helper.getRef && helper.hasRef && helper.hasRef()) {
+      const ref = helper.getRef();
+      if (ref && typeof ref === 'string') {
+        const innerSchemaPrefix = '#/components/schemas/';
+        if (ref.startsWith(innerSchemaPrefix)) {
+          const refName: string = ref.substring(innerSchemaPrefix.length);
+          const newSchema = prop.toObject();
+          if (refName && newSchema) {
+            this.addSchema(refName, newSchema)
+            schemaObject = {
+              $ref: ref
+            };
+          }
+        }
+      }
+    }
+
     // store "prop" into "propSchema"
     if (propSchema.isType('object') && propSchema.hasProperties()) {
-      propSchema.setProperty(name, prop.toObject());
+      propSchema.setProperty(name, schemaObject);
     } else {
-      propSchema.set(name, prop.toObject());
+      propSchema.set(name, schemaObject);
     }
   }
 
@@ -1179,10 +1537,10 @@ export class OpenApi {
       }
     }
 
-    // default
+    // example
     if (helper.hasExampleValue()) {
       if (forBody) {
-        prop.setDefault(
+        prop.setExample(
           helper.getExampleValue()
         );
       } else {

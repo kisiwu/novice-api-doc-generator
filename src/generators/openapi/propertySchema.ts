@@ -158,6 +158,10 @@ export class PropertySchema {
     return this;
   }
 
+  getDescription(): string | undefined {
+    return this.#param.description;
+  }
+
   setAllowEmptyValue(value: boolean): PropertySchema {
     this.#param.allowEmptyValue = value;
     return this;
@@ -165,6 +169,11 @@ export class PropertySchema {
 
   setDefault(value: unknown): PropertySchema {
     this.#param.default = value;
+    return this;
+  }
+
+  setExample(value: unknown): PropertySchema {
+    this.#param.example = value;
     return this;
   }
 
