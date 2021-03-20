@@ -1,14 +1,11 @@
 /*
 const Log = require('./_log').extend('openapi');
-const JoiUtils = require('./parameters/joiUtils');
 */
 /**
  * @todo: type "alternative" (oneOf)
- * @todo: removeTags ?
  * @todo: remove useless methods
  * @todo: change var, method names (eg: _fillBodyPropertySchema, ...)
- * @todo: robust code
- * @todo: use openapi/defintions
+ * @todo: use openapi/defintions + robust code
  */
 
 /**
@@ -777,6 +774,9 @@ export class OpenApi {
       }
     });
     return this;
+  }
+  addTag(tag: TagObject): OpenApi {
+    return this.addTags(tag);
   }
 
   /**
