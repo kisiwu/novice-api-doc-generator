@@ -22,6 +22,7 @@ export interface GeneratorHelperInterface extends ElementHelper {
   hasRule(name: string): boolean; //@todo: make more specific method (e.g.: shouldBeUnique, should...)
   getRule(name: string): unknown; // should it still be used?
   getChildren(): Record<string, GeneratorHelperInterface>;
+  getAlternatives(): GeneratorHelperInterface[];
 
   /**
    * methods for openapi
@@ -124,5 +125,9 @@ export class GeneratorHelper implements GeneratorHelperInterface {
 
   getChildren(): Record<string, GeneratorHelperInterface> {
     return {};
+  }
+
+  getAlternatives(): GeneratorHelperInterface[] {
+    return [];
   }
 }

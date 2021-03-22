@@ -24,6 +24,8 @@ describe('api doc', function () {
 
     openapi.responsesProperty = 'openapi';
 
+    //openapi.addExample('Versions', {value: [8, 9]})
+
     /*
     // add components/schema
     openapi.addSchema('Coule', {
@@ -178,7 +180,8 @@ describe('api doc', function () {
             },
             deprecated: true,
             style: 'form'
-          }).example({$ref: '#/components/examples/Versions'})
+          }).example([8,9])
+          //.example({$ref: '#/components/examples/Versions'})
           .max(2)
           .description('version numbers')
           .single()
@@ -247,13 +250,25 @@ describe('api doc', function () {
       }
     }, function (req: { meta: unknown }, res: { json(arg: unknown): void }) {
       res.json(req.meta)
+    })
+    .post({
+      name: 'Test xml',
+      description: 'testing purpose... again',
+      tags: ['Test'],
+      parameters: {
+        body: Joi.string().required(),
+        consumes: 'application/xml',
+      },
+      path: '/app/xml',
+    }, function (req: { meta: unknown }, res: { json(arg: unknown): void }) {
+      res.json(req.meta)
     });
 
     // add router
     openapi.add(router.getMeta());
 
     // remove unused definitions
-    //logger.log(openapi.cleanupComponents());
+    logger.log(openapi.cleanupComponents());
 
     // generate result
     const result = openapi.result();

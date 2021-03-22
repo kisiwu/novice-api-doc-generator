@@ -388,4 +388,18 @@ export class JoiGeneratorHelper implements GeneratorHelperInterface {
     }
     return r;
   }
+
+  getAlternatives(): GeneratorHelperInterface[] {
+    const r: GeneratorHelperInterface[] = [];
+    if (!this.isJoi()) {
+      return r;
+    }
+    if (this._joi.$_terms
+      && this._joi.$_terms.matches && this._joi.$_terms.matches.length) {
+      this._joi.$_terms.matches.forEach(
+        (c: JoiSchema) => r.push(new JoiGeneratorHelper(c))
+      );
+    }
+    return r;
+  }
 }

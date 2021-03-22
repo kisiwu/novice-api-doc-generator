@@ -16,6 +16,7 @@ interface PropertySchemaObjectExplicit {
   format?: string;
   uniqueItems?: boolean;
   style?: unknown;
+  oneOf?: unknown[];
 }
 
 export interface PropertySchemaObject extends PropertySchemaObjectExplicit {
@@ -29,9 +30,21 @@ export class PropertySchema {
   #min?: number;
   #max?: number;
 
+  #oneOf: PropertySchemaObject[];
+
   constructor(defaultValue: PropertySchemaObject = {}) {
     this.#param = defaultValue;
     this.#requiredAs = 'boolean';
+    this.#oneOf = [];
+  }
+
+  addOneOf(schema: PropertySchemaObject): PropertySchema {
+    this.#oneOf.push(schema);
+    return this;
+  }
+
+  getOneOf(): PropertySchemaObject[] {
+    return this.#oneOf;
   }
 
   setRequiredToArray(): PropertySchema {
@@ -210,6 +223,11 @@ export class PropertySchema {
 
   setUniqueItems(value: boolean | undefined): PropertySchema {
     this.#param.uniqueItems = value;
+    return this;
+  }
+
+  setAdditionalProperties(value: unknown): PropertySchema {
+    this.#param.additionalProperties = value;
     return this;
   }
 
