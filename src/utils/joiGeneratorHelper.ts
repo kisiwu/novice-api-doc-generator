@@ -47,6 +47,8 @@ const VALID_TYPES: string[] = [
   'float',
   'double',
   'integer',
+  'int32',
+  'int64',
   'date',
   'date-time',
   'datetime',
@@ -262,6 +264,69 @@ export class JoiGeneratorHelper implements GeneratorHelperInterface {
       && this._joi['$_terms'].metas[0].ref;
   }
 
+  hasDiscriminator(): boolean {
+    if (!this.isJoi()) {
+      return false;
+    }
+    return this._joi['$_terms']
+      && this._joi['$_terms'].metas
+      && this._joi['$_terms'].metas[0]
+      && this._joi['$_terms'].metas[0].discriminator
+      && typeof this._joi['$_terms'].metas[0].discriminator === 'object' ? true : false;
+  }
+
+  getDiscriminator(): unknown {
+    if (!this.isJoi()) {
+      return;
+    }
+    return this._joi['$_terms']
+      && this._joi['$_terms'].metas
+      && this._joi['$_terms'].metas[0]
+      && this._joi['$_terms'].metas[0].discriminator;
+  }
+
+  hasXml(): boolean {
+    if (!this.isJoi()) {
+      return false;
+    }
+    return this._joi['$_terms']
+      && this._joi['$_terms'].metas
+      && this._joi['$_terms'].metas[0]
+      && this._joi['$_terms'].metas[0].xml
+      && typeof this._joi['$_terms'].metas[0].xml === 'object' ? true : false;
+  }
+
+  getXml(): unknown {
+    if (!this.isJoi()) {
+      return;
+    }
+    return this._joi['$_terms']
+      && this._joi['$_terms'].metas
+      && this._joi['$_terms'].metas[0]
+      && this._joi['$_terms'].metas[0].xml;
+  }
+
+  hasExamples(): boolean {
+    if (!this.isJoi()) {
+      return false;
+    }
+    return this._joi['$_terms']
+      && this._joi['$_terms'].metas
+      && this._joi['$_terms'].metas[0]
+      && this._joi['$_terms'].metas[0].examples
+      && typeof this._joi['$_terms'].metas[0].examples === 'object' ? true : false;
+  }
+
+  getExamples(): unknown {
+    if (!this.isJoi()) {
+      return;
+    }
+    return this._joi['$_terms']
+      && this._joi['$_terms'].metas
+      && this._joi['$_terms'].metas[0]
+      && this._joi['$_terms'].metas[0].examples;
+  }
+
   allowsEmptyValue(): boolean {
     let r = false;
     if (!this.isJoi()) {
@@ -397,7 +462,11 @@ export class JoiGeneratorHelper implements GeneratorHelperInterface {
     if (this._joi.$_terms
       && this._joi.$_terms.matches && this._joi.$_terms.matches.length) {
       this._joi.$_terms.matches.forEach(
-        (c: JoiSchema) => r.push(new JoiGeneratorHelper(c))
+        (c: {schema?: JoiSchema;}) => {
+          if(c.schema) {
+            r.push(new JoiGeneratorHelper(c.schema))
+          }
+        }
       );
     }
     return r;

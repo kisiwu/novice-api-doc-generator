@@ -1,4 +1,4 @@
-//import fs from 'fs';
+// import fs from 'fs';
 import routing from '@novice1/routing';
 import { OpenApi } from '../src';
 import Joi from 'joi';
@@ -25,6 +25,13 @@ describe('api doc', function () {
     openapi.responsesProperty = 'openapi';
 
     //openapi.addExample('Versions', {value: [8, 9]})
+    openapi.addExample('simple-lang-example',{
+      summary: 'lang example',
+      value: 'fr'
+    }).addExample('lang-country-example', {
+      summary: 'lang country example',
+      value: 'fr_BE'
+    });
 
     /*
     // add components/schema
@@ -252,11 +259,88 @@ describe('api doc', function () {
       res.json(req.meta)
     })
     .post({
+      name: 'Test alternatives',
+      description: 'testing purpose... again',
+      tags: ['Test'],
+      parameters: {
+        query: Joi.object({
+          lang: Joi.string().example('en').meta({
+            examples: {
+              'simple-lang': {
+                $ref: '#/components/examples/simple-lang-example'
+              },
+              'lang-country': {
+                $ref: '#/components/examples/lang-country-example'
+              }
+            }
+          })
+        }),
+        body: Joi.alternatives().try(
+          Joi.object().keys({
+            type: Joi.string()//.valid('sheep').required()
+            .description('type of animal'),
+            size: Joi.number().positive().unit('cm')
+          }).description('Sheep')
+          .meta({
+            ref: '#/components/schemas/Sheep'
+          }),
+          Joi.object().keys({
+            type: Joi.string()//.valid('dog').required()
+            .description('type of animal'),
+            size: Joi.number().positive().unit('cm')
+          }).description('Dog')
+          .meta({
+            ref: '#/components/schemas/Dog'
+          })
+        ).required()
+        .description('Animal')
+        .meta({
+          ref: '#/components/schemas/Wanimal',
+          discriminator: {
+            propertyName: 'type',
+            mapping: {
+              dog: '#/components/schemas/Dog',
+              sheep: '#/components/schemas/Sheep'
+            }
+          }
+        }),
+        consumes: 'application/json',
+      },
+      path: '/app/alternatives',
+    }, function (req: { meta: unknown }, res: { json(arg: unknown): void }) {
+      res.json(req.meta)
+    })
+    .post({
       name: 'Test xml',
       description: 'testing purpose... again',
       tags: ['Test'],
       parameters: {
-        body: Joi.string().required(),
+        body: Joi.object()
+          .keys({
+            id: Joi.number()
+            .meta({
+              format: 'int32',
+              xml: {
+                attribute: true
+              }
+            }),
+            name: Joi.string()
+            .meta({
+              xml: {
+                namespace: 'http://example.com/schema/sample',
+                prefix: 'sample'
+              }
+            }),
+            animals: Joi.array()
+              .items(Joi.string().meta({
+                xml: {
+                  name: 'animal'
+                }
+              }))
+          }).required()
+          .meta({
+            ref: '#/components/schemas/Person'
+          }),
         consumes: 'application/xml',
       },
       path: '/app/xml',

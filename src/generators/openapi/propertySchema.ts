@@ -1,5 +1,4 @@
-
-interface PropertySchemaObjectExplicit {
+export interface PropertySchemaObject {
   required?: boolean | string[];
   schema?: Record<string, unknown>;
   properties?: Record<string, unknown>;
@@ -17,9 +16,10 @@ interface PropertySchemaObjectExplicit {
   uniqueItems?: boolean;
   style?: unknown;
   oneOf?: unknown[];
-}
-
-export interface PropertySchemaObject extends PropertySchemaObjectExplicit {
+  discriminator?: unknown;
+  xml?: unknown;
+  example?: unknown;
+  examples?: unknown;
   [key: string]: unknown;
 }
 
@@ -161,6 +161,16 @@ export class PropertySchema {
     return this;
   }
 
+  setDiscriminator(value: unknown): PropertySchema {
+    this.#param.discriminator = value;
+    return this;
+  }
+
+  setXml(value: unknown): PropertySchema {
+    this.#param.xml = value;
+    return this;
+  }
+
   setType(value: string): PropertySchema {
     this.#param.type = value;
     return this;
@@ -187,6 +197,11 @@ export class PropertySchema {
 
   setExample(value: unknown): PropertySchema {
     this.#param.example = value;
+    return this;
+  }
+
+  setExamples(value: unknown): PropertySchema {
+    this.#param.examples = value;
     return this;
   }
 
