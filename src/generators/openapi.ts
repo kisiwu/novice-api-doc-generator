@@ -43,18 +43,12 @@ import {
   ReferenceObject,
   RequestBodyObject,
   TagObject,
-  
-  /*ComponentsObject,
-  ExampleObject,
-  HeaderObject,
-  ParameterObject,*/
 } from './openapi/definitions';
 
 
 interface OpenAPIResult {
   info: Record<string, unknown>;
   servers: unknown[];
-  //components: ComponentsObject;
   components: {
     schemas?: {
       [key: string]: PropertySchemaObject;

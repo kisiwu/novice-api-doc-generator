@@ -1,3 +1,5 @@
+/*
+//@todo
 import { GeneratorHelperInterface } from '../../../utils/generatorHelper';
 import {
   ExampleObject,
@@ -5,9 +7,6 @@ import {
 } from '../definitions';
 
 export interface OpenApiGeneratorHelperInterface extends GeneratorHelperInterface {
-  /**
-   * methods for openapi
-   */
   hasStyle?(): boolean;
   getStyle?(): unknown;
   hasAdditionalProperties?(): boolean;
@@ -21,3 +20,4 @@ export interface OpenApiGeneratorHelperInterface extends GeneratorHelperInterfac
   hasExamples?(): boolean;
   getExamples?(): Record<string, ExampleObject | ReferenceObject> | undefined;
 }
+*/
