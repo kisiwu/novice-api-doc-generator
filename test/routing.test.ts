@@ -1,4 +1,4 @@
-// import fs from 'fs';
+//import fs from 'fs';
 import routing from '@novice1/routing';
 import { OpenApi } from '../src';
 import { GenerateComponentsRules } from '../src/generators/openapi';
@@ -357,7 +357,20 @@ describe('api doc', function () {
               }))
           }).required()
           .meta({
-            ref: '#/components/schemas/Person'
+            ref: '#/components/schemas/Person',
+            encoding: {
+              profileImage: {
+                contentType: 'application/xml',
+                headers: {
+                  'X-Rate-Limit-Limit': {
+                    description: 'The number of allowed requests in the current period',
+                    schema: {
+                      type: 'integer'
+                    }
+                  }
+                }
+              }
+            }
           }),
         consumes: 'application/xml',
       },

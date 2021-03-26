@@ -38,7 +38,9 @@ export interface GeneratorHelperInterface extends ElementHelper {
   hasXml?(): boolean;
   getXml?(): unknown;
   hasExamples?(): boolean;
-  getExamples?(): unknown;
+  getExamples?(): Record<string, Record<string, unknown>> | undefined;
+  hasEncoding?(): boolean;
+  getEncoding?(): Record<string, Record<string, unknown>> | undefined;
 }
 
 export class GeneratorHelper implements GeneratorHelperInterface {

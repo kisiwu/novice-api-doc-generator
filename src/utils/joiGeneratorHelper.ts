@@ -317,7 +317,7 @@ export class JoiGeneratorHelper implements GeneratorHelperInterface {
       && typeof this._joi['$_terms'].metas[0].examples === 'object' ? true : false;
   }
 
-  getExamples(): unknown {
+  getExamples(): Record<string, Record<string, unknown>> | undefined {
     if (!this.isJoi()) {
       return;
     }
@@ -325,6 +325,27 @@ export class JoiGeneratorHelper implements GeneratorHelperInterface {
       && this._joi['$_terms'].metas
       && this._joi['$_terms'].metas[0]
       && this._joi['$_terms'].metas[0].examples;
+  }
+
+  hasEncoding(): boolean {
+    if (!this.isJoi()) {
+      return false;
+    }
+    return this._joi['$_terms']
+      && this._joi['$_terms'].metas
+      && this._joi['$_terms'].metas[0]
+      && this._joi['$_terms'].metas[0].encoding
+      && typeof this._joi['$_terms'].metas[0].encoding === 'object' ? true : false;
+  }
+
+  getEncoding(): Record<string, Record<string, unknown>> | undefined {
+    if (!this.isJoi()) {
+      return;
+    }
+    return this._joi['$_terms']
+      && this._joi['$_terms'].metas
+      && this._joi['$_terms'].metas[0]
+      && this._joi['$_terms'].metas[0].encoding;
   }
 
   allowsEmptyValue(): boolean {

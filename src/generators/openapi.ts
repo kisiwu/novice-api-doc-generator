@@ -1105,23 +1105,6 @@ export class OpenApi {
 
       // ReferenceObject | ParameterObject
       parameterObject = this._autoParameterObjectToRef(helper, parameterObject);
-      /*
-      if(helper.getRef && helper.hasRef && helper.hasRef()) {
-        const ref = helper.getRef();
-        if (ref && typeof ref === 'string') {
-          const innerSchemaPrefix = '#/components/parameters/'; 
-          if (ref.startsWith(innerSchemaPrefix)) {
-            const refName: string = ref.substring(innerSchemaPrefix.length);
-            if (refName) {
-              this.addParameter(refName, parameterObject);
-              parameterObject = {
-                $ref: ref
-              };
-            }
-          }
-        }
-      }
-      */
 
       res.push(parameterObject);
     };
@@ -1188,76 +1171,6 @@ export class OpenApi {
         parameterObject.setStyle('deepObject');
       }
     }
-    /*
-    const propSchema = new PropertySchema(formatType(helper.getType()));
-
-    let description = '';
-
-    // description
-    if (helper.getDescription()) {
-      description = helper.getDescription();
-    }
-  
-    // unit
-    if (helper.getUnit()) {
-      if (description) {
-        description += ` (${helper.getUnit()})`
-      } else {
-        description = `(${helper.getUnit()})`
-      }
-    }
-
-    if (description) {
-      parameterObject.setDescription(
-        description
-      );
-      propSchema.setDescription(description);
-    }
-    
-  
-    // default
-    if (helper.hasDefaultValue()) {
-      propSchema.setDefault(helper.getDefaultValue());
-    }
-
-    // example
-    if (helper.hasExampleValue()) {
-      propSchema.setExample(helper.getExampleValue());
-    }
-  
-    // enum
-    if (helper.getEnum().length) {
-      propSchema.setEnum(helper.getEnum());
-    }
-
-    // min, max, ...
-    if (helper.hasMin()) {
-      propSchema.setMin(helper.getMin());
-    }
-    if (helper.hasMax()) {
-      propSchema.setMax(helper.getMax());
-    }
-
-    // array items
-    if (propSchema.isType('array')) {
-      if (location === 'query') {
-        // allowing multiple values by repeating the query parameter
-        parameterObject.setExplode(true);
-      }
-      this._fillArraySchemaObject(helper, propSchema);
-    }
-
-    // object items
-    if (propSchema.isType('object')) {
-      propSchema.setRequiredToArray();
-      this._fillObjectSchemaObject(helper, propSchema);
-
-      // style ?
-      if(!parameterObject.hasStyle()) {
-        parameterObject.setStyle('deepObject');
-      }
-    }
-    */
 
     // examples
     if(helper?.hasExamples?.()
@@ -1313,26 +1226,6 @@ export class OpenApi {
         }
         // ReferenceObject | RequestBodyObject
         res = this._autoRequestBodyObjectToRef(bodyHelper, res);
-        /*
-        if(bodyHelper.getRef && bodyHelper.hasRef && bodyHelper.hasRef()) {
-          const ref = bodyHelper.getRef();
-          if (ref && typeof ref === 'string') {
-            const innerSchemaPrefix = '#/components/requestBodies/';
-            if (ref.startsWith(innerSchemaPrefix)) {
-              const refName: string = ref.substring(innerSchemaPrefix.length);
-              if (refName) {
-                if (bodyHelper.getDescription()) {
-                  res.description = bodyHelper.getDescription();
-                }
-                this.addRequestBody(refName, res);
-                res = {
-                  $ref: ref
-                };
-              }
-            }
-          }
-        }
-        */
       }
     }
   
@@ -1352,6 +1245,9 @@ export class OpenApi {
 
     let helperWithRef: GeneratorHelperInterface | undefined;
 
+    let examples: Record<string, Record<string, unknown>> | undefined;
+    let encoding: Record<string, Record<string, unknown>> | undefined;
+
     if (body) {
       const bodyHelper = body instanceof this.#helperClass ? body : new this.#helperClass(body);
       if(bodyHelper.isValid()) {
@@ -1359,7 +1255,16 @@ export class OpenApi {
         if(this._getLocalRef(bodyHelper)){
           helperWithRef = bodyHelper;
         }
-        schemaObject = bodySchema.toObject();//this._createSchemaObject(bodyHelper)
+        if (bodyHelper?.hasExamples?.()
+          && bodyHelper.getExamples) {
+            examples = bodyHelper.getExamples();
+          }
+        if (bodyHelper?.hasEncoding?.()
+          && bodyHelper.getEncoding) {
+            encoding = bodyHelper.getEncoding();
+          }
+
+        schemaObject = bodySchema.toObject();
       } else if(!(body instanceof this.#helperClass)) {
         bodySchema = new PropertySchema({
           type: 'object',
@@ -1459,16 +1364,13 @@ export class OpenApi {
     if(schemaObject) {
       content.schema = schemaObject;
     }
-    /*
-    @todo set examples
+
     if (examples) {
       content.examples = examples;
     }
-    @todo set encoding
     if (encoding) {
       content.encoding = encoding;
     }
-    */
 
     consumes.forEach((mime: string) => {
       if (res.content) {
