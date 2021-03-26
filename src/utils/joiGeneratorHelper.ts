@@ -68,14 +68,14 @@ export class JoiGeneratorHelper implements GeneratorHelperInterface {
     this._joi = joiObject && typeof joiObject === 'object' ? joiObject : {};
   }
 
-  private isJoi(): boolean {
+  protected isJoi(): boolean {
     return (this._joi
       && typeof this._joi.type === 'string'
       && this._joi.$_terms
       && this._joi.$) ? true : false;
   }
 
-  private hasMeta(v: string): boolean {
+  protected hasMeta(v: string): boolean {
     if (!this.isJoi()) {
       return false;
     }
@@ -85,7 +85,7 @@ export class JoiGeneratorHelper implements GeneratorHelperInterface {
       && this._joi['$_terms'].metas[0][v] ? true : false;
   }
 
-  private getMeta(v: string): unknown {
+  protected getMeta(v: string): unknown {
     if (!this.hasMeta(v)) {
       return;
     }

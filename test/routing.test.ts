@@ -1,6 +1,7 @@
 // import fs from 'fs';
 import routing from '@novice1/routing';
 import { OpenApi } from '../src';
+import { GenerateComponentsRules } from '../src/generators/openapi';
 import Joi from 'joi';
 
 describe('api doc', function () {
@@ -20,9 +21,26 @@ describe('api doc', function () {
           description: 'Testing purpose',
           externalDocs: { description: 'Find more info here', url: 'https://swagger.io/specification/' }
         }
-      ]);
+      ]).setGenerateComponentsRule(GenerateComponentsRules.undefined);
 
     openapi.responsesProperty = 'openapi';
+
+    openapi.addRequestBody('AppBody', {
+       required: true,
+       content: {
+        'multipart/form-data': {
+         schema: {
+          $ref: '#/components/schemas/Mikamika'
+         }
+        },
+        'application/json': {
+         schema: {
+          $ref: '#/components/schemas/Mikamika'
+         }
+        }
+       },
+       description: 'MY GEEEEEEEEEEEEEE'
+      });
 
     //openapi.addExample('Versions', {value: [8, 9]})
     openapi.addExample('simple-lang-example',{

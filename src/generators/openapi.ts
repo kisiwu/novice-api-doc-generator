@@ -9,8 +9,6 @@ const Log = require('./_log').extend('openapi');
  */
 
 /**
- * @todo: handle examples for Media Type Object (meta.examples)
- * @todo: handle encoding for Media Type Object (meta.encoding)
  * @todo: remove useless methods
  * @todo: change var, method names ...
  * @todo: use openapi/defintions + robust code
@@ -32,6 +30,7 @@ const Log = require('./_log').extend('openapi');
  * todo: requestBody is not necesserly an object
  * todo: type "alternative" (oneOf)
  * todo alternative discriminator (meta.discriminator)
+ * todo: (de)activate auto generation of component
  */
 
 import { GeneratorHelperInterface } from '../utils/generatorHelper'
@@ -46,6 +45,7 @@ import {
   TagObject,
   
   /*ComponentsObject,
+  ExampleObject,
   HeaderObject,
   ParameterObject,*/
 } from './openapi/definitions';
@@ -208,6 +208,12 @@ function formatType(type: string): {type: string, format?: string} {
   return t;
 }
 
+export enum GenerateComponentsRules {
+  always = 'always',
+  undefined = 'undefined',
+  never = 'never',
+}
+
 export class OpenApi {
   #consumes: string[];
   #result: OpenAPIResult;
@@ -215,6 +221,7 @@ export class OpenApi {
   #helperClass: { new(args: unknown): GeneratorHelperInterface };
 
   responsesProperty?: string;
+  #generateComponentsRule = GenerateComponentsRules.always;
 
   // useless
   _produces?: unknown[]; 
@@ -237,6 +244,18 @@ export class OpenApi {
       tags: []
     };
     this.#security = [];
+  }
+
+  setGenerateComponentsRule(v: GenerateComponentsRules): OpenApi {
+    const value: GenerateComponentsRules = GenerateComponentsRules[v];
+    if (value) {
+      this.#generateComponentsRule = value;
+    }
+    return this;
+  }
+
+  getGenerateComponentsRule(): GenerateComponentsRules {
+    return this.#generateComponentsRule;
   }
 
   setConsumes(v: string[]): OpenApi {
@@ -370,6 +389,14 @@ export class OpenApi {
     return r;
   }
 
+  hasSchema(name: string): boolean {
+    let r = false;
+    if (this.#result.components?.schemas?.[name]) {
+      r = true;
+    }
+    return r;
+  }
+
   addSchema(name: string, schema: PropertySchemaObject): OpenApi {
     if (!this.#result.components.schemas) {
       this.#result.components.schemas = {}; 
@@ -459,6 +486,14 @@ export class OpenApi {
     return r;
   }
 
+  hasParameter(name: string): boolean {
+    let r = false;
+    if (this.#result.components?.parameters?.[name]) {
+      r = true;
+    }
+    return r;
+  }
+
   addParameter(name: string, schema: PropertySchemaObject): OpenApi {
     if (!this.#result.components.parameters) {
       this.#result.components.parameters = {}; 
@@ -492,6 +527,14 @@ export class OpenApi {
     if (this.#result.components.requestBodies) {
       r = this.#result.components.requestBodies[name];
       delete this.#result.components.requestBodies[name];
+    }
+    return r;
+  }
+
+  hasRequestBody(name: string): boolean {
+    let r = false;
+    if (this.#result.components?.requestBodies?.[name]) {
+      r = true;
     }
     return r;
   }
@@ -1060,6 +1103,9 @@ export class OpenApi {
 
       let parameterObject = this._createParameterObject(key, helper, defaultSchemaObject);
 
+      // ReferenceObject | ParameterObject
+      parameterObject = this._autoParameterObjectToRef(helper, parameterObject);
+      /*
       if(helper.getRef && helper.hasRef && helper.hasRef()) {
         const ref = helper.getRef();
         if (ref && typeof ref === 'string') {
@@ -1075,6 +1121,7 @@ export class OpenApi {
           }
         }
       }
+      */
 
       res.push(parameterObject);
     };
@@ -1118,6 +1165,30 @@ export class OpenApi {
       .setRequired(helper.isRequired())
       .setSchema(formatType(helper.getType()));
 
+    
+    const propSchema = this._createBasicSchema(helper);
+    const description = propSchema.getDescription();
+
+    if (description) {
+      parameterObject.setDescription(
+        description
+      );
+    }
+
+    if (propSchema.isType('array')) {
+      // allowing multiple values by repeating the query parameter
+      if (location === 'query') {
+        parameterObject.setExplode(true);
+      }
+    }
+
+    if (propSchema.isType('object')) {
+      // style ?
+      if(!parameterObject.hasStyle()) {
+        parameterObject.setStyle('deepObject');
+      }
+    }
+    /*
     const propSchema = new PropertySchema(formatType(helper.getType()));
 
     let description = '';
@@ -1153,16 +1224,45 @@ export class OpenApi {
     if (helper.hasExampleValue()) {
       propSchema.setExample(helper.getExampleValue());
     }
+  
+    // enum
+    if (helper.getEnum().length) {
+      propSchema.setEnum(helper.getEnum());
+    }
+
+    // min, max, ...
+    if (helper.hasMin()) {
+      propSchema.setMin(helper.getMin());
+    }
+    if (helper.hasMax()) {
+      propSchema.setMax(helper.getMax());
+    }
+
+    // array items
+    if (propSchema.isType('array')) {
+      if (location === 'query') {
+        // allowing multiple values by repeating the query parameter
+        parameterObject.setExplode(true);
+      }
+      this._fillArraySchemaObject(helper, propSchema);
+    }
+
+    // object items
+    if (propSchema.isType('object')) {
+      propSchema.setRequiredToArray();
+      this._fillObjectSchemaObject(helper, propSchema);
+
+      // style ?
+      if(!parameterObject.hasStyle()) {
+        parameterObject.setStyle('deepObject');
+      }
+    }
+    */
 
     // examples
     if(helper?.hasExamples?.()
       && helper.getExamples) {
         parameterObject.setExamples(helper.getExamples());
-    }
-  
-    // enum
-    if (helper.getEnum().length) {
-      propSchema.setEnum(helper.getEnum());
     }
 
     // handle deprecated
@@ -1183,36 +1283,14 @@ export class OpenApi {
         helper.allowsEmptyValue()
       );
     }
-  
-    // array items
-    if (propSchema.isType('array')) {
-      if (location === 'query') {
-        // allowing multiple values by repeating the query parameter
-        parameterObject.setExplode(true);
-      }
-      this._fillArraySchemaObject(helper, propSchema);
-    }
 
-    // object items
-    if (propSchema.isType('object')) {
-      propSchema.setRequiredToArray();
-      this._fillObjectSchemaObject(helper, propSchema);
-
-      // style ?
-      if(!parameterObject.hasStyle()) {
-        parameterObject.setStyle('deepObject');
-      }
+    let schemaObject = propSchema.toObject();
+    if (!Array.isArray(schemaObject.required)) {
+      delete schemaObject.required;
     }
   
-    // min, max, ...
-    if (helper.hasMin()) {
-      propSchema.setMin(helper.getMin());
-    }
-    if (helper.hasMax()) {
-      propSchema.setMax(helper.getMax());
-    }
-
-    const schemaObject = this._autoSchemaObjectToRef(helper, propSchema.toObject());
+    // ReferenceObject | SchemaObject
+    schemaObject = this._autoSchemaObjectToRef(helper, schemaObject);
     parameterObject.setSchema(schemaObject);
   
     return parameterObject.toObject();
@@ -1233,6 +1311,9 @@ export class OpenApi {
         if( children.body || children.files ) {
           this._pushRequestBody(children.body, children.files, consumes, res);
         }
+        // ReferenceObject | RequestBodyObject
+        res = this._autoRequestBodyObjectToRef(bodyHelper, res);
+        /*
         if(bodyHelper.getRef && bodyHelper.hasRef && bodyHelper.hasRef()) {
           const ref = bodyHelper.getRef();
           if (ref && typeof ref === 'string') {
@@ -1251,6 +1332,7 @@ export class OpenApi {
             }
           }
         }
+        */
       }
     }
   
@@ -1274,7 +1356,7 @@ export class OpenApi {
       const bodyHelper = body instanceof this.#helperClass ? body : new this.#helperClass(body);
       if(bodyHelper.isValid()) {
         bodySchema = this._createSchema(bodyHelper);
-        if(this._getRef(bodyHelper)){
+        if(this._getLocalRef(bodyHelper)){
           helperWithRef = bodyHelper;
         }
         schemaObject = bodySchema.toObject();//this._createSchemaObject(bodyHelper)
@@ -1315,7 +1397,7 @@ export class OpenApi {
       if(filesHelper.isValid()) {
         if (!bodySchema && filesHelper.getType() !== 'object') {
           filesSchema = this._createSchema(filesHelper, undefined, undefined, 'binary');
-          if(this._getRef(filesHelper)){
+          if(this._getLocalRef(filesHelper)){
             helperWithRef = filesHelper;
           }
           schemaObject = filesSchema.toObject();
@@ -1366,6 +1448,7 @@ export class OpenApi {
     }
 
     if (helperWithRef && schemaObject) {
+      // ReferenceObject | SchemaObject
       schemaObject = this._autoSchemaObjectToRef(helperWithRef, schemaObject);
     }
 
@@ -1376,6 +1459,16 @@ export class OpenApi {
     if(schemaObject) {
       content.schema = schemaObject;
     }
+    /*
+    @todo set examples
+    if (examples) {
+      content.examples = examples;
+    }
+    @todo set encoding
+    if (encoding) {
+      content.encoding = encoding;
+    }
+    */
 
     consumes.forEach((mime: string) => {
       if (res.content) {
@@ -1450,7 +1543,10 @@ export class OpenApi {
         parentProp.setRequiredToArray();
         parentProp.pushIntoRequired(name);
       } else if (parentProp?.isType('array')) {
-        parentProp.setMin(parentProp.getMin() || 1);
+        parentProp.setMin(
+          typeof parentProp.getMin() !== 'undefined' ?
+            parentProp.getMin() : 1
+        );
       } else {
         prop.setRequired(true);
       }
@@ -1528,6 +1624,7 @@ export class OpenApi {
 
     const prop = this._createBasicSchema(helper, parentProp, name, format);
 
+    // ReferenceObject | SchemaObject
     const schemaObject = this._autoSchemaObjectToRef(helper, prop.toObject());
     return schemaObject;
   }
@@ -1636,10 +1733,7 @@ export class OpenApi {
         // items
         const firstItem = helper.getFirstItem();
         if (firstItem && firstItem.isValid()) {
-          //@todo: fill items validation if array
-          // propSchema.setItems({});
           const schemaObject = this._createSchemaObject(firstItem, propSchema, 'items');
-          //@todo: if firstItem.hasXml
           propSchema.setItems(schemaObject);
         } else {
           propSchema.setItems(formatType('any'));
@@ -1678,27 +1772,100 @@ export class OpenApi {
     schemaObject: PropertySchemaObject
   ): PropertySchemaObject {
     let newSchema = schemaObject;
-    const ref: string | undefined = this._getRef(helper);
+    const ref: string | undefined = this._getLocalRef(helper, 'schemas');
+    const remoteRef: string | undefined = this._getRemoteRef(helper);
     if (ref) {
-      const entityName: string = this._refToEntityName(ref);
+      const entityName: string = this._localRefToEntityName(ref);
       if (entityName && newSchema) {
-        this.addSchema(entityName, newSchema)
+        if (this.#generateComponentsRule === GenerateComponentsRules.always) {
+          this.addSchema(entityName, newSchema);
+        } else if(this.#generateComponentsRule === GenerateComponentsRules.undefined) {
+          if (!this.hasSchema(entityName)) {
+            this.addSchema(entityName, newSchema);
+          }
+        }
         newSchema = {
           $ref: ref
         };
       }
+    } else if(remoteRef) {
+      newSchema = {
+        $ref: remoteRef
+      };
     }
     return newSchema;
   }
 
-  private _getRef(
-    helper: GeneratorHelperInterface
+  private _autoParameterObjectToRef(
+    helper: GeneratorHelperInterface,
+    schemaObject: PropertySchemaObject
+  ): PropertySchemaObject {
+    let newSchema = schemaObject;
+    const ref: string | undefined = this._getLocalRef(helper, 'parameters');
+    const remoteRef: string | undefined = this._getRemoteRef(helper);
+    if (ref) {
+      const entityName: string = this._localRefToEntityName(ref);
+      if (entityName && newSchema) {
+        if (this.#generateComponentsRule === GenerateComponentsRules.always) {
+          this.addParameter(entityName, newSchema);
+        } else if(this.#generateComponentsRule === GenerateComponentsRules.undefined) {
+          if (!this.hasParameter(entityName)) {
+            this.addParameter(entityName, newSchema);
+          }
+        }
+        newSchema = {
+          $ref: ref
+        };
+      }
+    } else if(remoteRef) {
+      newSchema = {
+        $ref: remoteRef
+      };
+    }
+    return newSchema;
+  }
+
+  private _autoRequestBodyObjectToRef(
+    helper: GeneratorHelperInterface,
+    schemaObject: RequestBodyObject
+  ): RequestBodyObject {
+    let newSchema = schemaObject;
+    const ref: string | undefined = this._getLocalRef(helper, 'requestBodies');
+    const remoteRef: string | undefined = this._getRemoteRef(helper);
+    if (ref) {
+      const entityName: string = this._localRefToEntityName(ref);
+      if (entityName && newSchema) {
+        if (helper.getDescription()) {
+          newSchema.description = helper.getDescription();
+        }
+        if (this.#generateComponentsRule === GenerateComponentsRules.always) {
+          this.addRequestBody(entityName, newSchema);
+        } else if(this.#generateComponentsRule === GenerateComponentsRules.undefined) {
+          if (!this.hasRequestBody(entityName)) {
+            this.addRequestBody(entityName, newSchema);
+          }
+        }
+        newSchema = {
+          $ref: ref
+        };
+      }
+    } else if(remoteRef) {
+      newSchema = {
+        $ref: remoteRef
+      };
+    }
+    return newSchema;
+  }
+
+  private _getLocalRef(
+    helper: GeneratorHelperInterface,
+    componentCategory = 'schemas'
   ): string | undefined {
     let r: string | undefined;
     if(helper.getRef && helper.hasRef && helper.hasRef()) {
       const ref = helper.getRef();
       if (ref && typeof ref === 'string') {
-        const innerSchemaRefPrefix = '#/components/schemas/';
+        const innerSchemaRefPrefix = `#/components/${componentCategory}/`;
         if (ref.startsWith(innerSchemaRefPrefix)) {
           r = ref;
         }
@@ -1707,7 +1874,22 @@ export class OpenApi {
     return r;
   }
 
-  private _refToEntityName(ref: string): string {
+  private _getRemoteRef(
+    helper: GeneratorHelperInterface
+  ): string | undefined {
+    let r: string | undefined;
+    if(helper.getRef && helper.hasRef && helper.hasRef()) {
+      const ref = helper.getRef();
+      if (ref && typeof ref === 'string') {
+        if (!ref.startsWith('#/')) {
+          r = ref;
+        }
+      }
+    }
+    return r;
+  }
+
+  private _localRefToEntityName(ref: string): string {
     const entityName = ref.substring(ref.lastIndexOf('/') + 1);
     return entityName;
   }
