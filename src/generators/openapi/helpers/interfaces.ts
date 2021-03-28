@@ -1,0 +1,32 @@
+import { DefaultHelperInterface } from '../../../helpers/defaultHelper';
+import {
+  AdditionalProperties,
+  DiscriminatorObject,
+  EncodingObject,
+  ExampleObject,
+  ReferenceObject,
+  XMLObject,
+} from '../definitions';
+
+export interface OpenApiHelperInterface extends DefaultHelperInterface {
+  // required
+  getFirstItem(): OpenApiHelperInterface | undefined;
+  getChildren(): Record<string, OpenApiHelperInterface>;
+  getAlternatives(): OpenApiHelperInterface[];
+
+  // optionals
+  hasStyle?(): boolean;
+  getStyle?(): string | undefined;
+  hasAdditionalProperties?(): boolean;
+  getAdditionalProperties?(): AdditionalProperties | undefined;
+  hasRef?(): boolean;
+  getRef?(): string | undefined;
+  hasDiscriminator?(): boolean;
+  getDiscriminator?(): DiscriminatorObject | undefined;
+  hasXml?(): boolean;
+  getXml?(): XMLObject | undefined;
+  hasExamples?(): boolean;
+  getExamples?(): Record<string, ExampleObject | ReferenceObject> | undefined;
+  hasEncoding?(): boolean;
+  getEncoding?(): Record<string, EncodingObject> | undefined;
+}

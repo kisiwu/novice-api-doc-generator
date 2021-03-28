@@ -1,9 +1,81 @@
-import { PropertySchemaObject } from './propertySchema';
+export type AdditionalProperties = boolean | SchemaObject | ReferenceObject;
+
+export enum ParameterLocations {
+  cookie = 'cookie',
+  header = 'header',
+  path = 'path',
+  query = 'query',
+}
+
+/**
+ * @links
+ *  - https://swagger.io/specification/#schema-object
+ *  - https://tools.ietf.org/html/draft-wright-json-schema-validation-00
+ */
+export interface SchemaObject {
+  title?: string;
+  /**
+   * CommonMark syntax MAY be used for rich text representation.
+   */
+  description?: string;
+
+  type?: string;
+  format?: string;
+  pattern?: RegExp | string;
+  default?: unknown;
+
+  enum?: unknown[];
+  multipleOf?: number;
+  allOf?: Array<SchemaObject | ReferenceObject>;
+  anyOf?: Array<SchemaObject | ReferenceObject>;
+  oneOf?: Array<SchemaObject | ReferenceObject>;
+  not?: SchemaObject | ReferenceObject;
+
+  items?: SchemaObject | ReferenceObject;
+  uniqueItems?: boolean;
+  properties?: Record<string, SchemaObject | ReferenceObject>;
+  additionalProperties?: AdditionalProperties;
+  required?: string[];
+
+  maxLength?: number;
+  minLength?: number;
+  maxItems?: number;
+  minItems?: number;
+  maxProperties?: number;
+  minProperties?: number;
+  maximum?: number;
+  minimum?: number;
+  exclusiveMaximum?: boolean;
+  exclusiveMinimum?: boolean;
+
+  nullable?: boolean;
+  discriminator?: DiscriminatorObject;
+  readOnly?: boolean;
+  writeOnly?: boolean;
+  xml?: unknown;
+  externalDocs?: ExternalDocObject;
+  example?: unknown;
+  deprecated?: boolean;
+  [key: string]: unknown;
+}
+
+export interface XMLObject {
+  name?: string;
+  namespace?: string;
+  prefix?: string;
+  attribute?: boolean;
+  wrapped?: boolean;
+}
+
+export interface DiscriminatorObject {
+  propertyName: string; // REQUIRED. The name of the property in the payload that will hold the discriminator value.
+  mapping?: Record<string, string>; // An object to hold mappings between payload values and schema names or references.
+}
 
 export interface ExternalDocObject {
   description?: string; // A short description of the target documentation. CommonMark syntax MAY be used for rich text representation.
   url: string; // REQUIRED. The URL for the target documentation. Value MUST be in the format of a URL.
-} 
+}
 
 export interface TagObject {
   name: string;
@@ -38,6 +110,7 @@ export interface SecuritySchemeObject {
 
 export interface ReferenceObject {
   $ref: string;
+  [key: string]: unknown;
 }
 
 export interface ServerVariableObject {
@@ -78,22 +151,15 @@ export interface HeaderObject {
   style?: string; // Describes how the parameter value will be serialized depending on the type of the parameter value. Default values (based on value of in): for query - form; for path - simple; for header - simple; for cookie - form.
   explode?: boolean; // When this is true, parameter values of type array or object generate separate parameters for each value of the array or key-value pair of the map. For other types of parameters this property has no effect. When style is form, the default value is true. For all other styles, the default value is false.
   allowReserved?: boolean; // Determines whether the parameter value SHOULD allow reserved characters, as defined by RFC3986 :/?#[]@!$&'()*+,;= to be included without percent-encoding. This property only applies to parameters with an in value of query. The default value is false.
-  schema?: PropertySchemaObject | ReferenceObject; // The schema defining the type used for the parameter.
+  schema?: SchemaObject | ReferenceObject; // The schema defining the type used for the parameter.
   example?: unknown; // Example of the parameter's potential value. The example SHOULD match the specified schema and encoding properties if present. The example field is mutually exclusive of the examples field. Furthermore, if referencing a schema that contains an example, the example value SHALL override the example provided by the schema. To represent examples of media types that cannot naturally be represented in JSON or YAML, a string value can contain the example with escaping where necessary.
   examples?: Record<string, ExampleObject | ReferenceObject>; // Examples of the parameter's potential value. Each example SHOULD contain a value in the correct format as specified in the parameter encoding. The examples field is mutually exclusive of the example field. Furthermore, if referencing a schema that contains an example, the examples value SHALL override the example provided by the schema.
   content?: Record<string, MediaTypeObject>; // A map containing the representations for the parameter. The key is the media type and the value describes it. The map MUST only contain one entry.
 }
 
-export enum ParameterLocations {
-  cookie = 'cookie',
-  header = 'header',
-  path = 'path',
-  query = 'query',
-}
-
 export interface ParameterObject extends HeaderObject {
   name: string;
-  in: ParameterLocations;
+  in: string;//ParameterLocations;
   //in: string; // Possible values are "query", "header", "path" or "cookie".
   allowEmptyValue?: boolean; // Sets the ability to pass empty-valued parameters. This is valid only for query parameters and allows sending a parameter with an empty value. Default value is false. If style is used, and if behavior is n/a (cannot be serialized), the value of allowEmptyValue SHALL be ignored. Use of this property is NOT RECOMMENDED, as it is likely to be removed in a later revision.
 }
@@ -107,7 +173,7 @@ export interface EncodingObject {
 }
 
 export interface MediaTypeObject {
-  schema?: PropertySchemaObject | ReferenceObject; // The schema defining the content of the request, response, or parameter.
+  schema?: SchemaObject | ReferenceObject; // The schema defining the content of the request, response, or parameter.
   example?: unknown; //	Example of the media type. The example object SHOULD be in the correct format as specified by the media type. The example field is mutually exclusive of the examples field. Furthermore, if referencing a schema which contains an example, the example value SHALL override the example provided by the schema.
   examples?: Record<string, ExampleObject | ReferenceObject> // Examples of the media type. Each example object SHOULD match the media type and specified schema if present. The examples field is mutually exclusive of the example field. Furthermore, if referencing a schema which contains an example, the examples value SHALL override the example provided by the schema.
   encoding?: Record<string, EncodingObject> //	A map between a property name and its encoding information. The key, being the property name, MUST exist in the schema as a property. The encoding object SHALL only apply to requestBody objects when the media type is multipart or application/x-www-form-urlencoded.
@@ -127,7 +193,7 @@ export interface ResponseObject {
 }
 
 export interface ComponentsObject {
-  schemas?: Record<string, PropertySchemaObject>;
+  schemas?: Record<string, SchemaObject | ReferenceObject>;
   requestBodies?: Record<string, RequestBodyObject | ReferenceObject>;
   headers?: Record<string, HeaderObject | ReferenceObject>;
   parameters?: Record<string, ParameterObject | ReferenceObject>;

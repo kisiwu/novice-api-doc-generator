@@ -39,7 +39,7 @@ describe('api doc', function () {
          }
         }
        },
-       description: 'MY GEEEEEEEEEEEEEE'
+       description: 'Jojo vs DIO'
       });
 
     //openapi.addExample('Versions', {value: [8, 9]})
@@ -217,7 +217,7 @@ describe('api doc', function () {
           },
           ref: '#/components/schemas/Mikamika'
         })
-        .max(6).unknown(true),
+        .max(10).unknown(true),
         files: Joi.object()
         .keys({
           file: Joi.array()
