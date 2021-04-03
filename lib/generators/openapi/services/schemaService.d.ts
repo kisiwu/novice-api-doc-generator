@@ -1,0 +1,37 @@
+import { AdditionalProperties, DiscriminatorObject, ReferenceObject, SchemaObject, XMLObject } from '../definitions';
+export declare class SchemaCreator {
+    #private;
+    constructor(schema?: SchemaObject);
+    addOneOf(schema: SchemaObject | ReferenceObject): SchemaCreator;
+    getOneOf(): (SchemaObject | ReferenceObject)[];
+    isRequired(): boolean;
+    isType(typeName: string): boolean;
+    hasProperties(): boolean;
+    getProperty(propertyName: string): SchemaObject | ReferenceObject | undefined;
+    getType(): string | undefined;
+    getMin(): number | undefined;
+    getMax(): number | undefined;
+    getRequired(): string[] | undefined;
+    addRequired(propertyName: string): SchemaCreator;
+    setRequired(properties: string[]): SchemaCreator;
+    setProperty(propertyName: string, schema: SchemaObject | ReferenceObject): SchemaCreator;
+    setProperties(properties: Record<string, SchemaObject | ReferenceObject>): SchemaCreator;
+    setSchema(schema: SchemaObject): SchemaCreator;
+    setDiscriminator(discriminator: DiscriminatorObject): SchemaCreator;
+    setXml(xml: XMLObject): SchemaCreator;
+    setType(typeName: string): SchemaCreator;
+    setFormat(format: string): SchemaCreator;
+    setDescription(value: string): SchemaCreator;
+    getDescription(): string | undefined;
+    setAllowEmptyValue(bool: boolean): SchemaCreator;
+    setDefault(value: unknown): SchemaCreator;
+    setExample(value: unknown): SchemaCreator;
+    setEnum(value: unknown[]): SchemaCreator;
+    setMin(value: number | undefined): SchemaCreator;
+    setMax(value: number | undefined): SchemaCreator;
+    setItems(schema: SchemaObject | ReferenceObject): SchemaCreator;
+    setUniqueItems(bool: boolean | undefined): SchemaCreator;
+    setAdditionalProperties(value: AdditionalProperties): SchemaCreator;
+    setDeprecated(bool: boolean): SchemaCreator;
+    toObject(): SchemaObject;
+}
