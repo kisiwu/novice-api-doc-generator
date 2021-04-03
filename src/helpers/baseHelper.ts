@@ -1,4 +1,8 @@
-export interface DefaultHelperInterface {
+/**
+ * @module helpers-base
+ */
+
+export interface BaseHelperInterface {
   isValid(): boolean;
   getType(): string;
   getDescription(): string;

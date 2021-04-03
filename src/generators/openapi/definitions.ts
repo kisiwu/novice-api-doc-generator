@@ -1,3 +1,7 @@
+/**
+ * @module openapi-definitions
+ */
+
 export type AdditionalProperties = boolean | SchemaObject | ReferenceObject;
 
 export enum ParameterLocations {
@@ -5,6 +9,33 @@ export enum ParameterLocations {
   header = 'header',
   path = 'path',
   query = 'query',
+}
+
+export interface SecurityRequirementObject {
+  [key: string]: string[];
+}
+
+export interface ContactObject {
+  name?: string; // The identifying name of the contact person/organization.
+  url?: string; // The URL pointing to the contact information. MUST be in the format of a URL.
+  email?: string; // The email address of the contact person/organization. MUST be in the format of an email address.
+  [key: string]: unknown;
+}
+
+export interface LicenseObject {
+  name: string; // REQUIRED. The license name used for the API.
+  url?: string; // A URL to the license used for the API. MUST be in the format of a URL.
+  [key: string]: unknown;
+}
+
+export interface InfoObject {
+  title: string; // REQUIRED. The title of the API.
+  description?: string; // A short description of the API. CommonMark syntax MAY be used for rich text representation.
+  termsOfService?: string; // A URL to the Terms of Service for the API. MUST be in the format of a URL.
+  contact?: ContactObject; // The contact information for the exposed API.
+  license?: LicenseObject; // The license information for the exposed API.
+  version: string; // REQUIRED. The version of the OpenAPI document (which is distinct from the OpenAPI Specification version or the API implementation version).
+  [key: string]: unknown;
 }
 
 /**

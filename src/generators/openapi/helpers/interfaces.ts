@@ -1,4 +1,8 @@
-import { DefaultHelperInterface } from '../../../helpers/defaultHelper';
+/**
+ * @module openapi-helpers-interfaces
+ */
+
+import { BaseHelperInterface } from '../../../helpers/baseHelper';
 import {
   AdditionalProperties,
   DiscriminatorObject,
@@ -8,7 +12,7 @@ import {
   XMLObject,
 } from '../definitions';
 
-export interface OpenApiHelperInterface extends DefaultHelperInterface {
+export interface OpenApiHelperInterface extends BaseHelperInterface {
   // required
   getFirstItem(): OpenApiHelperInterface | undefined;
   getChildren(): Record<string, OpenApiHelperInterface>;

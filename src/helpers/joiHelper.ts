@@ -1,4 +1,8 @@
-import { DefaultHelperInterface } from './defaultHelper';
+/**
+ * @module helpers-joi
+ */
+
+import { BaseHelperInterface } from './baseHelper';
 import { VALID_TYPES } from '../utils/genericUtils';
 import { Schema } from 'joi'
 
@@ -40,8 +44,8 @@ export type JoiSchema = Partial<Schema> & {
   'binary'
  */
 
-export class JoiHelper implements DefaultHelperInterface {
-  _joi: JoiSchema;
+export class JoiHelper implements BaseHelperInterface {
+  protected _joi: JoiSchema;
 
   constructor(joiObject: JoiSchema | unknown = {}) {
     this._joi = joiObject && typeof joiObject === 'object' ? joiObject : {};
@@ -58,20 +62,15 @@ export class JoiHelper implements DefaultHelperInterface {
     if (!this.isJoi()) {
       return false;
     }
-    return this._joi['$_terms']
-      && this._joi['$_terms'].metas
-      && this._joi['$_terms'].metas[0]
-      && this._joi['$_terms'].metas[0][v] ? true : false;
+    return typeof this._joi?.['$_terms']?.metas?.[0]?.[v] !== 'undefined' ? 
+      true : false;
   }
 
   protected getMeta(v: string): unknown {
     if (!this.hasMeta(v)) {
       return;
     }
-    return this._joi['$_terms']
-      && this._joi['$_terms'].metas
-      && this._joi['$_terms'].metas[0]
-      && this._joi['$_terms'].metas[0][v];
+    return this._joi?.['$_terms']?.metas?.[0]?.[v];
   }
 
   isValid(): boolean {

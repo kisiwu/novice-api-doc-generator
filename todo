@@ -1,2 +1,4 @@
-- finish todo's in utils
-- finish todo's in generators/OpenApi
+openapi:
+  - finish todo's in generators/OpenApi
+  - add debug logs
+  - generate doc

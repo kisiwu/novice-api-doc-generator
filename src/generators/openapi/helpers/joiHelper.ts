@@ -1,3 +1,7 @@
+/**
+ * @module openapi-helpers-joi
+ */
+
 import { JoiHelper, JoiSchema } from '../../../helpers/joiHelper';
 import { AdditionalProperties, DiscriminatorObject, EncodingObject, ExampleObject, ReferenceObject, XMLObject } from '../definitions';
 import { OpenApiHelperInterface } from './interfaces';

@@ -1,16 +1,11 @@
-/*
-const Log = require('./_log').extend('openapi');
-*/
-
 /**
- * @note : for now it is not possible to only
- * send files outside of object property. Well, at least not tried yet
- * but it definitely doesn't work with alternatives 
+ * @module openapi
  */
 
 /**
- * @todo: remove useless methods
+ * @todo: getters
  * @todo: change var, method names ...
+ * @todo add debug logs
  */
 
 import {
@@ -27,7 +22,13 @@ import {
   ParameterObject,
   ParameterLocations,
   LinkObject,
-  HeaderObject
+  HeaderObject,
+  InfoObject,
+  LicenseObject,
+  ContactObject,
+  ExternalDocObject,
+  ServerObject,
+  SecurityRequirementObject
 } from './openapi/definitions';
 import { OpenApiHelperInterface } from './openapi/helpers/interfaces';
 import { OpenApiJoiHelper } from './openapi/helpers/joiHelper';
@@ -41,28 +42,21 @@ interface ResponsesRecord {
   [key: string]: ResponseObject | ReferenceObject;
 }
 
-interface OpenAPIResult {
-  info: Record<string, unknown>;
-  servers: unknown[];
-  components: ComponentsObject;
-  paths: Record<string, Record<string, unknown>>;
-  tags: TagObject[];
-  [key: string]: unknown;
-}
-
 interface RouteParameters {
+  // validate
   params?: Record<string, unknown>;
   body?: Record<string, unknown>;
   query?: Record<string, unknown>;
   files?: Record<string, unknown>;
   headers?: Record<string, unknown>;
   cookies?: Record<string, unknown>;
-  [key: string]: unknown;
-}
 
-interface Route {
-  path: string;
-  methods: Record<string, unknown>;
+  // others
+  operationId?: string;
+  consumes?: unknown;
+  produces?: unknown;
+  security?: unknown;
+  undoc?: boolean;
   [key: string]: unknown;
 }
 
@@ -75,31 +69,53 @@ interface RouteSchema {
   responses?: ResponsesRecord;
   auth?: unknown;
   tags?: unknown;
-  operationId?: string;
-  consumes?: unknown;
-  produces?: unknown;
-  security?: unknown;
-  undoc?: boolean;
+  [key: string]: unknown;
+}
+
+export interface Route {
+  path: string;
+  methods: Record<string, unknown>;
+  [key: string]: unknown;
+}
+
+export interface ProcessedRoute {
+  path: string;
+  method?: string;
+  schema?: unknown;
+}
+
+export interface OpenAPIResult {
+  openapi: string;
+  info: InfoObject;
+  servers: ServerObject[];
+  components: ComponentsObject;
+  paths: Record<string, Record<string, unknown>>;
+  security?: SecurityRequirementObject[];
+  tags: TagObject[];
+  externalDocs?: ExternalDocObject;
   [key: string]: unknown;
 }
 
 export enum GenerateComponentsRules {
   always = 'always',
-  undefined = 'undefined',
+  ifUndefined = 'ifUndefined',
   never = 'never',
 }
 
+/**
+ * @note For now it is not possible to only
+ * send files outside of object property (multipart). 
+ * Well, at least not tried yet
+ * but it definitely doesn't work with alternatives 
+ */
 export class OpenApi {
   #consumes: string[];
   #result: OpenAPIResult;
-  #security: unknown[];
+  #security: SecurityRequirementObject[];
   #helperClass: { new(args: unknown): OpenApiHelperInterface };
 
-  responsesProperty?: string;
+  #responsesProperty?: string;
   #generateComponentsRule = GenerateComponentsRules.always;
-
-  // useless
-  _produces?: unknown[];
 
   constructor(helperClass: { new(args: unknown): OpenApiHelperInterface } = OpenApiJoiHelper) {
     this.#consumes = [];
@@ -133,22 +149,37 @@ export class OpenApi {
     return this.#generateComponentsRule;
   }
 
+  setResponsesProperty(v: string): OpenApi {
+    this.#responsesProperty = v;
+    return this;
+  }
+
+  getResponsesProperty(): string | undefined {
+    return this.#responsesProperty;
+  }
+
   setConsumes(v: string[]): OpenApi {
     this.#consumes = v;
     return this;
   }
 
-  setProduces(v: unknown[]): OpenApi {
-    this._produces = v;
-    return this;
+  getConsumes(): string[] {
+    return this.#consumes;
   }
-
 
   removeCallback(name: string): unknown {
     let r: unknown;
     if (this.#result.components.callbacks) {
       r = this.#result.components.callbacks[name];
       delete this.#result.components.callbacks[name];
+    }
+    return r;
+  }
+
+  hasCallback(name: string): boolean {
+    let r = false;
+    if (this.#result.components?.callbacks?.[name]) {
+      r = true;
     }
     return r;
   }
@@ -165,8 +196,8 @@ export class OpenApi {
    * 
    * @returns removed callbacks
    */
-  cleanupCallbacks(): { [x: string]: unknown; } {
-    const r: { [x: string]: unknown; } = {};
+  cleanupCallbacks(): Record<string, unknown> {
+    const r: Record<string, unknown> = {};
     const refs = JSON.stringify(this.#result).match(/#\/components\/callbacks\/[^/"]*/g);
     if (this.#result.components.callbacks) {
       Object.keys(this.#result.components.callbacks).forEach(name => {
@@ -186,6 +217,14 @@ export class OpenApi {
     if (this.#result.components.links) {
       r = this.#result.components.links[name];
       delete this.#result.components.links[name];
+    }
+    return r;
+  }
+
+  hasLink(name: string): boolean {
+    let r = false;
+    if (this.#result.components?.links?.[name]) {
+      r = true;
     }
     return r;
   }
@@ -223,6 +262,14 @@ export class OpenApi {
     if (this.#result.components.examples) {
       r = this.#result.components.examples[name];
       delete this.#result.components.examples[name];
+    }
+    return r;
+  }
+
+  hasExample(name: string): boolean {
+    let r = false;
+    if (this.#result.components?.examples?.[name]) {
+      r = true;
     }
     return r;
   }
@@ -305,6 +352,14 @@ export class OpenApi {
     if (this.#result.components.headers) {
       r = this.#result.components.headers[name];
       delete this.#result.components.headers[name];
+    }
+    return r;
+  }
+
+  hasHeader(name: string): boolean {
+    let r = false;
+    if (this.#result.components?.headers?.[name]) {
+      r = true;
     }
     return r;
   }
@@ -436,6 +491,14 @@ export class OpenApi {
     return r;
   }
 
+  hasResponse(name: string): boolean {
+    let r = false;
+    if (this.#result.components?.responses?.[name]) {
+      r = true;
+    }
+    return r;
+  }
+
   addResponse(name: string, response: ReferenceObject | ResponseObject): OpenApi {
     if (!this.#result.components.responses) {
       this.#result.components.responses = {};
@@ -462,6 +525,61 @@ export class OpenApi {
       });
     }
     return r;
+  }
+
+  setSecuritySchemes(v: Record<string, ReferenceObject | SecuritySchemeObject>): OpenApi {
+    this.#result.components.securitySchemes = v;
+    return this;
+  }
+
+  removeSecurityScheme(name: string): ReferenceObject | SecuritySchemeObject | undefined {
+    let r: ReferenceObject | SecuritySchemeObject | undefined;
+    if (this.#result.components.securitySchemes) {
+      r = this.#result.components.securitySchemes[name];
+      delete this.#result.components.securitySchemes[name];
+    }
+    return r;
+  }
+
+  hasSecurityScheme(name: string): boolean {
+    let r = false;
+    if (this.#result.components?.securitySchemes?.[name]) {
+      r = true;
+    }
+    return r;
+  }
+
+  addSecurityScheme(name: string, schema: ReferenceObject | SecuritySchemeObject): OpenApi {
+    if (!this.#result.components.securitySchemes) {
+      this.#result.components.securitySchemes = {};
+    }
+    this.#result.components.securitySchemes[name] = schema;
+    return this;
+  }
+
+  /**
+   * 
+   * @returns removed securitySchemes
+   */
+  cleanupSecuritySchemes(): Record<string, SecuritySchemeObject | ReferenceObject> {
+    const r: Record<string, SecuritySchemeObject | ReferenceObject> = {};
+    const refs = JSON.stringify(this.#result).match(/#\/components\/securitySchemes\/[^/"]*/g);
+    if (this.#result.components.securitySchemes) {
+      Object.keys(this.#result.components.securitySchemes).forEach(name => {
+        if (!refs?.includes(`#/components/securitySchemes/${name}`)) {
+          if (this.#result.components?.securitySchemes?.[name]) {
+            r[name] = this.#result.components.securitySchemes[name];
+            delete this.#result.components.securitySchemes[name];
+          }
+        }
+      });
+    }
+    return r;
+  }
+
+  setComponents(k: Record<string, ComponentsObject>): OpenApi {
+    this.#result.components = k;
+    return this;
   }
 
   /**
@@ -497,132 +615,6 @@ export class OpenApi {
     return r;
   }
 
-  setComponent(k: string, v: unknown): OpenApi {
-    this.#result.components[k] = v;
-    return this;
-  }
-
-  setComponents(k: Record<string, ComponentsObject>): OpenApi {
-    this.#result.components = k;
-    return this;
-  }
-
-  setDefinitions(v: Record<string, ComponentsObject>): OpenApi {
-    return this.setComponents(v);
-  }
-
-  setSecuritySchemes(v: Record<string, ReferenceObject | SecuritySchemeObject>): OpenApi {
-    this.#result.components.securitySchemes = v;
-    return this;
-  }
-
-  setSecurityDefinitions(v: Record<string, ReferenceObject | SecuritySchemeObject>): OpenApi {
-    return this.setSecuritySchemes(v);
-  }
-
-  removeSecurityScheme(name: string): ReferenceObject | SecuritySchemeObject | undefined {
-    let r: ReferenceObject | SecuritySchemeObject | undefined;
-    if (this.#result.components.securitySchemes) {
-      r = this.#result.components.securitySchemes[name];
-      delete this.#result.components.securitySchemes[name];
-    }
-    return r;
-  }
-
-  addSecurityScheme(name: string, schema: ReferenceObject | SecuritySchemeObject): OpenApi {
-    if (!this.#result.components.securitySchemes) {
-      this.#result.components.securitySchemes = {};
-    }
-    this.#result.components.securitySchemes[name] = schema;
-    return this;
-  }
-
-  /**
-   * 
-   * @returns removed securitySchemes
-   */
-  cleanupSecuritySchemes(): Record<string, SecuritySchemeObject | ReferenceObject> {
-    const r: Record<string, SecuritySchemeObject | ReferenceObject> = {};
-    const refs = JSON.stringify(this.#result).match(/#\/components\/securitySchemes\/[^/"]*/g);
-    if (this.#result.components.securitySchemes) {
-      Object.keys(this.#result.components.securitySchemes).forEach(name => {
-        if (!refs?.includes(`#/components/securitySchemes/${name}`)) {
-          if (this.#result.components?.securitySchemes?.[name]) {
-            r[name] = this.#result.components.securitySchemes[name];
-            delete this.#result.components.securitySchemes[name];
-          }
-        }
-      });
-    }
-    return r;
-  }
-
-  setDefaultSecurity(v: Record<string, unknown>): OpenApi;
-  setDefaultSecurity(v: unknown[]): OpenApi;
-  setDefaultSecurity(v: unknown): OpenApi {
-    if (Array.isArray(v)) {
-      this.#security = v;
-    } else if (v && typeof v == 'object') {
-      this.#security = [v];
-    } else {
-      this.#security = [];
-    }
-    return this;
-  }
-
-  setInfo(v: Record<string, unknown>): OpenApi {
-    this.#result.info = v;
-    return this;
-  }
-
-  setInfoProperty(prop: string, v: unknown): OpenApi {
-    this.#result.info[prop] = v;
-    return this;
-  }
-
-  setTitle(v: unknown): OpenApi {
-    return this.setInfoProperty('title', v);
-  }
-
-  setVersion(v: unknown): OpenApi {
-    return this.setInfoProperty('version', v);
-  }
-
-  setLicense(v: unknown): OpenApi {
-    return this.setInfoProperty('license', v);
-  }
-
-  setServers(v: unknown[]): OpenApi;
-  setServers(v: unknown): OpenApi;
-  setServers(v: unknown): OpenApi {
-    this.#result.servers = [];
-    let v2: unknown[] = [];
-    if (!Array.isArray(v)) {
-      v2 = [v]
-    } else {
-      v2 = v
-    }
-    v2.forEach(el => this.addServer(el))
-    return this;
-  }
-
-  setHost(v: unknown[]): OpenApi;
-  setHost(v: unknown): OpenApi;
-  setHost(v: unknown): OpenApi {
-    return this.setServers(v);
-  }
-
-  setSchemes(v: string[] | unknown): OpenApi {
-    if (Array.isArray(v)) {
-      this.#result.schemes = v;
-    } else if (v && typeof v === 'string') {
-      this.#result.schemes = [v];
-    } else {
-      this.#result.schemes = [];
-    }
-    return this;
-  }
-
   setTags(tags: TagObject[]): OpenApi {
     this.#result.tags = tags;
     return this;
@@ -636,6 +628,10 @@ export class OpenApi {
       this.#result.tags.slice(idx, 1);
     }
     return r;
+  }
+
+  addTag(tag: TagObject): OpenApi {
+    return this.addTags(tag);
   }
 
   addTags(tags: TagObject): OpenApi
@@ -654,27 +650,114 @@ export class OpenApi {
     });
     return this;
   }
-  addTag(tag: TagObject): OpenApi {
-    return this.addTags(tag);
+
+  setDefaultSecurity(securityObjects: SecurityRequirementObject[]): OpenApi;
+  setDefaultSecurity(securityObject: SecurityRequirementObject): OpenApi;
+  setDefaultSecurity(security: string[]): OpenApi;
+  setDefaultSecurity(security: string): OpenApi;
+  setDefaultSecurity(v: SecurityRequirementObject[] | SecurityRequirementObject | string[] | string): OpenApi {
+    this.#security = [];
+    if (Array.isArray(v)) {
+      v.forEach((value: SecurityRequirementObject | string) => this.addDefaultSecurity(value));
+    } else {
+      this.addDefaultSecurity(v);
+    }
+    return this;
   }
 
-  /**
-   * useless getter
-   */
-  getConsumes(): string[] {
-    return this.#consumes;
+  addDefaultSecurity(security: SecurityRequirementObject | string): OpenApi;
+  addDefaultSecurity(security: SecurityRequirementObject): OpenApi;
+  addDefaultSecurity(security: string): OpenApi;
+  addDefaultSecurity(v: SecurityRequirementObject | string): OpenApi {
+    if (v) {
+      if(typeof v === 'string') {
+        this.#security.push({
+          [v]: []
+        });
+      } else {
+        this.#security.push(v);
+      }
+    }
+    return this;
   }
 
-  /**
-   * useless getter
-   */
-  getSecurity(): unknown[] {
+  getDefaultSecurity(): SecurityRequirementObject[] {
     return this.#security;
   }
 
-  addServer(v: string): OpenApi;
-  addServer(v: unknown): OpenApi;
-  addServer(v: unknown): OpenApi {
+  setInfo(v: InfoObject): OpenApi {
+    this.#result.info = v;
+    return this;
+  }
+
+  getInfo(): InfoObject {
+    return this.#result.info;
+  }
+
+  setInfoProperty(prop: string, v: unknown): OpenApi {
+    this.#result.info[prop] = v;
+    return this;
+  }
+
+  setTitle(title: string): OpenApi {
+    this.#result.info.title = title;
+    return this;
+  }
+
+  setDescription(description: string): OpenApi {
+    this.#result.info.description = description;
+    return this;
+  }
+
+  setTermsOfService(termsOfService: string): OpenApi {
+    this.#result.info.termsOfService = termsOfService;
+    return this;
+  }
+
+  setVersion(version: string): OpenApi {
+    this.#result.info.version = version;
+    return this;
+  }
+
+  setContact(contact: ContactObject): OpenApi {
+    this.#result.info.contact = contact;
+    return this;
+  }
+
+  setLicense(license: string): OpenApi;
+  setLicense(license: LicenseObject): OpenApi;
+  setLicense(license: LicenseObject | string): OpenApi {
+    if (typeof license === 'string') {
+      this.#result.info.license = {
+        name: license
+      };
+    } else {
+      this.#result.info.license = license;
+    }
+    return this;
+  }
+
+  setServers(servers: ServerObject[]): OpenApi;
+  setServers(server: ServerObject): OpenApi;
+  setServers(v: ServerObject[] | ServerObject): OpenApi {
+    this.#result.servers = [];
+    let v2: ServerObject[] = [];
+    if (!Array.isArray(v)) {
+      v2 = [v]
+    } else {
+      v2 = v
+    }
+    v2.forEach(el => this.addServer(el))
+    return this;
+  }
+
+  getServers(): ServerObject[] {
+    return this.#result.servers;
+  }
+
+  addServer(server: ServerObject): OpenApi;
+  addServer(url: string): OpenApi;
+  addServer(v: ServerObject | string): OpenApi {
     if (typeof v === 'string') {
       v = { url: v }
     }
@@ -682,9 +765,43 @@ export class OpenApi {
     return this;
   }
 
-  add(routes: Route[]): unknown[];
-  add(routes: Route): unknown[];
-  add(routes: Route[] | Route): unknown[] {
+  /**
+   * 
+   * OpenApi.setServers({ url })
+   */
+  setHost(url: string): OpenApi {
+    return this.setServers({
+      url
+    });
+  }
+
+  setExternalDoc(externalDoc: ExternalDocObject): OpenApi;
+  setExternalDoc(url: string): OpenApi
+  setExternalDoc(externalDoc: ExternalDocObject | string): OpenApi {
+    if (typeof externalDoc === 'string') {
+      this.#result.externalDocs = { url: externalDoc };
+    } else {
+      this.#result.externalDocs = externalDoc;
+    }
+    return this;
+  } 
+
+  /**
+   * @example
+   * ```typescript
+   * import routing from '@novice1/routing';
+   * import { OpenApi } from '@novice1/api-doc-generator';
+   * 
+   * const router = routing().post(...);
+   * const openapi = new OpenApi();
+   * const routes = openapi.add(router.getMeta());
+   * const { path, method, schema } = routes[0];
+   * ```
+   * @returns The added/updated routes
+   */
+  add(routes: Route[]): ProcessedRoute[];
+  add(routes: Route): ProcessedRoute[];
+  add(routes: Route[] | Route): ProcessedRoute[] {
 
     let routes2: Route[] = [];
 
@@ -694,7 +811,7 @@ export class OpenApi {
       routes2 = routes;
     }
 
-    const results: unknown[] = [];
+    const results: ProcessedRoute[] = [];
 
     routes2.forEach((route) => {
       // format route to add by methods
@@ -709,15 +826,18 @@ export class OpenApi {
         Object.keys(route).forEach((p) => {
           r[p] = route[p];
         });
-        results.push(this._add(r));
+        const added = this._add(r);
+        if (added) {
+          results.push(added);
+        }
       });
     });
-
-    return results.filter((r) => r);
+  
+    return results;
   }
 
-  remove(path: string, method?: string): unknown[] {
-    const r: unknown[] = [];
+  remove(path: string, method?: string): ProcessedRoute[] {
+    const r: ProcessedRoute[] = [];
     if (this.#result.paths[path]) {
       if (method) {
         if (this.#result.paths[path][method]) {
@@ -748,8 +868,8 @@ export class OpenApi {
   private _getResponsesSchema(responses?: ResponsesRecord): ResponsesRecord {
     let r: ResponsesRecord = {};
     if (responses
-      && this.responsesProperty) {
-      const tmp = responses[this.responsesProperty];
+      && this.#responsesProperty) {
+      const tmp = responses[this.#responsesProperty];
       if (tmp && typeof tmp === 'object') {
         Object.assign(r, tmp);
       }
@@ -759,7 +879,7 @@ export class OpenApi {
     return r;
   }
 
-  private _add(route: RouteSchema): unknown {
+  private _add(route: RouteSchema): ProcessedRoute | undefined {
 
     const parameters = route.parameters || {};
     const responses = this._getResponsesSchema(route.responses);
@@ -774,12 +894,13 @@ export class OpenApi {
     const undoc = parameters.undoc;
 
     let consumes: string[] = ['application/json'];
-    let produces: unknown = parameters.produces;
     let security: unknown[] = this.#security;
 
     // if it shouldn't be documented
     if (undoc) {
-      return;
+      return {
+        path
+      };
     }
 
     // format consumes
@@ -793,15 +914,6 @@ export class OpenApi {
       }
     } else {
       consumes = parameters.consumes;
-    }
-
-    // format produces
-    if (!Array.isArray(produces)) {
-      if (produces && typeof produces == 'string') {
-        produces = [produces];
-      } else {
-        produces = undefined;
-      }
     }
 
     // format security
@@ -1547,7 +1659,7 @@ export class OpenApi {
       if (entityName && newSchema) {
         if (this.#generateComponentsRule === GenerateComponentsRules.always) {
           this.addSchema(entityName, newSchema);
-        } else if (this.#generateComponentsRule === GenerateComponentsRules.undefined) {
+        } else if (this.#generateComponentsRule === GenerateComponentsRules.ifUndefined) {
           if (!this.hasSchema(entityName)) {
             this.addSchema(entityName, newSchema);
           }
@@ -1576,7 +1688,7 @@ export class OpenApi {
       if (entityName && newParamObject) {
         if (this.#generateComponentsRule === GenerateComponentsRules.always) {
           this.addParameter(entityName, newParamObject);
-        } else if (this.#generateComponentsRule === GenerateComponentsRules.undefined) {
+        } else if (this.#generateComponentsRule === GenerateComponentsRules.ifUndefined) {
           if (!this.hasParameter(entityName)) {
             this.addParameter(entityName, newParamObject);
           }
@@ -1608,7 +1720,7 @@ export class OpenApi {
         }
         if (this.#generateComponentsRule === GenerateComponentsRules.always) {
           this.addRequestBody(entityName, newSchema);
-        } else if (this.#generateComponentsRule === GenerateComponentsRules.undefined) {
+        } else if (this.#generateComponentsRule === GenerateComponentsRules.ifUndefined) {
           if (!this.hasRequestBody(entityName)) {
             this.addRequestBody(entityName, newSchema);
           }

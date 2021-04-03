@@ -18,9 +18,9 @@
     "testany": "env TS_NODE_COMPILER_OPTIONS='{\"module\": \"commonjs\", \"noImplicitAny\": false}' kaukau --require ts-node/register --file test --ext .test.ts"
   },
   "keywords": [
+    "openapi",
     "postman",
-    "swagger",
-    "openapi"
+    "swagger"
   ],
   "author": "demingongo",
   "contributors": [
@@ -36,7 +36,7 @@
     "@typescript-eslint/eslint-plugin": "^4.15.2",
     "@typescript-eslint/parser": "^4.15.2",
     "eslint": "^7.21.0",
-    "kaukau": "^0.2.1",
+    "kaukau": "^0.2.2",
     "ts-node": "^9.1.1",
     "typedoc": "^0.20.29",
     "typescript": "^4.2.2"

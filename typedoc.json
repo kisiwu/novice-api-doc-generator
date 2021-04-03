@@ -2,12 +2,17 @@
   "entryPoints": [
     "src/index.ts", 
     "src/utils/genericUtils.ts",
-    "src/helpers/defaultHelper.ts",
+    "src/helpers/baseHelper.ts",
     "src/helpers/joiHelper.ts",
     "src/generators/openapi.ts", 
     "src/generators/openapi/definitions.ts",
     "src/generators/openapi/helpers/interfaces.ts",
     "src/generators/openapi/helpers/joiHelper.ts"
   ],
-  "out": "docs"
+  "out": "docs",
+
+  "excludeInternal": true,
+  "excludePrivate": true,
+  "includeVersion": true,
+  "hideGenerator": true
 }

@@ -14,16 +14,15 @@ describe('api doc', function () {
       .setTitle('api doc')
       .setHost('http://test.kaukau.tst')
       .setConsumes(['multipart/form-data', 'application/json'])
-      .setProduces(['application/json', 'text/html', 'text/plain'])
+      //.setProduces(['application/json', 'text/html', 'text/plain'])
       .setTags([
         {
           name: 'Test',
           description: 'Testing purpose',
           externalDocs: { description: 'Find more info here', url: 'https://swagger.io/specification/' }
         }
-      ]).setGenerateComponentsRule(GenerateComponentsRules.undefined);
-
-    openapi.responsesProperty = 'openapi';
+      ]).setGenerateComponentsRule(GenerateComponentsRules.ifUndefined)
+      .setResponsesProperty('openapi');
 
     openapi.addRequestBody('AppBody', {
        required: true,
