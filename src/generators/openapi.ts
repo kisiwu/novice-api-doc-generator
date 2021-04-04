@@ -4,8 +4,8 @@
 
 /**
  * @todo: getters
- * @todo: change var, method names ...
  * @todo add debug logs
+ * @todo: change var, method names ...
  */
 
 import {
@@ -158,13 +158,22 @@ export class OpenApi {
     return this.#responsesProperty;
   }
 
-  setConsumes(v: string[]): OpenApi {
-    this.#consumes = v;
+  setConsumes(consumes: string[]): OpenApi {
+    this.#consumes = consumes;
     return this;
   }
 
   getConsumes(): string[] {
     return this.#consumes;
+  }
+
+  setCallbacks(callbacks: Record<string, unknown>): OpenApi {
+    this.#result.components.callbacks = callbacks;
+    return this;
+  }
+
+  getCallbacks(): Record<string, unknown> | undefined {
+    return this.#result.components.callbacks;
   }
 
   removeCallback(name: string): unknown {
@@ -212,6 +221,15 @@ export class OpenApi {
     return r;
   }
 
+  setLinks(links: Record<string, ReferenceObject | LinkObject>): OpenApi {
+    this.#result.components.links = links;
+    return this;
+  }
+
+  getLinks(): Record<string, ReferenceObject | LinkObject> | undefined {
+    return this.#result.components.links;
+  }
+
   removeLink(name: string): ReferenceObject | LinkObject | undefined {
     let r: ReferenceObject | LinkObject | undefined;
     if (this.#result.components.links) {
@@ -255,6 +273,15 @@ export class OpenApi {
       });
     }
     return r;
+  }
+
+  setExamples(examples: Record<string, ReferenceObject | ExampleObject>): OpenApi {
+    this.#result.components.examples = examples;
+    return this;
+  }
+
+  getExamples(): Record<string, ReferenceObject | ExampleObject> | undefined {
+    return this.#result.components.examples;
   }
 
   removeExample(name: string): ReferenceObject | ExampleObject | undefined {
@@ -302,6 +329,15 @@ export class OpenApi {
     return r;
   }
 
+  setSchemas(schemas: Record<string, SchemaObject | ReferenceObject>): OpenApi {
+    this.#result.components.schemas = schemas;
+    return this;
+  }
+
+  getSchemas(): Record<string, SchemaObject | ReferenceObject> | undefined {
+    return this.#result.components.schemas;
+  }
+
   removeSchema(name: string): SchemaObject | ReferenceObject | undefined {
     let r: SchemaObject | undefined;
     if (this.#result.components.schemas) {
@@ -345,6 +381,15 @@ export class OpenApi {
       });
     }
     return r;
+  }
+
+  setHeaders(headers: Record<string, ReferenceObject | HeaderObject>): OpenApi {
+    this.#result.components.headers = headers;
+    return this;
+  }
+
+  getHeaders(): Record<string, ReferenceObject | HeaderObject> | undefined {
+    return this.#result.components.headers;
   }
 
   removeHeader(name: string): ReferenceObject | HeaderObject | undefined {
@@ -392,6 +437,15 @@ export class OpenApi {
     return r;
   }
 
+  setParameters(parameters: Record<string, ReferenceObject | ParameterObject>): OpenApi {
+    this.#result.components.parameters = parameters;
+    return this;
+  }
+
+  getParameters(): Record<string, ReferenceObject | ParameterObject> | undefined {
+    return this.#result.components.parameters;
+  }
+
   removeParameter(name: string): ReferenceObject | ParameterObject | undefined {
     let r: ReferenceObject | ParameterObject | undefined;
     if (this.#result.components.parameters) {
@@ -437,6 +491,15 @@ export class OpenApi {
     return r;
   }
 
+  setRequestBodies(requestBodies: Record<string, ReferenceObject | RequestBodyObject>): OpenApi {
+    this.#result.components.requestBodies = requestBodies;
+    return this;
+  }
+
+  getRequestBodies(): Record<string, ReferenceObject | RequestBodyObject> | undefined {
+    return this.#result.components.requestBodies;
+  }
+
   removeRequestBody(name: string): ReferenceObject | RequestBodyObject | undefined {
     let r: ReferenceObject | RequestBodyObject | undefined;
     if (this.#result.components.requestBodies) {
@@ -480,6 +543,15 @@ export class OpenApi {
       });
     }
     return r;
+  }
+
+  setResponses(responses: Record<string, ReferenceObject | ResponseObject>): OpenApi {
+    this.#result.components.responses = responses;
+    return this;
+  }
+
+  getResponses(): Record<string, ReferenceObject | ResponseObject> | undefined {
+    return this.#result.components.responses;
   }
 
   removeResponse(name: string): ReferenceObject | ResponseObject | undefined {
@@ -532,6 +604,10 @@ export class OpenApi {
     return this;
   }
 
+  getSecuritySchemes(): Record<string, ReferenceObject | SecuritySchemeObject> | undefined {
+    return this.#result.components.securitySchemes;
+  }
+
   removeSecurityScheme(name: string): ReferenceObject | SecuritySchemeObject | undefined {
     let r: ReferenceObject | SecuritySchemeObject | undefined;
     if (this.#result.components.securitySchemes) {
@@ -577,9 +653,13 @@ export class OpenApi {
     return r;
   }
 
-  setComponents(k: Record<string, ComponentsObject>): OpenApi {
-    this.#result.components = k;
+  setComponents(components: ComponentsObject): OpenApi {
+    this.#result.components = components;
     return this;
+  }
+
+  getComponents(): ComponentsObject {
+    return this.#result.components;
   }
 
   /**
@@ -618,6 +698,10 @@ export class OpenApi {
   setTags(tags: TagObject[]): OpenApi {
     this.#result.tags = tags;
     return this;
+  }
+
+  getTags(): TagObject[] {
+    return this.#result.tags;
   }
 
   removeTag(tagName: string): TagObject | undefined {
@@ -704,9 +788,17 @@ export class OpenApi {
     return this;
   }
 
+  getTitle(): string {
+    return this.#result.info.title;
+  }
+
   setDescription(description: string): OpenApi {
     this.#result.info.description = description;
     return this;
+  }
+
+  getDescription(): string | undefined {
+    return this.#result.info.description;
   }
 
   setTermsOfService(termsOfService: string): OpenApi {
@@ -714,14 +806,26 @@ export class OpenApi {
     return this;
   }
 
+  getTermsOfService(): string | undefined {
+    return this.#result.info.termsOfService;
+  }
+
   setVersion(version: string): OpenApi {
     this.#result.info.version = version;
     return this;
   }
 
+  getVersion(): string {
+    return this.#result.info.version;
+  }
+
   setContact(contact: ContactObject): OpenApi {
     this.#result.info.contact = contact;
     return this;
+  }
+
+  getContact(): ContactObject | undefined {
+    return this.#result.info.contact;
   }
 
   setLicense(license: string): OpenApi;
@@ -735,6 +839,10 @@ export class OpenApi {
       this.#result.info.license = license;
     }
     return this;
+  }
+
+  getLicense(): LicenseObject | undefined {
+    return this.#result.info.license;
   }
 
   setServers(servers: ServerObject[]): OpenApi;
@@ -785,6 +893,10 @@ export class OpenApi {
     }
     return this;
   } 
+
+  getExternalDoc(): ExternalDocObject | undefined {
+    return this.#result.externalDocs;
+  }
 
   /**
    * @example
