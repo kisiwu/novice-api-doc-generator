@@ -3,6 +3,7 @@ docs
 private
 src
 test
+types
 todo
 typedoc.json
 

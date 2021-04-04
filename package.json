@@ -1,5 +1,6 @@
 {
-  "name": "api-doc-generator",
+  "name": "@novice1/api-doc-generator",
+  "private": false,
   "version": "0.0.1",
   "description": "Quickly generate API Documentation.",
   "main": "lib/index.js",
