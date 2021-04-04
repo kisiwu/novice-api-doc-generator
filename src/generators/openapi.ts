@@ -3,7 +3,6 @@
  */
 
 /**
- * @todo: getters
  * @todo add debug logs
  * @todo: change var, method names ...
  */
@@ -35,8 +34,9 @@ import { OpenApiJoiHelper } from './openapi/helpers/joiHelper';
 import { SchemaCreator } from './openapi/services/schemaService';
 import { ParameterCreator } from './openapi/services/parameterService';
 import { MediaTypeCreator } from './openapi/services/mediaTypeService';
-import { formatPath, formatType } from './openapi/utils';
+import { formatPath, formatType, Log } from './openapi/utils';
 import extend from 'extend';
+
 
 interface ResponsesRecord {
   [key: string]: ResponseObject | ReferenceObject;
@@ -80,7 +80,7 @@ export interface Route {
 
 export interface ProcessedRoute {
   path: string;
-  method?: string;
+  method: string;
   schema?: unknown;
 }
 
@@ -1010,8 +1010,10 @@ export class OpenApi {
 
     // if it shouldn't be documented
     if (undoc) {
+      Log.debug('"undoc" route [%s %s]', method, path);
       return {
-        path
+        path,
+        method
       };
     }
 
@@ -1057,7 +1059,7 @@ export class OpenApi {
 
     if (auth) {
       if (!security.length) {
-        // Log.warn("Missing 'security' for route: %s %s", method, path);
+        Log.warn('Missing "security" for route: %s %s', method, path);
       } else {
         schema.security = security;
       }
@@ -1078,7 +1080,7 @@ export class OpenApi {
     this.#result.paths[path] = this.#result.paths[path] || {};
     this.#result.paths[path][method] = schema;
 
-    // Log.info('added route [%s %s]: %O', method, path, schema);
+    Log.debug('added route [%s %s]: %O', method, path, schema);
 
     return {
       path,

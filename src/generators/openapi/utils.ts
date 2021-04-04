@@ -1,4 +1,5 @@
 import { VALID_TYPES } from '../../utils/genericUtils';
+import Logger from '@novice1/logger';
 
 export function formatType(type: string): { type?: string, format?: string } {
   let t: { type?: string, format?: string } = {
@@ -81,3 +82,5 @@ export function formatPath(path: string, params?: Record<string, unknown>): stri
   }
   return path;
 }
+
+export const Log = Logger.debugger('@novice1/api-doc-generator').extend('openapi');

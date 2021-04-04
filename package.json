@@ -43,6 +43,7 @@
     "typescript": "^4.2.2"
   },
   "dependencies": {
+    "@novice1/logger": "^1.2.5",
     "extend": "^3.0.2",
     "joi": "^17.4.0",
     "tslib": "^2.1.0"
