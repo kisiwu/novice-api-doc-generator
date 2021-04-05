@@ -1,4 +1,9 @@
 openapi:
   - finish todo's in generators/OpenApi
-  - add debug logs
-  - generate doc
+  - generate doc @done
+
+postman:
+  - write generator
+  - write postman/definitions.ts
+
+Archive:

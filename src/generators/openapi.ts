@@ -3,7 +3,6 @@
  */
 
 /**
- * @todo add debug logs
  * @todo: change var, method names ...
  */
 
@@ -984,6 +983,7 @@ export class OpenApi {
       const tmp = responses[this.#responsesProperty];
       if (tmp && typeof tmp === 'object') {
         Object.assign(r, tmp);
+        r = extend(true, r, tmp);
       }
     } else {
       r = responses || r;
@@ -1010,17 +1010,20 @@ export class OpenApi {
 
     // if it shouldn't be documented
     if (undoc) {
-      Log.debug('"undoc" route [%s %s]', method, path);
+      Log.info('"undoc" route [%s %s]', method, path);
       return {
         path,
         method
       };
     }
 
+    Log.debug('adding route [%s %s]', method, path);
+
     // format consumes
     if (!Array.isArray(parameters.consumes)) {
       if (parameters.consumes && typeof parameters.consumes === 'string') {
         consumes = [parameters.consumes];
+        Log.debug('overwrite "consumes": %O', consumes);
       } else {
         if (this.#consumes.length) {
           consumes = this.#consumes;
@@ -1028,6 +1031,7 @@ export class OpenApi {
       }
     } else {
       consumes = parameters.consumes;
+      Log.debug('overwrite "consumes": %O', consumes);
     }
 
     // format security
@@ -1059,9 +1063,10 @@ export class OpenApi {
 
     if (auth) {
       if (!security.length) {
-        Log.warn('Missing "security" for route: %s %s', method, path);
+        Log.warn('Missing "security" for "auth" route: %s %s', method, path);
       } else {
         schema.security = security;
+        Log.debug('security:', security);
       }
     }
 
@@ -1091,14 +1096,11 @@ export class OpenApi {
 
   private _formatResponses(routeResponses: ResponsesRecord): ResponsesRecord {
     // format responses
-    const responses: ResponsesRecord = {};
+    const responses: ResponsesRecord = routeResponses;
 
-    Object.keys(routeResponses).forEach((p) => {
-      responses[p] = routeResponses[p];
-    });
-
-    // if none
+    // if empty
     if (!Object.keys(responses).length) {
+      Log.debug('empty responses object');
       responses.default = {
         description: 'none',
       };
@@ -1119,28 +1121,36 @@ export class OpenApi {
     }
 
     if (parameters.headers) {
+      Log.debug('handle headers');
       this._pushPathParameters(
         ParameterLocations.header, parameters.headers, res);
     } else if (children && children.headers) {
+      Log.debug('handle headers');
       this._pushPathParameters(
         ParameterLocations.header, children.headers, res);
     }
     if (parameters.params) {
+      Log.debug('handle params');
       this._pushPathParameters(ParameterLocations.path, parameters.params, res);
     } else if (children && children.params) {
+      Log.debug('handle params');
       this._pushPathParameters(
         ParameterLocations.path, children.params, res);
     }
     if (parameters.query) {
+      Log.debug('handle query');
       this._pushPathParameters(
         ParameterLocations.query, parameters.query, res);
     } else if (children && children.query) {
+      Log.debug('handle query');
       this._pushPathParameters(ParameterLocations.query, children.query, res);
     }
     if (parameters.cookies) {
+      Log.debug('handle cookies');
       this._pushPathParameters(
         ParameterLocations.cookie, parameters.cookies, res);
     } else if (children && children.cookies) {
+      Log.debug('handle cookies');
       this._pushPathParameters(
         ParameterLocations.cookie, children.cookies, res);
     }
@@ -1192,6 +1202,12 @@ export class OpenApi {
       if (style) {
         defaultParamObject.style = style;
       }
+
+      Log.debug(
+        '%s: %s (style: %s)',
+        defaultParamObject.in,
+        defaultParamObject.name,
+        defaultParamObject.style);
 
       const parameterObject = this._createParameterObject(location, helper, defaultParamObject);
 
@@ -1305,12 +1321,14 @@ export class OpenApi {
 
     // body|files
     if (parameters.body || parameters.files) {
+      Log.debug('handle body and/or files');
       this._pushRequestBody(parameters.body, parameters.files, consumes, res);
     } else {
       const bodyHelper = new this.#helperClass(parameters);
       if (bodyHelper.isValid()) {
         const children = bodyHelper.getChildren();
         if (children.body || children.files) {
+          Log.debug('handle body and/or files');
           this._pushRequestBody(children.body, children.files, consumes, res);
         }
         // ReferenceObject | RequestBodyObject
@@ -1340,6 +1358,7 @@ export class OpenApi {
     let contentIsRequired = false;
 
     if (body) {
+      Log.debug('handle body');
       const bodyHelper = body instanceof this.#helperClass ? body : new this.#helperClass(body);
       if (bodyHelper.isValid()) {
         bodySchema = this._createSchema(bodyHelper);
@@ -1381,6 +1400,7 @@ export class OpenApi {
     }
 
     if (files && (!schemaObject || bodySchema?.isType('object'))) {
+      Log.debug('handle files');
       const filesHelper = files instanceof this.#helperClass ? files : new this.#helperClass(files);
 
       // mix with bodySchema or create new
@@ -1772,20 +1792,24 @@ export class OpenApi {
       const entityName: string = this._localRefToEntityName(ref);
       if (entityName && newSchema) {
         if (this.#generateComponentsRule === GenerateComponentsRules.always) {
+          Log.debug('generate component "%s"', ref);
           this.addSchema(entityName, newSchema);
         } else if (this.#generateComponentsRule === GenerateComponentsRules.ifUndefined) {
           if (!this.hasSchema(entityName)) {
+            Log.debug('generate component "%s"', ref);
             this.addSchema(entityName, newSchema);
           }
         }
         newSchema = {
           $ref: ref
         };
+        Log.silly('$ref: %s', newSchema.$ref);
       }
     } else if (remoteRef) {
       newSchema = {
         $ref: remoteRef
       };
+      Log.silly('$ref: %s', newSchema.$ref);
     }
     return newSchema;
   }
@@ -1801,20 +1825,24 @@ export class OpenApi {
       const entityName: string = this._localRefToEntityName(ref);
       if (entityName && newParamObject) {
         if (this.#generateComponentsRule === GenerateComponentsRules.always) {
+          Log.debug('generate component "%s"', ref);
           this.addParameter(entityName, newParamObject);
         } else if (this.#generateComponentsRule === GenerateComponentsRules.ifUndefined) {
           if (!this.hasParameter(entityName)) {
+            Log.debug('generate component "%s"', ref);
             this.addParameter(entityName, newParamObject);
           }
         }
         newParamObject = {
           $ref: ref
         };
+        Log.silly('$ref: %s', newParamObject.$ref);
       }
     } else if (remoteRef) {
       newParamObject = {
         $ref: remoteRef
       };
+      Log.silly('$ref: %s', newParamObject.$ref);
     }
     return newParamObject;
   }
@@ -1833,20 +1861,24 @@ export class OpenApi {
           newSchema.description = helper.getDescription();
         }
         if (this.#generateComponentsRule === GenerateComponentsRules.always) {
+          Log.debug('generate component "%s"', ref);
           this.addRequestBody(entityName, newSchema);
         } else if (this.#generateComponentsRule === GenerateComponentsRules.ifUndefined) {
           if (!this.hasRequestBody(entityName)) {
+            Log.debug('generate component "%s"', ref);
             this.addRequestBody(entityName, newSchema);
           }
         }
         newSchema = {
           $ref: ref
         };
+        Log.silly('$ref: %s', newSchema.$ref);
       }
     } else if (remoteRef) {
       newSchema = {
         $ref: remoteRef
       };
+      Log.silly('$ref: %s', newSchema.$ref);
     }
     return newSchema;
   }
