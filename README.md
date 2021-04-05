@@ -14,14 +14,14 @@ $ npm install @novice1/api-doc-generator
 
 ### Default
 
-By default it understands joi schemas.
+By default it understands `joi` schemas.
 
 Example:
 ```ts
 import { OpenApi } from '@novice1/api-doc-generator';
 import { GenerateComponentsRules } from '@novice1/api-doc-generator/generators/openapi';
 import routing from '@novice1/routing';
-import joi from 'joi';
+import Joi from 'joi';
 
 const openapi = new OpenApi();
 
@@ -57,7 +57,7 @@ const router = routing()
     tags: ['default'],
     parameters: {
       query: {
-        version: joi.number()
+        version: Joi.number()
           .description('version number')
           .min(1)
           .max(3)
@@ -100,15 +100,15 @@ const oas = openapi.result();
 
 The `joi` types it can handle are: *alternatives*, *any*, *array*, *boolean*, *date* *function*, *number*, *object*, *string*, *binary*.
 
-It also handles format methods like `joi.string().email()`, `joi.string().url()` and more.
+It also handles format methods like `Joi.string().email()`, `Joi.string().url()` and more.
 
-#### joi.meta
+#### Joi.meta
 
-In some cases you might have to precise the format in `joi.meta`. For example `joi.string().meta({format: 'password'})`, `joi.date().meta({format: 'datetime'})` or more.
+In some cases you might have to precise the format in `Joi.meta`. For example `Joi.string().meta({format: 'password'})`, `Joi.date().meta({format: 'datetime'})` or more.
 
 You can also define a [reference](https://swagger.io/specification/#reference-object). For example:
 ```js
-joi.object()
+Joi.object()
   .keys({
     name: Joi.string().required(),
     petType: Joi.string().required()
@@ -117,7 +117,7 @@ joi.object()
 ```
 If the reference is local (`#`), it could automatically generate the component depending on the rule you set (see `OpenApi.setGenerateComponentsRule`).
 
-List of elements you can configure in `joi.meta`: 
+List of elements you can configure in `Joi.meta`: 
 - `additionalProperties`
 - `allowReserved`
 - `deprecated`
@@ -136,5 +136,6 @@ The possible value for each of them is defined in the [OpenAPI Specification](ht
 
 - [@novice1/api-doc-generator documentation](https://novice1.000webhostapp.com/api-doc-generator/)
 - [OpenAPI Specification](https://swagger.io/specification/)
+- [@novice1/validator-joi](https://www.npmjs.com/package/@novice1/validator-joi)
 - [@novice1/routing](https://www.npmjs.com/package/@novice1/routing)
 - [joi](https://www.npmjs.com/package/joi)
