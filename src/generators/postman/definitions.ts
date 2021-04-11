@@ -2,6 +2,20 @@ export type Description = string | DescriptionObject | null;
 
 export type FormParameter = ValueFormParameter | SrcFormParameter;
 
+export enum AuthType {
+  apikey = 'apikey',
+  awsv4 = 'awsv4',
+  basic = 'basic',
+  bearer = 'bearer',
+  digest = 'digest',
+  edgegrid = 'edgegrid',
+  hawk = 'hawk',
+  noauth = 'noauth',
+  oauth1 = 'oauth1',
+  oauth2 = 'oauth2',
+  ntlm = 'ntlm'
+}
+
 export interface DescriptionObject {
   content?: string; // The content of the description goes here, as a raw string.
   type?: string; // Holds the mime type of the raw description content. E.g: 'text/markdown' or 'text/html'.
@@ -70,25 +84,26 @@ export interface EventObject {
   disabled?: boolean; // default false Indicates whether the event is disabled. If absent, the event is assumed to be enabled
 }
 
-export interface AuthMethod {
+export interface AuthAttribute {
   key: string;
   value?: unknown;
   type?: string;
 }
 
 export interface Auth {
-  type?: string; // apikey awsv4 basic bearer digest edgegrid hawk noauth oauth1 oauth2 ntlm
+  type: string; // apikey awsv4 basic bearer digest edgegrid hawk noauth oauth1 oauth2 ntlm
   noauth?: unknown;
-  apikey?: AuthMethod[];
-  awsv4?: AuthMethod[];
-  basic?: AuthMethod[];
-  bearer?: AuthMethod[];
-  digest?: AuthMethod[];
-  edgegrid?: AuthMethod[];
-  hawk?: AuthMethod[];
-  ntlm?: AuthMethod[];
-  oauth1?: AuthMethod[];
-  oauth2?: AuthMethod[];
+  apikey?: AuthAttribute[];
+  awsv4?: AuthAttribute[];
+  basic?: AuthAttribute[];
+  bearer?: AuthAttribute[];
+  digest?: AuthAttribute[];
+  edgegrid?: AuthAttribute[];
+  hawk?: AuthAttribute[];
+  ntlm?: AuthAttribute[];
+  oauth1?: AuthAttribute[];
+  oauth2?: AuthAttribute[];
+  [key: string]: unknown;
 }
 
 
@@ -195,6 +210,7 @@ export interface ResponseObject {
   body?: null | string; // The raw text of the response.
   status?: string; // The response status, e.g: '200 OK'
   code?: number; // The numerical response code, example: 200, 201, 404, etc
+  [x: string]: unknown;
 }
 
 export interface Item {
@@ -203,7 +219,7 @@ export interface Item {
   description?: Description;
   variable?: Variable[];
   event?: EventObject[];
-  request: RequestObject | string;
+  request: RequestObject/* | string*/;
   response?: ResponseObject[];
   protocolProfileBehavior?: unknown;
 }

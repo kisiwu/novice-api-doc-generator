@@ -768,8 +768,8 @@ export class OpenApi {
     return this.#security;
   }
 
-  setInfo(v: InfoObject): OpenApi {
-    this.#result.info = v;
+  setInfo(info: InfoObject): OpenApi {
+    this.#result.info = info;
     return this;
   }
 
@@ -777,8 +777,8 @@ export class OpenApi {
     return this.#result.info;
   }
 
-  setInfoProperty(prop: string, v: unknown): OpenApi {
-    this.#result.info[prop] = v;
+  setInfoProperty(prop: string, value: unknown): OpenApi {
+    this.#result.info[prop] = value;
     return this;
   }
 

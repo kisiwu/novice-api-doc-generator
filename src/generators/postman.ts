@@ -8,17 +8,22 @@
 
 import {
   Auth,
+  AuthAttribute,
+  AuthType,
+  CollectionVersion,
+  Description,
   EventObject,
   Folder,
   InfoObject,
   Item,
+  ResponseObject,
   Variable
 } from './postman/definitions';
 /*
 import { OpenApiHelperInterface } from './openapi/helpers/interfaces';
 import { OpenApiJoiHelper } from './openapi/helpers/joiHelper';
 */
-import { formatPath, /*formatType,*/ Log } from './openapi/utils';
+import { formatPath, /*formatType,*/ Log } from './postman/utils';
 import extend from 'extend';
 
 
@@ -41,6 +46,12 @@ interface RouteParameters {
   produces?: unknown;
   security?: unknown;
   undoc?: boolean;
+  descriptionType?: unknown;
+  variableList?: unknown;
+  eventList?: unknown;
+  protocolProfileBehavior?: unknown;
+  proxy?: unknown;
+  certificate?: unknown;
   [key: string]: unknown;
 }
 
@@ -93,33 +104,38 @@ export enum GenerateComponentsRules {
 export class Postman {
   #consumes: string[];
   #result: PostmanResult;
-  #security: unknown[];
+  #security?: Auth;
   //#helperClass: { new(args: unknown): OpenApiHelperInterface };
 
   #responsesProperty?: string;
   #generateComponentsRule = GenerateComponentsRules.always;
 
+  #host: string[];
+  #folders: Folder[];
+
   constructor(/*helperClass: { new(args: unknown): OpenApiHelperInterface } = OpenApiJoiHelper*/) {
     this.#consumes = [];
+    this.#folders = [];
     //this.#helperClass = helperClass;
+    this.#host = [];
     this.#result = {
       info: {
-        version: '1.0.0',
+        //version: '1.0.0',
         name: '@novice1 API',
         schema: 'https://schema.getpostman.com/json/collection/v2.1.0/collection.json'
       },
       item: [],
-      variable: [
+     /* variable: [
         {
-          id: 'baseUrl',
-          key: 'baseUrl',
+          id: 'host',
+          key: 'host',
           value: 'http://0.0.0.0',
           type: 'string'
         }
       ],
+      */
       protocolProfileBehavior: {}
     };
-    this.#security = [];
   }
 
   setGenerateComponentsRule(v: GenerateComponentsRules): Postman {
@@ -150,6 +166,193 @@ export class Postman {
 
   getConsumes(): string[] {
     return this.#consumes;
+  }
+
+  setHost(host: string): Postman;
+  setHost(host: string[]): Postman;
+  setHost(host: string[] | string): Postman {
+    if (Array.isArray(host)) {
+      this.#host = host;
+    } else {
+      this.#host = [host];
+    }
+    return this;
+  }
+
+  getHost(): string[] {
+    return this.#host;
+  }
+
+  addHost(host: string): Postman {
+    this.#host.push(host);
+    return this;
+  }
+
+  setInfo(info: InfoObject): Postman {
+    this.#result.info = info;
+    return this;
+  }
+
+  getInfo(): InfoObject {
+    return this.#result.info;
+  }
+
+  setInfoProperty(prop: string, v: unknown): Postman {
+    this.#result.info[prop] = v;
+    return this;
+  }
+
+  setName(name: string): Postman {
+    this.#result.info.name = name;
+    return this;
+  }
+
+  getName(): string {
+    return this.#result.info.name;
+  }
+
+  setPostmanId(postmanId: string): Postman {
+    this.#result.info._postman_id = postmanId;
+    return this;
+  }
+
+  getPostmanId(): string | undefined {
+    return this.#result.info._postman_id;
+  }
+
+  setDescription(description: Description): Postman {
+    this.#result.info.description = description;
+    return this;
+  }
+
+  getDescription(): Description | undefined {
+    return this.#result.info.description;
+  }
+
+  setVersion(version: CollectionVersion | string | undefined): Postman {
+    this.#result.info.version = version;
+    return this;
+  }
+
+  getVersion(): CollectionVersion | string | undefined {
+    return this.#result.info.version;
+  }
+
+  setSchema(schema: string): Postman {
+    this.#result.info.schema = schema;
+    return this;
+  }
+
+  getSchema(): string {
+    return this.#result.info.schema;
+  }
+
+  setVariableList(variableList: Variable[]): Postman {
+    this.#result.variable = variableList;
+    return this;
+  }
+
+  getVariableList(): Variable[] | undefined {
+    return this.#result.variable;
+  }
+
+  addVariable(variable: Variable): Postman {
+    if(!this.#result.variable) {
+      this.#result.variable = [];
+    }
+    this.#result.variable.push(variable);
+    return this;
+  }
+
+  setEventList(eventList: EventObject[]): Postman {
+    this.#result.event = eventList;
+    return this;
+  }
+
+  getEventList(): EventObject[] | undefined {
+    return this.#result.event;
+  }
+
+  addEvent(event: EventObject): Postman {
+    if(!this.#result.event) {
+      this.#result.event = [];
+    }
+    this.#result.event.push(event);
+    return this;
+  }
+
+  setAuth(auth: Auth | null): Postman;
+  setAuth(type: string, auth?: AuthAttribute[]): Postman;
+  setAuth(type: string | Auth | null, authAttributes?: AuthAttribute[]): Postman {
+    if (typeof type === 'string') {
+      const v: Auth = { type };
+      if (authAttributes) {
+        v[type] = authAttributes;
+      }
+      this.#result.auth = v;
+    } else {
+      this.#result.auth = type;
+    }
+    return this;
+  }
+
+  getAuth(): Auth | null | undefined {
+    return this.#result.auth;
+  }
+
+  setProtocolProfileBehavior(protocolProfileBehavior: unknown): Postman {
+    this.#result.protocolProfileBehavior = protocolProfileBehavior;
+    return this;
+  }
+
+  getProtocolProfileBehavior(): unknown {
+    return this.#result.protocolProfileBehavior;
+  }
+
+  setFolders(folders: Folder[]): Postman {
+    this.#folders = folders;
+    return this;
+  }
+
+  getFolders(): Folder[] {
+    return this.#folders;
+  }
+
+  addFolder(name: string): Postman;
+  addFolder(folder: Folder): Postman;
+  addFolder(folder: Folder | string): Postman {
+    if (typeof folder === 'string') {
+      this.addFolders(folder);
+    } else {
+      this.addFolders(folder);
+    }
+    return this;
+  }
+
+  addFolders(name: string): Postman;
+  addFolders(folder: Folder): Postman;
+  addFolders(folders: Folder[]): Postman;
+  addFolders(folders: Folder[] | Folder | string): Postman {
+    let v: Folder[];
+    if (typeof folders === 'string') {
+      v = [{
+        name: folders,
+        item: []
+      }];
+    } else if (!Array.isArray(folders)) {
+      v = [folders];
+    } else {
+      v = folders;
+    }
+    v.forEach(folder => {
+      const f = this.#folders.find(f => f.name === folder.name);
+      if (f) {
+        Object.assign(f, folder);
+      } else {
+        this.#folders.push(folder);
+      }
+    });
+    return this;
   }
 
   /*
@@ -227,82 +430,6 @@ export class Postman {
     return this.#security;
   }
 
-  setInfo(v: InfoObject): Postman {
-    this.#result.info = v;
-    return this;
-  }
-
-  getInfo(): InfoObject {
-    return this.#result.info;
-  }
-
-  setInfoProperty(prop: string, v: unknown): Postman {
-    this.#result.info[prop] = v;
-    return this;
-  }
-
-  setTitle(title: string): Postman {
-    this.#result.info.title = title;
-    return this;
-  }
-
-  getTitle(): string {
-    return this.#result.info.title;
-  }
-
-  setDescription(description: string): Postman {
-    this.#result.info.description = description;
-    return this;
-  }
-
-  getDescription(): string | undefined {
-    return this.#result.info.description;
-  }
-
-  setTermsOfService(termsOfService: string): Postman {
-    this.#result.info.termsOfService = termsOfService;
-    return this;
-  }
-
-  getTermsOfService(): string | undefined {
-    return this.#result.info.termsOfService;
-  }
-
-  setVersion(version: string): Postman {
-    this.#result.info.version = version;
-    return this;
-  }
-
-  getVersion(): string {
-    return this.#result.info.version;
-  }
-
-  setContact(contact: ContactObject): Postman {
-    this.#result.info.contact = contact;
-    return this;
-  }
-
-  getContact(): ContactObject | undefined {
-    return this.#result.info.contact;
-  }
-
-  setLicense(license: string): Postman;
-  setLicense(license: LicenseObject): Postman;
-  setLicense(license: LicenseObject | string): Postman {
-    if (typeof license === 'string') {
-      this.#result.info.license = {
-        name: license
-      };
-    } else {
-      this.#result.info.license = license;
-    }
-    return this;
-  }
-
-  getLicense(): LicenseObject | undefined {
-    return this.#result.info.license;
-  }
-
   setServers(servers: ServerObject[]): Postman;
   setServers(server: ServerObject): Postman;
   setServers(v: ServerObject[] | ServerObject): Postman {
@@ -329,27 +456,6 @@ export class Postman {
     }
     this.#result.servers.push(v);
     return this;
-  }
-
-  setHost(url: string): Postman {
-    return this.setServers({
-      url
-    });
-  }
-
-  setExternalDoc(externalDoc: ExternalDocObject): Postman;
-  setExternalDoc(url: string): Postman
-  setExternalDoc(externalDoc: ExternalDocObject | string): Postman {
-    if (typeof externalDoc === 'string') {
-      this.#result.externalDocs = { url: externalDoc };
-    } else {
-      this.#result.externalDocs = externalDoc;
-    }
-    return this;
-  } 
-
-  getExternalDoc(): ExternalDocObject | undefined {
-    return this.#result.externalDocs;
   }
   */
 
@@ -434,27 +540,25 @@ export class Postman {
   }
   */
 
-  /*
-  private _getResponsesSchema(responses?: ResponsesRecord): ResponsesRecord {
-    let r: ResponsesRecord = {};
+  private _getResponsesSchema(responses?: ResponsesRecord): ResponseObject[] {
+    let r: ResponseObject[] = [];
+    let tmp: unknown;
     if (responses
       && this.#responsesProperty) {
-      const tmp = responses[this.#responsesProperty];
-      if (tmp && typeof tmp === 'object') {
-        Object.assign(r, tmp);
-        r = extend(true, r, tmp);
-      }
+      tmp = responses[this.#responsesProperty];
     } else {
-      r = responses || r;
+      tmp = responses;
+    }
+    if (Array.isArray(tmp)) {
+      r = tmp;
     }
     return r;
   }
-  */
 
   private _add(route: RouteSchema): ProcessedRoute | undefined {
 
     const parameters = route.parameters || {};
-    //const responses = this._getResponsesSchema(route.responses);
+    const responses: ResponseObject[] = this._getResponsesSchema(route.responses);
 
     const path = formatPath(route.path, parameters.params);
     const method = route.method;
@@ -465,8 +569,15 @@ export class Postman {
     const operationId = parameters.operationId;
     const undoc = parameters.undoc;
 
+    const descriptionType = parameters.descriptionType || ''; // e.g. 'text/markdown'
+    const variableList = parameters.variableList;
+    const eventList = parameters.eventList;
+    const protocolProfileBehavior = parameters.protocolProfileBehavior;
+    const proxy = parameters.proxy;
+    const certificate = parameters.certificate;
+
     let consumes: string[] = ['application/json'];
-    let security: unknown[] = this.#security;
+    let security: Auth | undefined = this.#security;
 
     // if it shouldn't be documented
     if (undoc) {
@@ -495,46 +606,119 @@ export class Postman {
     }
 
     // format security
+    const authTypes: string[] = Object.values(AuthType);
     if (!Array.isArray(parameters.security)) {
-      if (parameters.security && typeof parameters.security == 'object') {
-        security = [security];
-      } else if (parameters.security && typeof parameters.security == 'string') {
-        security = [{ [parameters.security]: [] }];
-      } else {
-        security = this.#security;
+      if (parameters.security 
+        && typeof parameters.security === 'object') {
+        const v: Record<string, unknown> = extend({}, parameters.security);
+        if (typeof v.type === 'string' && authTypes.find(t => t === v.type)) {
+          const authType: string = v.type;
+          const vauth: Auth = {type: authType, [authType]: []};
+          const authAttributes = v[authType];
+          if (Array.isArray(authAttributes)) {
+            authAttributes.forEach(attr => {
+              if (typeof attr?.key === 'string') {
+                const a: AuthAttribute = {key: attr.key};
+                if (attr.value) {
+                  a.value = attr.value;
+                }
+                if (typeof attr.type === 'string') {
+                  a.type = attr.type;
+                }
+              }
+            });
+          }
+          security = vauth;
+        } else {
+          const types: string[] = Object.keys(v);
+          const authType = authTypes.find(t => {
+            return types.includes(t);
+          });
+          if (authType) {
+            security = {
+              type: authType
+            };
+          }
+        }
+      } else if (parameters.security 
+        && typeof parameters.security == 'string'
+        && authTypes.find(t => t === parameters.security)) {
+        security = { type: parameters.security };
       }
     } else {
-      security = parameters.security.map((s) => {
-        if (s && typeof s == 'string') {
-          s = { [s]: [] };
-        }
-        return s;
+      const authType: string = parameters.security.find((s) => {
+        return authTypes.includes(s);
       });
+      if (authType) {
+        security = {type: authType};
+      }
     }
 
-    const schema: Record<string, unknown> = {
-      summary: description,
-      tags: tags,
+
+    // build item
+    const schema: Item = {
+      description,
+      request: {}
     };
 
-    if (operationId) {
-      schema.operationId = operationId;
+    if (descriptionType 
+      && typeof descriptionType === 'string'
+      && typeof description === 'string') {
+      schema.description = {
+        content: description,
+        type: descriptionType
+      };
     }
 
+    if (operationId) {
+      schema.id = operationId;
+    }
+
+    if (Array.isArray(eventList)) {
+      schema.event = eventList;
+    }
+
+    if (Array.isArray(variableList)) {
+      schema.variable = variableList;
+    }
+
+    if (protocolProfileBehavior) {
+      schema.protocolProfileBehavior = protocolProfileBehavior;
+    }
+
+    // format response
+    schema.response = this._formatResponses(responses);
+
+    // format request
     if (auth) {
-      if (!security.length) {
+      if (!security) {
         Log.warn('Missing "security" for "auth" route: %s %s', method, path);
       } else {
-        schema.security = security;
+        schema.request.auth = security;
         Log.debug('security:', security);
       }
     }
+    if (proxy && typeof proxy === 'object') {
+      schema.request.proxy = proxy;
+    }
+    if (certificate && typeof certificate === 'object') {
+      schema.request.certificate = certificate;
+    }
+    schema.request.method = method.toUpperCase();
+    if (schema.description) {
+      schema.request.description = schema.description;
+    }
+
+    // @todo: format url 
+    // @todo: format header
+    // @todo: format body
+    
 
     // format parameters, requestBody, responses
     /*
     const formattedParameters: (ParameterObject | ReferenceObject)[] = this._formatParameters(parameters);
     const formattedRequestBody: RequestBodyObject = this._formatRequestBody(parameters, consumes);
-    schema.responses = this._formatResponses(responses);
+    
 
     if (formattedRequestBody && Object.keys(formattedRequestBody).length) {
       schema.requestBody = formattedRequestBody;
@@ -556,22 +740,17 @@ export class Postman {
     };
   }
 
-  /*
-  private _formatResponses(routeResponses: ResponsesRecord): ResponsesRecord {
-    // format responses
-    const responses: ResponsesRecord = routeResponses;
 
+  private _formatResponses(routeResponses: ResponseObject[]): ResponseObject[] {
     // if empty
-    if (!Object.keys(responses).length) {
+    if (!routeResponses.length) {
       Log.debug('empty responses object');
-      responses.default = {
-        description: 'none',
-      };
     }
 
-    return responses;
+    return routeResponses;
   }
 
+  /*
   // format parameters methods
   private _formatParameters(parameters: RouteParameters): (ParameterObject | ReferenceObject)[] {
     // format parameters
