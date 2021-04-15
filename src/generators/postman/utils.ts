@@ -33,12 +33,14 @@ export function formatType(type: string): { type?: string, format?: string } {
     t.format = type;
     Log.silly('type %s to %o', type, t);
   } else if (type === 'int32' || type === 'int64') {
-    t.type = 'integer'
+    t.type = 'number'
     t.format = type;
     Log.silly('type %s to %o', type, t);
   }
   else if (!VALID_TYPES.includes(type)) {
-    t = {};
+    t = {
+      type: 'any'
+    };
     Log.silly('type %s to %o', type, t);
   }
 

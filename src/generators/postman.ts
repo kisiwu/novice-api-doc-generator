@@ -14,15 +14,18 @@ import {
   Description,
   EventObject,
   Folder,
+  HeaderObject,
   InfoObject,
   Item,
+  QueryParam,
   ResponseObject,
+  UrlObject,
   Variable
 } from './postman/definitions';
-/*
-import { OpenApiHelperInterface } from './openapi/helpers/interfaces';
-import { OpenApiJoiHelper } from './openapi/helpers/joiHelper';
-*/
+
+import { PostmanHelperInterface } from './postman/helpers/interfaces';
+import { PostmanJoiHelper } from './postman/helpers/joiHelper';
+
 import { formatPath, /*formatType,*/ Log } from './postman/utils';
 import extend from 'extend';
 
@@ -79,7 +82,7 @@ export interface ProcessedRoute {
   schema?: unknown;
 }
 
-export interface PostmanResult {
+export interface PostmanCollection {
   info: InfoObject;
   item: (Item | Folder)[];
   event?: EventObject[];
@@ -89,10 +92,9 @@ export interface PostmanResult {
   [key: string]: unknown;
 }
 
-export enum GenerateComponentsRules {
-  always = 'always',
-  ifUndefined = 'ifUndefined',
-  never = 'never',
+export enum GenerateFoldersRules {
+  siblings = 'siblings',
+  tree = 'tree'
 }
 
 /**
@@ -103,20 +105,20 @@ export enum GenerateComponentsRules {
  */
 export class Postman {
   #consumes: string[];
-  #result: PostmanResult;
+  #result: PostmanCollection;
   #security?: Auth;
-  //#helperClass: { new(args: unknown): OpenApiHelperInterface };
+  #helperClass: { new(args: unknown): PostmanHelperInterface };
 
   #responsesProperty?: string;
-  #generateComponentsRule = GenerateComponentsRules.always;
 
+  #generateFoldersRule = GenerateFoldersRules.tree;
   #host: string[];
   #folders: Folder[];
 
-  constructor(/*helperClass: { new(args: unknown): OpenApiHelperInterface } = OpenApiJoiHelper*/) {
+  constructor(helperClass: { new(args: unknown): PostmanHelperInterface } = PostmanJoiHelper) {
     this.#consumes = [];
     this.#folders = [];
-    //this.#helperClass = helperClass;
+    this.#helperClass = helperClass;
     this.#host = [];
     this.#result = {
       info: {
@@ -138,16 +140,16 @@ export class Postman {
     };
   }
 
-  setGenerateComponentsRule(v: GenerateComponentsRules): Postman {
-    const value: GenerateComponentsRules = GenerateComponentsRules[v];
+  setGenerateFoldersRule(v: GenerateFoldersRules): Postman {
+    const value: GenerateFoldersRules = GenerateFoldersRules[v];
     if (value) {
-      this.#generateComponentsRule = value;
+      this.#generateFoldersRule = value;
     }
     return this;
   }
 
-  getGenerateComponentsRule(): GenerateComponentsRules {
-    return this.#generateComponentsRule;
+  getGenerateFoldersRule(): GenerateFoldersRules {
+    return this.#generateFoldersRule;
   }
 
   setResponsesProperty(v: string): Postman {
@@ -562,6 +564,7 @@ export class Postman {
 
     const path = formatPath(route.path, parameters.params);
     const method = route.method;
+    const name = route.name || '';
     const description = route.description || '';
     const tags = route.tags || [];
     const auth = route.auth;
@@ -657,6 +660,7 @@ export class Postman {
 
     // build item
     const schema: Item = {
+      name,
       description,
       request: {}
     };
@@ -709,34 +713,77 @@ export class Postman {
       schema.request.description = schema.description;
     }
 
-    // @todo: format url 
-    // @todo: format header
+    // format url (params, query)
+    schema.request.url= this._formatUrl(path, parameters);
+    // format header
+    const formattedHeader = this._formatHeader(parameters, consumes);
+    if(formattedHeader.length) {
+      schema.request.header = formattedHeader;
+    }
     // @todo: format body
-    
-
-    // format parameters, requestBody, responses
     /*
-    const formattedParameters: (ParameterObject | ReferenceObject)[] = this._formatParameters(parameters);
-    const formattedRequestBody: RequestBodyObject = this._formatRequestBody(parameters, consumes);
+    const formattedBody = this._formatBody(parameters, consumes);
+    if(formattedBody) {
+      schema.request.body = formattedBody;
+    }
+    */
     
 
-    if (formattedRequestBody && Object.keys(formattedRequestBody).length) {
-      schema.requestBody = formattedRequestBody;
-    }
-    if (formattedParameters && formattedParameters.length) {
-      schema.parameters = formattedParameters;
+    const folders: Folder[] = [];
+    if (Array.isArray(tags) && tags.length) {
+      let currentFolder: Folder | undefined;
+      tags.forEach(tag => {
+        if (typeof tag === 'string') {
+          let tmpFolder: Folder | undefined;
+          if (this.#generateFoldersRule === GenerateFoldersRules.siblings) {
+            tmpFolder = this.#folders.find(f => f.name === tag);
+            if (!tmpFolder) {
+              tmpFolder = {
+                name: tag,
+                item: []
+              };
+            }
+            folders.push(tmpFolder);
+          } else {
+            if(!currentFolder) {
+              tmpFolder = this.#folders.find(f => f.name === tag);
+              if (!tmpFolder) {
+                tmpFolder = {
+                  name: tag,
+                  item: []
+                };
+                this.#folders.push(tmpFolder);
+              }
+            } else {
+              tmpFolder = <Folder | undefined>currentFolder.item.find(f => f.name === tag);
+              if(!tmpFolder) {
+                tmpFolder = {
+                  name: tag,
+                  item: []
+                };
+              }
+            }
+            currentFolder = tmpFolder;
+            folders[0] = currentFolder;
+          }
+        }
+      });
     }
 
-    this.#result.paths[path] = this.#result.paths[path] || {};
-    this.#result.paths[path][method] = schema;
-    */
+    if (!folders.length) {
+      this.#result.item.push(schema);
+    } else {
+      folders.forEach(folder => {
+        folder.item.push(schema);
+      });
+    }
 
     Log.debug('added route [%s %s]: %O', method, path, schema);
 
     return {
       path,
       method,
-      schema: {}//this.#result.paths[path][method],
+      schema
     };
   }
 
@@ -746,70 +793,128 @@ export class Postman {
     if (!routeResponses.length) {
       Log.debug('empty responses object');
     }
-
     return routeResponses;
   }
 
-  /*
-  // format parameters methods
-  private _formatParameters(parameters: RouteParameters): (ParameterObject | ReferenceObject)[] {
-    // format parameters
-    const res: (ParameterObject | ReferenceObject)[] = [];
+  private _formatHeader(
+    parameters: RouteParameters,
+    consumes: string[]
+  ): HeaderObject[] {
+    const res: HeaderObject[] = [];
 
     const paramsHelper = new this.#helperClass(parameters);
-    let children: Record<string, OpenApiHelperInterface> | undefined;
+    let children: Record<string, PostmanHelperInterface> | undefined;
     if (paramsHelper.isValid()) {
       children = paramsHelper.getChildren();
     }
 
     if (parameters.headers) {
       Log.debug('handle headers');
-      this._pushPathParameters(
-        ParameterLocations.header, parameters.headers, res);
+      this._pushHeader(parameters.headers, res);
     } else if (children && children.headers) {
       Log.debug('handle headers');
-      this._pushPathParameters(
-        ParameterLocations.header, children.headers, res);
+      this._pushHeader(children.headers, res);
     }
-    if (parameters.params) {
-      Log.debug('handle params');
-      this._pushPathParameters(ParameterLocations.path, parameters.params, res);
-    } else if (children && children.params) {
-      Log.debug('handle params');
-      this._pushPathParameters(
-        ParameterLocations.path, children.params, res);
-    }
-    if (parameters.query) {
-      Log.debug('handle query');
-      this._pushPathParameters(
-        ParameterLocations.query, parameters.query, res);
-    } else if (children && children.query) {
-      Log.debug('handle query');
-      this._pushPathParameters(ParameterLocations.query, children.query, res);
-    }
-    if (parameters.cookies) {
-      Log.debug('handle cookies');
-      this._pushPathParameters(
-        ParameterLocations.cookie, parameters.cookies, res);
-    } else if (children && children.cookies) {
-      Log.debug('handle cookies');
-      this._pushPathParameters(
-        ParameterLocations.cookie, children.cookies, res);
+
+    // add default Content-Type
+    if(consumes.length && !res.find(h => h.key === 'Content-Type')) {
+      res.push({
+        key: 'Content-Type',
+        value: consumes[0]
+      });
     }
 
     return res;
   }
 
-  private _pushPathParameters(
-    location: ParameterLocations,
-    value: Record<string, unknown> | OpenApiHelperInterface,
-    res: Array<ReferenceObject | ParameterObject>) {
-    const valueHelper = value instanceof this.#helperClass ? value : new this.#helperClass(value);
-    let valueHelperType: string | undefined;
+  private _formatUrl(
+    path: string, 
+    parameters: RouteParameters
+  ): UrlObject {
+   const url: UrlObject = {
+			host: this.#host,
+			path: path.substring(1).split('/'),
+   };
 
-    let children: Record<string, OpenApiHelperInterface>;
+   const variables = this._formatUrlVariable(parameters);
+   if (variables.length) {
+     url.variable = variables;
+   }
+
+   const queryParams = this._formatUrlQuery(parameters);
+   if (queryParams.length) {
+     url.query = queryParams;
+   }
+
+   return url;
+  }
+
+  private _formatUrlVariable(parameters: RouteParameters): Variable[] {
+    const res: Variable[] = [];
+
+    const paramsHelper = new this.#helperClass(parameters);
+    let children: Record<string, PostmanHelperInterface> | undefined;
+    if (paramsHelper.isValid()) {
+      children = paramsHelper.getChildren();
+    }
+
+    if (parameters.params) {
+      Log.debug('handle params');
+      this._pushVariable(parameters.params, res);
+    } else if (children && children.params) {
+      Log.debug('handle params');
+      this._pushVariable(children.params, res);
+    }
+
+    return res;
+  }
+
+  // format parameters methods
+  private _formatUrlQuery(parameters: RouteParameters): QueryParam[] {
+    // format parameters
+    const res: QueryParam[] = [];
+
+    const paramsHelper = new this.#helperClass(parameters);
+    let children: Record<string, PostmanHelperInterface> | undefined;
+    if (paramsHelper.isValid()) {
+      children = paramsHelper.getChildren();
+    }
+
+    //if (parameters.headers) {
+    //  Log.debug('handle headers');
+    //  this._pushPathParameters(
+    //    ParameterLocations.header, parameters.headers, res);
+    //} else if (children && children.headers) {
+    //  Log.debug('handle headers');
+    //  this._pushPathParameters(
+    //    ParameterLocations.header, children.headers, res);
+    //}
+    //if (parameters.params) {
+    //  Log.debug('handle params');
+    //  this._pushPathParameters(ParameterLocations.path, parameters.params, res);
+    //} else if (children && children.params) {
+    //  Log.debug('handle params');
+    //  this._pushPathParameters(
+    //    ParameterLocations.path, children.params, res);
+    //}
+    if (parameters.query) {
+      Log.debug('handle query');
+      this._pushQueryParam(parameters.query, res);
+    } else if (children && children.query) {
+      Log.debug('handle query');
+      this._pushQueryParam(children.query, res);
+    }
+
+    return res;
+  }
+
+  private _pushHeader(
+    value: Record<string, unknown> | PostmanHelperInterface,
+    res: HeaderObject[]) {
+    const valueHelper = value instanceof this.#helperClass ? value : new this.#helperClass(value);
+
+    let children: Record<string, PostmanHelperInterface>;
     if (valueHelper.isValid()) {
-      valueHelperType = formatType(valueHelper.getType()).type;
       children = valueHelper.getChildren();
     }
 
@@ -820,7 +925,105 @@ export class Postman {
       return Object.keys(value);
     };
 
-    const getChild = (name: string): OpenApiHelperInterface | undefined => {
+    const getChild = (name: string): PostmanHelperInterface | undefined => {
+      if (children) {
+        return children[name];
+      }
+      if (value instanceof this.#helperClass) {
+        return;
+      }
+      return new this.#helperClass(value[name]);
+    };
+
+    const handleChild = (
+      key: string,
+      helper: PostmanHelperInterface) => {
+      if (!helper.isValid()) return;
+
+      let value = '';
+
+      if(helper.hasDefaultValue()) {
+        const defaultValue = helper.getDefaultValue();
+        if (typeof defaultValue === 'string') {
+          value = defaultValue;
+        } else if(defaultValue && typeof defaultValue === 'object'){
+          value = JSON.stringify(defaultValue);
+        } else {
+          value = `${defaultValue}`;
+        }
+      } else if(helper.hasExampleValue()) {
+        const exampleValue = helper.getExampleValue();
+        if (typeof exampleValue === 'string') {
+          value = exampleValue;
+        } else if(exampleValue && typeof exampleValue === 'object'){
+          value = JSON.stringify(exampleValue);
+        } else {
+          value = `${exampleValue}`;
+        }
+      } else {
+        value = `<${helper.getType()}>`;
+      }
+
+      const header: HeaderObject = {
+        key,
+        value
+      };
+
+      const description: string = helper.getDescription(); 
+      const unit: string = helper.getUnit();
+
+      if (description) {
+        header.description = {
+          content: description
+        };
+        if (helper.hasDescriptionType?.()
+          && helper.getDescriptionType) {
+            header.description.type = helper.getDescriptionType();
+        } else if(unit) {
+          header.description.content = `${description} (${unit})`;
+        }
+      } else if(unit) {
+        header.description = `(${unit})`;
+      }
+
+      if (!helper.isRequired()) {
+        header.disabled = true;
+      }
+
+      Log.debug('HeaderObject: %O', header);
+
+      res.push(header);
+    };
+
+
+    getChildrenNames().forEach((name: string) => {
+      const helper = getChild(name);
+      if (helper) {
+        handleChild(name, helper);
+      }
+    });
+  }
+
+  private _pushVariable(
+    value: Record<string, unknown> | PostmanHelperInterface,
+    res: Variable[]) {
+
+    const VALID_VARIABLE_TYPES = ['string', 'boolean', 'any', 'number'];
+    const valueHelper = value instanceof this.#helperClass ? value : new this.#helperClass(value);
+
+    let children: Record<string, PostmanHelperInterface>;
+    if (valueHelper.isValid()) {
+      children = valueHelper.getChildren();
+    }
+
+    const getChildrenNames = () => {
+      if (children) {
+        return Object.keys(children);
+      }
+      return Object.keys(value);
+    };
+
+    const getChild = (name: string): PostmanHelperInterface | undefined => {
       if (children) {
         return children[name];
       }
@@ -832,30 +1035,46 @@ export class Postman {
 
     const handleChild = (
       name: string,
-      helper: OpenApiHelperInterface,
-      style?: string) => {
+      helper: PostmanHelperInterface) => {
       if (!helper.isValid()) return;
 
-      const defaultParamObject: ParameterObject = {
+      const variable: Variable = {
         name,
-        in: location
+        type: helper.getType()
       };
 
-      if (style) {
-        defaultParamObject.style = style;
+      if (!variable.type || !VALID_VARIABLE_TYPES.includes(variable.type)) {
+        variable.type = 'any';
       }
 
-      Log.debug(
-        '%s: %s (style: %s)',
-        defaultParamObject.in,
-        defaultParamObject.name,
-        defaultParamObject.style);
+      const description: string = helper.getDescription();
+      const unit: string = helper.getUnit();
 
-      const parameterObject = this._createParameterObject(location, helper, defaultParamObject);
+      if (description) {
+        variable.description = {
+          content: description
+        };
+        if (helper.hasDescriptionType?.()
+          && helper.getDescriptionType) {
+          variable.description.type = helper.getDescriptionType();
+        } else if (unit) {
+          variable.description.content = `${description} (${unit})`;
+        }
+      } else if (unit) {
+        variable.description = `(${unit})`;
+      }
 
-      // ReferenceObject | ParameterObject
-      const pObject = this._autoParameterObjectToRef(helper, parameterObject);
-      res.push(pObject);
+      if (helper.hasDefaultValue()) {
+        const defaultValue = helper.getDefaultValue();
+        variable.value = defaultValue;
+      } else if (helper.hasExampleValue()) {
+        const exampleValue = helper.getExampleValue();
+        variable.value = exampleValue;
+      }
+
+      Log.debug('Variable: %O', variable);
+
+      res.push(variable);
     };
 
 
@@ -865,24 +1084,105 @@ export class Postman {
         handleChild(name, helper);
       }
     });
-
-    // e.g.: enable additional query
-    if (valueHelperType === 'object') {
-      if (valueHelper.getAdditionalProperties
-        && valueHelper.hasAdditionalProperties?.()) {
-        let style: string | undefined;
-        if (valueHelper.getStyle
-          && valueHelper.hasStyle?.()) {
-          style = 'form';
-        }
-        handleChild(location, valueHelper, style);
-      }
-    }
   }
 
+  private _pushQueryParam(
+    value: Record<string, unknown> | PostmanHelperInterface,
+    res: QueryParam[]) {
+    const valueHelper = value instanceof this.#helperClass ? value : new this.#helperClass(value);
+
+    let children: Record<string, PostmanHelperInterface>;
+    if (valueHelper.isValid()) {
+      children = valueHelper.getChildren();
+    }
+
+    const getChildrenNames = () => {
+      if (children) {
+        return Object.keys(children);
+      }
+      return Object.keys(value);
+    };
+
+    const getChild = (name: string): PostmanHelperInterface | undefined => {
+      if (children) {
+        return children[name];
+      }
+      if (value instanceof this.#helperClass) {
+        return;
+      }
+      return new this.#helperClass(value[name]);
+    };
+
+    const handleChild = (
+      key: string,
+      helper: PostmanHelperInterface) => {
+      if (!helper.isValid()) return;
+
+      const queryParam: QueryParam = {
+        key
+      };
+
+      const description: string = helper.getDescription(); 
+      const unit: string = helper.getUnit();
+
+      if (description) {
+        queryParam.description = {
+          content: description
+        };
+        if (helper.hasDescriptionType?.()
+          && helper.getDescriptionType) {
+          queryParam.description.type = helper.getDescriptionType();
+        } else if(unit) {
+          queryParam.description.content = `${description} (${unit})`;
+        }
+      } else if(unit) {
+        queryParam.description = `(${unit})`;
+      }
+
+      if (!helper.isRequired()) {
+        queryParam.disabled = true;
+      }
+
+      if(helper.hasDefaultValue()) {
+        const defaultValue = helper.getDefaultValue();
+        if (typeof defaultValue === 'string') {
+          queryParam.value = defaultValue;
+        } else if(defaultValue && typeof defaultValue === 'object'){
+          queryParam.value = JSON.stringify(defaultValue);
+        } else {
+          queryParam.value = `${defaultValue}`;
+        }
+      } else if(helper.hasExampleValue()) {
+        const exampleValue = helper.getExampleValue();
+        if (typeof exampleValue === 'string') {
+          queryParam.value = exampleValue;
+        } else if(exampleValue && typeof exampleValue === 'object'){
+          queryParam.value = JSON.stringify(exampleValue);
+        } else {
+          queryParam.value = `${exampleValue}`;
+        }
+      } else {
+        queryParam.value = `<${helper.getType()}>`;
+      }
+
+      Log.debug('QueryParam: %O', queryParam);
+
+      res.push(queryParam);
+    };
+
+
+    getChildrenNames().forEach((name: string) => {
+      const helper = getChild(name);
+      if (helper) {
+        handleChild(name, helper);
+      }
+    });
+  }
+
+  /*
   private _createParameterObject(
     location: string,
-    helper: OpenApiHelperInterface,
+    helper: PostmanHelperInterface,
     defaultParameterObject: ParameterObject): ParameterObject {
     const parameter = new ParameterCreator(defaultParameterObject)
       .setRequired(helper.isRequired())
@@ -975,8 +1275,8 @@ export class Postman {
   }
 
   private _pushRequestBody(
-    body: Record<string, unknown> | OpenApiHelperInterface | undefined,
-    files: Record<string, unknown> | OpenApiHelperInterface | undefined,
+    body: Record<string, unknown> | PostmanHelperInterface | undefined,
+    files: Record<string, unknown> | PostmanHelperInterface | undefined,
     consumes: string[],
     res: RequestBodyObject) {
 
@@ -985,7 +1285,7 @@ export class Postman {
     let bodySchema: SchemaCreator | undefined;
     let filesSchema: SchemaCreator | undefined;
 
-    let helperWithRef: OpenApiHelperInterface | undefined;
+    let helperWithRef: PostmanHelperInterface | undefined;
 
     let examples: Record<string, ExampleObject | ReferenceObject> | undefined;
     let encoding: Record<string, EncodingObject> | undefined;
@@ -1132,7 +1432,7 @@ export class Postman {
   // -- schema object creation methods
 
   private _createBasicSchema(
-    helper: OpenApiHelperInterface,
+    helper: PostmanHelperInterface,
     parentProp?: SchemaCreator,
     name?: string,
     format?: string
@@ -1224,7 +1524,7 @@ export class Postman {
   }
 
   private _createSchema(
-    helper: OpenApiHelperInterface,
+    helper: PostmanHelperInterface,
     parentProp?: SchemaCreator,
     name?: string,
     format?: string
@@ -1237,7 +1537,7 @@ export class Postman {
   }
 
   private _createSchemaObject(
-    helper: OpenApiHelperInterface,
+    helper: PostmanHelperInterface,
     parentProp?: SchemaCreator,
     name?: string,
     format?: string
@@ -1255,7 +1555,7 @@ export class Postman {
   }
 
   private _createAlternativeSchema(
-    altHelper: OpenApiHelperInterface,
+    altHelper: PostmanHelperInterface,
     parentProp?: SchemaCreator,
     name?: string
   ): SchemaCreator {
@@ -1263,7 +1563,7 @@ export class Postman {
   }
 
   private _createAlternativeSchemaObject(
-    altHelper: OpenApiHelperInterface,
+    altHelper: PostmanHelperInterface,
     parentProp?: SchemaCreator,
     name?: string
   ): SchemaObject {
@@ -1334,7 +1634,15 @@ export class Postman {
   }
   */
 
-  result(): Record<string, unknown> {
-    return extend(true, {}, this.#result);
+  result(): PostmanCollection {
+    const result: PostmanCollection = extend(true, {}, this.#result);
+    const folders: Folder[] = [];
+    this.#folders.forEach(folder => {
+      folders.push(extend(true, {}, folder));
+    });
+    console.log(`FOLDERS: ${folders.length}`);
+    result.item.push(...folders);
+    console.log(`items: ${result.item.length}`);
+    return result;
   }
 }

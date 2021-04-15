@@ -173,6 +173,7 @@ export interface RequestBodyObject {
   },
   options?: Record<string, unknown>;
   disabled?: boolean;
+  [x: string]: unknown;
 }
 
 export interface RequestObject {
@@ -184,6 +185,7 @@ export interface RequestObject {
   description?: Description;
   header?: string | HeaderObject[];
   body?: null | RequestBodyObject;
+  [x: string]: unknown;
 }
 
 export interface CookieObject {
@@ -198,10 +200,12 @@ export interface CookieObject {
   session?: boolean;
   value?: string;
   extensions?: unknown[];
+  [x: string]: unknown;
 }
 
 export interface ResponseObject {
   id?: string; // A unique, user defined identifier that can be used to refer to this response from requests.
+  name?: string;
   originalRequest?: RequestObject;
   responseTime?: null | string | number;
   timings?: Record<string, unknown> | null; // Set of timing information related to request and response in milliseconds
