@@ -28,7 +28,7 @@ export function formatType(type: string): { type?: string, format?: string } {
     t.format = type;
     Log.silly('type %s to %o', type, t);
   }
-  else if (type === 'float' || type === 'double') {
+  else if (type === 'float' || type === 'double' || type === 'integer') {
     t.type = 'number'
     t.format = type;
     Log.silly('type %s to %o', type, t);

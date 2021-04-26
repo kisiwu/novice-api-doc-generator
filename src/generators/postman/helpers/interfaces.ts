@@ -3,6 +3,7 @@
  */
 
  import { BaseHelperInterface } from '../../../helpers/baseHelper';
+import { XMLObject } from '../../openapi/definitions';
  
  export interface PostmanHelperInterface extends BaseHelperInterface {
    // required
@@ -15,5 +16,7 @@
    getContentType?(): string | undefined;
    hasDescriptionType?(): boolean;
    getDescriptionType?(): string | undefined;
+   hasXml?(): boolean;
+   getXml?(): XMLObject | undefined;
  }
  

@@ -337,9 +337,9 @@ describe('api doc', function () {
             id: Joi.number()
             .meta({
               format: 'int32',
-              xml: {
+              /*xml: {
                 attribute: true
-              }
+              }*/
             }),
             name: Joi.string()
             .meta({
@@ -357,6 +357,9 @@ describe('api doc', function () {
           }).required()
           .meta({
             ref: '#/components/schemas/Person',
+            xml: {
+              name: 'element'
+            },
             encoding: {
               profileImage: {
                 contentType: 'application/xml',

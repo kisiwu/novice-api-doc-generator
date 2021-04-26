@@ -1,17 +1,17 @@
-import fs from 'fs';
+//import fs from 'fs';
 import routing from '@novice1/routing';
 import { Postman } from '../../src';
 import { GenerateFoldersRules } from '../../src/generators/postman';
 import Joi from 'joi';
 
-describe('api doc', function () {
+describe('api doc testpostman', function () {
   const { logger } = this.ctx.kaukau;
 
   it('postman doc', () => {
     // generator
     const postman = new Postman();
     postman
-      .setName('api doc')
+      .setName('api doc testpostman')
       .setHost('http://test.kaukau.tst')
       .setConsumes(['multipart/form-data', 'application/json'])
       //.setProduces(['application/json', 'text/html', 'text/plain'])
@@ -302,6 +302,7 @@ describe('api doc', function () {
     logger.silly('postman:', result.info.name);
 
     // uncomment to test locally
+    /*
     const wStream = fs.createWriteStream('private/postman.json', { flags: 'w+' });
     wStream.write(JSON.stringify(result, null, ' '), (err: unknown) => {
       if (err) {
@@ -309,6 +310,7 @@ describe('api doc', function () {
       }
       wStream.close();
     });
+    */
 
     //logger.silly(postman.remove('/app', 'post'));
   });

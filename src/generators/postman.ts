@@ -18,6 +18,7 @@ import {
   InfoObject,
   Item,
   QueryParam,
+  RequestBodyObject,
   ResponseObject,
   UrlObject,
   Variable
@@ -28,6 +29,8 @@ import { PostmanJoiHelper } from './postman/helpers/joiHelper';
 
 import { formatPath, /*formatType,*/ Log } from './postman/utils';
 import extend from 'extend';
+import { RequestBodyCreator } from './postman/services/requestBodyService';
+import { BasePostmanAuthBuilder } from '../utils/auth/baseAuthBuilder';
 
 
 interface ResponsesRecord {
@@ -94,7 +97,7 @@ export interface PostmanCollection {
 
 export enum GenerateFoldersRules {
   siblings = 'siblings',
-  tree = 'tree'
+  levels = 'levels'
 }
 
 /**
@@ -111,7 +114,7 @@ export class Postman {
 
   #responsesProperty?: string;
 
-  #generateFoldersRule = GenerateFoldersRules.tree;
+  #generateFoldersRule = GenerateFoldersRules.levels;
   #host: string[];
   #folders: Folder[];
 
@@ -285,8 +288,11 @@ export class Postman {
 
   setAuth(auth: Auth | null): Postman;
   setAuth(type: string, auth?: AuthAttribute[]): Postman;
-  setAuth(type: string | Auth | null, authAttributes?: AuthAttribute[]): Postman {
-    if (typeof type === 'string') {
+  setAuth(auth: BasePostmanAuthBuilder): Postman;
+  setAuth(type: string | Auth | null | BasePostmanAuthBuilder, authAttributes?: AuthAttribute[]): Postman {
+    if (type instanceof BasePostmanAuthBuilder) {
+      this.#result.auth = type.toPostman();
+    } else if (typeof type === 'string') {
       const v: Auth = { type };
       if (authAttributes) {
         v[type] = authAttributes;
@@ -357,81 +363,40 @@ export class Postman {
     return this;
   }
 
-  /*
-  setTags(tags: TagObject[]): Postman {
-    this.#result.tags = tags;
-    return this;
-  }
-
-  getTags(): TagObject[] {
-    return this.#result.tags;
-  }
-
-  removeTag(tagName: string): TagObject | undefined {
-    let r: TagObject | undefined;
-    const idx = this.#result.tags.findIndex(t => t.name === tagName);
-    if (idx > -1) {
-      r = this.#result.tags[idx];
-      this.#result.tags.slice(idx, 1);
-    }
-    return r;
-  }
-
-  addTag(tag: TagObject): Postman {
-    return this.addTags(tag);
-  }
-
-  addTags(tags: TagObject): Postman
-  addTags(tags: TagObject[]): Postman;
-  addTags(tags: TagObject[] | TagObject): Postman {
-    if (!Array.isArray(tags)) {
-      tags = [tags];
-    }
-    tags.forEach(tag => {
-      const t = this.#result.tags.find(t => t.name === tag.name);
-      if (t) {
-        Object.assign(t, tag);
+  setDefaultSecurity(auth: Auth): Postman;
+  setDefaultSecurity(type: string): Postman;
+  setDefaultSecurity(auth: BasePostmanAuthBuilder): Postman;
+  setDefaultSecurity(v: Auth | string | BasePostmanAuthBuilder): Postman {
+    if (v instanceof BasePostmanAuthBuilder) {
+      this.#security = v.toPostman();
+    } else if (typeof v === 'string') {
+      const authTypes: string[] = Object.values(AuthType);
+      if (authTypes.includes(v)) {
+        this.#security = {
+          type: v
+        };
       } else {
-        this.#result.tags.push(tag);
+        this.#security = {
+          type: 'noauth'
+        };
       }
-    });
-    return this;
-  }
-
-  setDefaultSecurity(securityObjects: SecurityRequirementObject[]): Postman;
-  setDefaultSecurity(securityObject: SecurityRequirementObject): Postman;
-  setDefaultSecurity(security: string[]): Postman;
-  setDefaultSecurity(security: string): Postman;
-  setDefaultSecurity(v: SecurityRequirementObject[] | SecurityRequirementObject | string[] | string): Postman {
-    this.#security = [];
-    if (Array.isArray(v)) {
-      v.forEach((value: SecurityRequirementObject | string) => this.addDefaultSecurity(value));
     } else {
-      this.addDefaultSecurity(v);
+      this.#security = v;
     }
     return this;
   }
 
-  addDefaultSecurity(security: SecurityRequirementObject | string): Postman;
-  addDefaultSecurity(security: SecurityRequirementObject): Postman;
-  addDefaultSecurity(security: string): Postman;
-  addDefaultSecurity(v: SecurityRequirementObject | string): Postman {
-    if (v) {
-      if(typeof v === 'string') {
-        this.#security.push({
-          [v]: []
-        });
-      } else {
-        this.#security.push(v);
-      }
-    }
-    return this;
-  }
-
-  getDefaultSecurity(): SecurityRequirementObject[] {
+  getDefaultSecurity(): Auth | undefined {
     return this.#security;
   }
 
+  removeDefaultSecurity(): Auth | undefined {
+    const r = this.#security;
+    this.#security = undefined;
+    return r;
+  }
+
+  /*
   setServers(servers: ServerObject[]): Postman;
   setServers(server: ServerObject): Postman;
   setServers(v: ServerObject[] | ServerObject): Postman {
@@ -610,7 +575,9 @@ export class Postman {
 
     // format security
     const authTypes: string[] = Object.values(AuthType);
-    if (!Array.isArray(parameters.security)) {
+    if(parameters.security instanceof BasePostmanAuthBuilder) {
+      security = parameters.security.toPostman();
+    } else if (!Array.isArray(parameters.security)) {
       if (parameters.security 
         && typeof parameters.security === 'object') {
         const v: Record<string, unknown> = extend({}, parameters.security);
@@ -701,6 +668,10 @@ export class Postman {
         schema.request.auth = security;
         Log.debug('security:', security);
       }
+    } else if (auth === false) {
+      schema.request.auth = {
+        type: 'noauth'
+      };
     }
     if (proxy && typeof proxy === 'object') {
       schema.request.proxy = proxy;
@@ -715,19 +686,16 @@ export class Postman {
 
     // format url (params, query)
     schema.request.url= this._formatUrl(path, parameters);
-    // format header
+    // format header (headers)
     const formattedHeader = this._formatHeader(parameters, consumes);
     if(formattedHeader.length) {
       schema.request.header = formattedHeader;
     }
-    // @todo: format body
-    /*
-    const formattedBody = this._formatBody(parameters, consumes);
+    // @todo: format body (body, files)
+    const formattedBody = this._formatRequestBody(parameters, consumes);
     if(formattedBody) {
       schema.request.body = formattedBody;
     }
-    */
-    
 
     const folders: Folder[] = [];
     if (Array.isArray(tags) && tags.length) {
@@ -794,6 +762,32 @@ export class Postman {
       Log.debug('empty responses object');
     }
     return routeResponses;
+  }
+
+  private _formatRequestBody(
+    parameters: RouteParameters,
+    consumes: string[]
+  ): RequestBodyObject | undefined {
+    let res: RequestBodyObject | undefined;
+    // body|files
+    if (parameters.body || parameters.files) {
+      Log.debug('handle body and/or files');
+      const rq = new RequestBodyCreator();
+      this._pushRequestBody(parameters.body, parameters.files, consumes, rq);
+      res = rq.toObject();
+    } else {
+      const bodyHelper = new this.#helperClass(parameters);
+      if (bodyHelper.isValid()) {
+        const children = bodyHelper.getChildren();
+        if (children.body || children.files) {
+          Log.debug('handle body and/or files');
+          const rq = new RequestBodyCreator();
+          this._pushRequestBody(children.body, children.files, consumes, rq);
+          res = rq.toObject();
+        }
+      }
+    }
+    return res;
   }
 
   private _formatHeader(
@@ -906,6 +900,93 @@ export class Postman {
     }
 
     return res;
+  }
+
+  private _pushRequestBody(
+    body: Record<string, unknown> | PostmanHelperInterface | undefined,
+    files: Record<string, unknown> | PostmanHelperInterface | undefined,
+    consumes: string[],
+    res: RequestBodyCreator) {
+
+    let contentIsRequired = false;
+
+    if (body) {
+      Log.debug('handle body');
+      const bodyHelper = body instanceof this.#helperClass ? body : new this.#helperClass(body);
+      if (bodyHelper.isValid()) {
+        res.setFieldsBody(bodyHelper);
+        if (bodyHelper.getType() === 'object') {
+          const bodyFields = bodyHelper.getChildren();
+          Object.keys(bodyFields).forEach(
+            name => {
+              const childHelper = bodyFields[name];
+              if (!childHelper.isValid()) {
+                return;
+              }
+              res.setField(name, childHelper);
+            }
+          );
+        } else {
+          res.setMode('raw');
+          res.setBody(bodyHelper);
+        }
+        contentIsRequired = contentIsRequired || bodyHelper.isRequired();
+      } else if (!(body instanceof this.#helperClass)) {
+        Object.keys(body).forEach(
+          name => {
+            const childHelper = new this.#helperClass(body[name]);
+            if (!childHelper.isValid()) {
+              return;
+            }
+            res.setField(name, childHelper);
+          }
+        );
+      }
+    }
+
+    if (files && !res.hasBody()) {
+      Log.debug('handle files');
+      const filesHelper = files instanceof this.#helperClass ? files : new this.#helperClass(files);
+      if (filesHelper.isValid()) {
+        if(!res.hasFieldsBody()) {
+          res.setFieldsBody(filesHelper);
+        }
+        if (!res.hasFields() && filesHelper.getType() !== 'object') {
+          res.setMode('file');
+          res.setFile(filesHelper);
+        } else if (filesHelper.getType() === 'object') {
+          const filesFields = filesHelper.getChildren();
+          Object.keys(filesFields).forEach(
+            name => {
+              const childHelper = filesFields[name];
+              if (!childHelper.isValid()) {
+                return;
+              }
+              res.setMode('formdata');
+              res.setFileField(name, childHelper);
+            }
+          );
+        }
+        contentIsRequired = contentIsRequired || filesHelper.isRequired();
+      } else if (!(files instanceof this.#helperClass)) {
+        Object.keys(files).forEach(
+          name => {
+            const childHelper = new this.#helperClass(files[name]);
+            if (!childHelper.isValid()) {
+              return;
+            }
+            res.setMode('formdata');
+            res.setFileField(name, childHelper);
+          }
+        );
+      }
+    }
+
+    res.setRequired(contentIsRequired);
+
+    if(consumes.length && !res.getMode()) {
+      res.setFormat(consumes[0]);
+    }
   }
 
   private _pushHeader(
@@ -1180,254 +1261,6 @@ export class Postman {
   }
 
   /*
-  private _createParameterObject(
-    location: string,
-    helper: PostmanHelperInterface,
-    defaultParameterObject: ParameterObject): ParameterObject {
-    const parameter = new ParameterCreator(defaultParameterObject)
-      .setRequired(helper.isRequired())
-      .setSchema(formatType(helper.getType()));
-
-
-    const schema = this._createBasicSchema(helper);
-    const description = schema.getDescription();
-
-    if (description) {
-      parameter.setDescription(
-        description
-      );
-    }
-
-    if (schema.isType('array')) {
-      // allowing multiple values by repeating the query parameter
-      if (location === 'query') {
-        parameter.setExplode(true);
-      }
-    }
-
-    if (schema.isType('object')) {
-      // style ?
-      if (!parameter.hasStyle()) {
-        parameter.setStyle('deepObject');
-      }
-    }
-
-    // examples
-    if (helper.hasExamples?.()) {
-      const examples = helper.getExamples?.();
-      if (examples) {
-        parameter.setExamples(examples);
-      }
-    }
-
-    // handle deprecated
-    if (helper.isDeprecated()) {
-      parameter.setDeprecated(true);
-    }
-    // handle style
-    if (!parameter.hasStyle()
-      && helper.hasStyle?.()) {
-      const style = helper.getStyle?.();
-      if (style) {
-        parameter.setStyle(style);
-      }
-    }
-
-    // allowEmptyValue
-    if (location !== 'path' && helper.allowsEmptyValue()) {
-      parameter.setAllowEmptyValue(
-        helper.allowsEmptyValue()
-      );
-    }
-
-    let schemaObject = schema.toObject();
-
-    // ReferenceObject | SchemaObject
-    schemaObject = this._autoSchemaObjectToRef(helper, schemaObject);
-    parameter.setSchema(schemaObject);
-
-    return parameter.toObject();
-  }
-
-  // format body methods
-  private _formatRequestBody(parameters: RouteParameters, consumes: string[]) {
-    // format body
-    let res: RequestBodyObject = {};
-
-    // body|files
-    if (parameters.body || parameters.files) {
-      Log.debug('handle body and/or files');
-      this._pushRequestBody(parameters.body, parameters.files, consumes, res);
-    } else {
-      const bodyHelper = new this.#helperClass(parameters);
-      if (bodyHelper.isValid()) {
-        const children = bodyHelper.getChildren();
-        if (children.body || children.files) {
-          Log.debug('handle body and/or files');
-          this._pushRequestBody(children.body, children.files, consumes, res);
-        }
-        // ReferenceObject | RequestBodyObject
-        res = this._autoRequestBodyObjectToRef(bodyHelper, res);
-      }
-    }
-
-    return res;
-  }
-
-  private _pushRequestBody(
-    body: Record<string, unknown> | PostmanHelperInterface | undefined,
-    files: Record<string, unknown> | PostmanHelperInterface | undefined,
-    consumes: string[],
-    res: RequestBodyObject) {
-
-    let schemaObject: SchemaObject | undefined;
-
-    let bodySchema: SchemaCreator | undefined;
-    let filesSchema: SchemaCreator | undefined;
-
-    let helperWithRef: PostmanHelperInterface | undefined;
-
-    let examples: Record<string, ExampleObject | ReferenceObject> | undefined;
-    let encoding: Record<string, EncodingObject> | undefined;
-
-    let contentIsRequired = false;
-
-    if (body) {
-      Log.debug('handle body');
-      const bodyHelper = body instanceof this.#helperClass ? body : new this.#helperClass(body);
-      if (bodyHelper.isValid()) {
-        bodySchema = this._createSchema(bodyHelper);
-        if (this._getLocalRef(bodyHelper)) {
-          helperWithRef = bodyHelper;
-        }
-        if (bodyHelper.hasExamples?.()) {
-          examples = bodyHelper.getExamples?.();
-        }
-        if (bodyHelper.hasEncoding?.()) {
-          encoding = bodyHelper.getEncoding?.();
-        }
-
-        contentIsRequired = contentIsRequired || bodyHelper.isRequired();
-        schemaObject = bodySchema.toObject();
-      } else if (!(body instanceof this.#helperClass)) {
-        bodySchema = new SchemaCreator({
-          type: 'object',
-          required: [],
-          properties: {},
-        });
-        Object.keys(body).forEach(
-          name => {
-            const childHelper = new this.#helperClass(body[name]);
-            if (!childHelper.isValid()) {
-              return;
-            }
-            const propertySchemaObject = this._createSchemaObject(
-              childHelper,
-              bodySchema,
-              name
-            );
-            bodySchema?.setProperty(name, propertySchemaObject);
-          }
-        );
-        contentIsRequired = contentIsRequired || bodySchema.isRequired();
-        schemaObject = bodySchema.toObject();
-      }
-    }
-
-    if (files && (!schemaObject || bodySchema?.isType('object'))) {
-      Log.debug('handle files');
-      const filesHelper = files instanceof this.#helperClass ? files : new this.#helperClass(files);
-
-      // mix with bodySchema or create new
-      const prop = bodySchema || new SchemaCreator({
-        type: 'object',
-        required: [],
-        properties: {},
-      });
-
-      if (filesHelper.isValid()) {
-        if (!bodySchema && filesHelper.getType() !== 'object') {
-          filesSchema = this._createSchema(filesHelper, undefined, undefined, 'binary');
-          if (this._getLocalRef(filesHelper)) {
-            helperWithRef = filesHelper;
-          }
-          if (filesHelper.hasExamples?.()) {
-            examples = filesHelper.getExamples?.();
-          }
-          if (filesHelper.hasEncoding?.()) {
-            encoding = filesHelper.getEncoding?.();
-          }
-          schemaObject = filesSchema.toObject();
-        } else if (filesHelper.getType() === 'object') {
-          const filesFields = filesHelper.getChildren();
-          Object.keys(filesFields).forEach(
-            name => {
-              const childHelper = filesFields[name];
-              if (!childHelper.isValid()) {
-                return;
-              }
-              const propertySchemaObject = this._createSchemaObject(
-                childHelper,
-                prop,
-                name,
-                'binary'
-              );
-              prop.setProperty(name, propertySchemaObject);
-            }
-          );
-          schemaObject = prop.toObject();
-        }
-        contentIsRequired = contentIsRequired || filesHelper.isRequired();
-      } else if (!(files instanceof this.#helperClass)) {
-        Object.keys(files).forEach(
-          name => {
-            const childHelper = new this.#helperClass(files[name]);
-            if (!childHelper.isValid()) {
-              return;
-            }
-            const propertySchemaObject = this._createSchemaObject(
-              childHelper,
-              prop,
-              name,
-              'binary'
-            );
-            prop.setProperty(name, propertySchemaObject);
-          }
-        );
-        contentIsRequired = contentIsRequired || prop.isRequired();
-        schemaObject = prop.toObject();
-      }
-    }
-
-    if (helperWithRef && schemaObject) {
-      // ReferenceObject | SchemaObject
-      schemaObject = this._autoSchemaObjectToRef(helperWithRef, schemaObject);
-    }
-
-    const mediaType: MediaTypeCreator = new MediaTypeCreator();
-
-    if (schemaObject) {
-      mediaType.setSchema(schemaObject);
-    }
-
-    if (examples) {
-      mediaType.setExamples(examples);
-    }
-
-    if (encoding) {
-      mediaType.setEncoding(encoding);
-    }
-
-    res.content = {};
-    res.required = contentIsRequired;
-    const content: MediaTypeObject = mediaType.toObject();
-
-    consumes.forEach((mime: string) => {
-      if (res.content) {
-        res.content[mime] = content;
-      }
-    });
-  }
 
   // -- schema object creation methods
 

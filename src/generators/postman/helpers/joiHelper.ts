@@ -3,6 +3,7 @@
  */
 
  import { JoiHelper, JoiSchema } from '../../../helpers/joiHelper';
+import { XMLObject } from '../../openapi/definitions';
  import { PostmanHelperInterface } from './interfaces';
  
  export class PostmanJoiHelper extends JoiHelper implements PostmanHelperInterface {
@@ -90,5 +91,26 @@
       && this._joi['$_terms'].metas
       && this._joi['$_terms'].metas[0]
       && this._joi['$_terms'].metas[0].descriptionType;
+  }
+
+  hasXml(): boolean {
+    if (!this.isJoi()) {
+      return false;
+    }
+    return this._joi['$_terms']
+      && this._joi['$_terms'].metas
+      && this._joi['$_terms'].metas[0]
+      && this._joi['$_terms'].metas[0].xml
+      && typeof this._joi['$_terms'].metas[0].xml === 'object' ? true : false;
+  }
+
+  getXml(): XMLObject | undefined {
+    if (!this.isJoi()) {
+      return;
+    }
+    return this._joi['$_terms']
+      && this._joi['$_terms'].metas
+      && this._joi['$_terms'].metas[0]
+      && this._joi['$_terms'].metas[0].xml;
   }
  }
