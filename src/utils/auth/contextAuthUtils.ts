@@ -1,0 +1,56 @@
+import extend from 'extend';
+import { BaseAuthUtil, BaseContextAuthUtil } from './baseAuthUtils';
+import { Auth } from '../../generators/postman/definitions';
+import { SecurityRequirementObject } from '../../generators/openapi/definitions';
+
+
+export class ContextAuthUtil extends BaseContextAuthUtil {
+  protected authUtil: BaseAuthUtil;
+  protected contextScopes: string[] = [];
+
+  constructor(authUtil: BaseAuthUtil, scopes: string[] = []) {
+    super();
+    this.authUtil = authUtil;
+    this.contextScopes = scopes;
+  }
+
+  toPostman(): Auth {
+    const r = this.authUtil.toPostman(this.contextScopes);
+    return r;
+  }
+
+  toOpenAPISecurity(): SecurityRequirementObject {
+    return this.authUtil.toOpenAPISecurity(this.contextScopes);
+  }
+}
+
+export class GroupContextAuthUtil extends BaseContextAuthUtil {
+  protected authUtils: BaseContextAuthUtil[] = [];
+
+  constructor(authUtils: BaseContextAuthUtil[]) {
+    super();
+    this.authUtils = authUtils;
+  }
+
+  toPostman(): Auth {
+    let r: Auth = {
+      type: 'noauth'
+    };
+    this.authUtils.forEach((builder, i) => {
+      const auth = builder.toPostman();
+      if (i !== 0) {
+        auth.type = r.type;
+      }
+      r = extend(r, auth);
+    });
+    return r;
+  }
+
+  toOpenAPISecurity(): SecurityRequirementObject {
+    let r: SecurityRequirementObject = {};
+    this.authUtils.forEach(builder => {
+      r = extend(r, builder.toOpenAPISecurity());
+    });
+    return r;
+  }
+}

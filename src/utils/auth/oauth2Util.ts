@@ -1,5 +1,5 @@
 import extend from 'extend';
-import { FullAuthBuilder } from './baseAuthBuilder';
+import { FullAuthUtil } from './baseAuthUtils';
 import { Auth } from '../../generators/postman/definitions';
 import { 
   OAuthFlowObject, 
@@ -35,7 +35,7 @@ export enum ChallengeAlgorithm {
   S256 = 'S256'
 }
 
-export class Oauth2Builder extends FullAuthBuilder {
+export class Oauth2Util extends FullAuthUtil {
 
   protected clientAuthentication?: string; // client_authentication
   protected state?: string;
@@ -56,7 +56,7 @@ export class Oauth2Builder extends FullAuthBuilder {
   protected username?: string; 
   protected refreshUrl?: string;
 
-  setDescription(description: string): Oauth2Builder {
+  setDescription(description: string): Oauth2Util {
     this.description = description;
     return this;
   }
@@ -64,7 +64,7 @@ export class Oauth2Builder extends FullAuthBuilder {
   /**
    * Send as Basic Auth header
    */
-  clientAuthenticationToHeader(): Oauth2Builder {
+  clientAuthenticationToHeader(): Oauth2Util {
     this.clientAuthentication = ClientAuthentication.header;
     return this;
   }
@@ -72,7 +72,7 @@ export class Oauth2Builder extends FullAuthBuilder {
   /**
    * Send client credentials to body
    */
-  clientAuthenticationToBody(): Oauth2Builder {
+  clientAuthenticationToBody(): Oauth2Util {
     this.clientAuthentication = ClientAuthentication.body;
     return this;
   }
@@ -84,11 +84,11 @@ export class Oauth2Builder extends FullAuthBuilder {
    * @returns 
    */
   setClientAuthentication(
-    clientAuthentication: ClientAuthentication): Oauth2Builder;
+    clientAuthentication: ClientAuthentication): Oauth2Util;
   setClientAuthentication(
-    clientAuthentication: string): Oauth2Builder;
+    clientAuthentication: string): Oauth2Util;
   setClientAuthentication(
-    clientAuthentication: ClientAuthentication): Oauth2Builder {
+    clientAuthentication: ClientAuthentication): Oauth2Util {
     this.clientAuthentication = clientAuthentication;
     return this;
   }
@@ -109,7 +109,7 @@ export class Oauth2Builder extends FullAuthBuilder {
    * preventing cross-site request forgery.
    * @returns 
    */
-  setState(state: string): Oauth2Builder {
+  setState(state: string): Oauth2Util {
     this.state = state;
     return this;
   }
@@ -130,7 +130,7 @@ export class Oauth2Builder extends FullAuthBuilder {
    * A map between the scope name and a short description for it. The map MAY be empty.
    * @returns 
    */
-  setScopes(scopes: Record<string, string>): Oauth2Builder {
+  setScopes(scopes: Record<string, string>): Oauth2Util {
     this.scopes = scopes;
     return this;
   }
@@ -145,7 +145,7 @@ export class Oauth2Builder extends FullAuthBuilder {
     return r;
   }
 
-  addScope(scope: string, description = ''): Oauth2Builder {
+  addScope(scope: string, description = ''): Oauth2Util {
     this.scopes[scope] = description;
     return this;
   }
@@ -154,7 +154,7 @@ export class Oauth2Builder extends FullAuthBuilder {
     return Object.keys(this.scopes);
   }
 
-  setClientSecret(clientSecret: string): Oauth2Builder {
+  setClientSecret(clientSecret: string): Oauth2Util {
     this.clientSecret = clientSecret;
     return this;
   }
@@ -169,7 +169,7 @@ export class Oauth2Builder extends FullAuthBuilder {
     return r;
   }
 
-  setClientId(clientId: string): Oauth2Builder {
+  setClientId(clientId: string): Oauth2Util {
     this.clientId = clientId;
     return this;
   }
@@ -190,7 +190,7 @@ export class Oauth2Builder extends FullAuthBuilder {
    * This is used to exchange the authorization code for an access token.
    * @returns 
    */
-  setAccessTokenUrl(accessTokenUrl: string): Oauth2Builder {
+  setAccessTokenUrl(accessTokenUrl: string): Oauth2Util {
     this.accessTokenUrl = accessTokenUrl;
     return this;
   }
@@ -211,7 +211,7 @@ export class Oauth2Builder extends FullAuthBuilder {
    * This is used to get the authorization code.
    * @returns 
    */
-  setAuthUrl(authUrl: string): Oauth2Builder {
+  setAuthUrl(authUrl: string): Oauth2Util {
     this.authUrl = authUrl;
     return this;
   }
@@ -231,7 +231,7 @@ export class Oauth2Builder extends FullAuthBuilder {
    * @param useBrowser If true, authorize using browser.
    * @returns 
    */
-  setUseBrowser(useBrowser: boolean): Oauth2Builder {
+  setUseBrowser(useBrowser: boolean): Oauth2Util {
     this.useBrowser = useBrowser;
     return this;
   }
@@ -252,7 +252,7 @@ export class Oauth2Builder extends FullAuthBuilder {
    * redirected to, after your application is authorized.
    * @returns 
    */
-  setRedirectUri(redirectUri: string): Oauth2Builder {
+  setRedirectUri(redirectUri: string): Oauth2Util {
     this.redirectUri = redirectUri;
     return this;
   }
@@ -267,9 +267,9 @@ export class Oauth2Builder extends FullAuthBuilder {
     return r;
   }
 
-  setGrantType(grantType: GrantType): Oauth2Builder;
-  setGrantType(grantType: string): Oauth2Builder;
-  setGrantType(grantType: string): Oauth2Builder {
+  setGrantType(grantType: GrantType): Oauth2Util;
+  setGrantType(grantType: string): Oauth2Util;
+  setGrantType(grantType: string): Oauth2Util {
     this.grantType = grantType;
     return this;
   }
@@ -284,9 +284,9 @@ export class Oauth2Builder extends FullAuthBuilder {
     return r;
   }
 
-  setTokenLocation(tokenLocation: TokenLocation): Oauth2Builder;
-  setTokenLocation(tokenLocation: string): Oauth2Builder;
-  setTokenLocation(tokenLocation: string): Oauth2Builder {
+  setTokenLocation(tokenLocation: TokenLocation): Oauth2Util;
+  setTokenLocation(tokenLocation: string): Oauth2Util;
+  setTokenLocation(tokenLocation: string): Oauth2Util {
     this.tokenLocation = tokenLocation;
     return this;
   }
@@ -301,7 +301,7 @@ export class Oauth2Builder extends FullAuthBuilder {
     return r;
   }
 
-  setTokenName(tokenName: string): Oauth2Builder {
+  setTokenName(tokenName: string): Oauth2Util {
     this.tokenName = tokenName;
     return this;
   }
@@ -321,7 +321,7 @@ export class Oauth2Builder extends FullAuthBuilder {
    * @param headerPrefix Added to the Authorization header before the access token.
    * @returns 
    */
-  setHeaderPrefix(headerPrefix: string): Oauth2Builder {
+  setHeaderPrefix(headerPrefix: string): Oauth2Util {
     this.headerPrefix = headerPrefix;
     return this;
   }
@@ -342,7 +342,7 @@ export class Oauth2Builder extends FullAuthBuilder {
    * connect the authorization request to the token request.
    * @returns 
    */
-  setCodeVerifier(codeVerifier: string): Oauth2Builder {
+  setCodeVerifier(codeVerifier: string): Oauth2Util {
     this.codeVerifier = codeVerifier;
     return this;
   }
@@ -361,9 +361,9 @@ export class Oauth2Builder extends FullAuthBuilder {
    * 
    * @param challengeAlgorithm Algoritm used for generating the Code Challenge.
    */
-  setChallengeAlgorithm(challengeAlgorithm: ChallengeAlgorithm): Oauth2Builder
-  setChallengeAlgorithm(challengeAlgorithm: string): Oauth2Builder;
-  setChallengeAlgorithm(challengeAlgorithm: string): Oauth2Builder {
+  setChallengeAlgorithm(challengeAlgorithm: ChallengeAlgorithm): Oauth2Util
+  setChallengeAlgorithm(challengeAlgorithm: string): Oauth2Util;
+  setChallengeAlgorithm(challengeAlgorithm: string): Oauth2Util {
     this.challengeAlgorithm = challengeAlgorithm;
     return this;
   }
@@ -378,7 +378,7 @@ export class Oauth2Builder extends FullAuthBuilder {
     return r;
   }
 
-  setPassword(password: string): Oauth2Builder {
+  setPassword(password: string): Oauth2Util {
     this.password = password;
     return this;
   }
@@ -393,7 +393,7 @@ export class Oauth2Builder extends FullAuthBuilder {
     return r;
   }
 
-  setUsername(username: string): Oauth2Builder {
+  setUsername(username: string): Oauth2Util {
     this.username = username;
     return this;
   }
@@ -408,7 +408,7 @@ export class Oauth2Builder extends FullAuthBuilder {
     return r;
   }
 
-  setRefreshUrl(refreshUrl: string): Oauth2Builder {
+  setRefreshUrl(refreshUrl: string): Oauth2Util {
     this.refreshUrl = refreshUrl;
     return this;
   }

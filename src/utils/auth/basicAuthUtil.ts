@@ -1,4 +1,4 @@
-import { FullAuthBuilder } from './baseAuthBuilder';
+import { FullAuthUtil } from './baseAuthUtils';
 import { Auth } from '../../generators/postman/definitions';
 import { SecuritySchemeObject } from '../../generators/openapi/definitions';
 
@@ -6,16 +6,16 @@ function isDefined(v: unknown) {
   return typeof v !== 'undefined';
 }
 
-export class BasicAuthBuilder extends FullAuthBuilder {
+export class BasicAuthUtil extends FullAuthUtil {
   protected password?: string;
   protected username?: string;
 
-  setDescription(description: string): BasicAuthBuilder {
+  setDescription(description: string): BasicAuthUtil {
     this.description = description;
     return this;
   }
 
-  setPassword(password: string): BasicAuthBuilder {
+  setPassword(password: string): BasicAuthUtil {
     this.password = password;
     return this;
   }
@@ -30,7 +30,7 @@ export class BasicAuthBuilder extends FullAuthBuilder {
     return r;
   }
 
-  setUsername(username: string): BasicAuthBuilder {
+  setUsername(username: string): BasicAuthUtil {
     this.username = username;
     return this;
   }

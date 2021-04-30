@@ -1,4 +1,4 @@
-import { FullAuthBuilder } from './baseAuthBuilder';
+import { FullAuthUtil } from './baseAuthUtils';
 import { Auth } from '../../generators/postman/definitions';
 import { SecuritySchemeObject } from '../../generators/openapi/definitions';
 
@@ -12,18 +12,18 @@ export enum ApiKeyLocation {
   cookie = 'cookie'
 }
 
-export class ApiKeyBuilder extends FullAuthBuilder {
+export class ApiKeyUtil extends FullAuthUtil {
 
   protected key?: string;
   protected value?: string;
   protected apiKeyLocation?: string; // in
 
-  setDescription(description: string): ApiKeyBuilder {
+  setDescription(description: string): ApiKeyUtil {
     this.description = description;
     return this;
   }
 
-  setKey(key: string): ApiKeyBuilder {
+  setKey(key: string): ApiKeyUtil {
     this.key = key;
     return this;
   }
@@ -38,7 +38,7 @@ export class ApiKeyBuilder extends FullAuthBuilder {
     return r;
   }
 
-  setName(key: string): ApiKeyBuilder {
+  setName(key: string): ApiKeyUtil {
     this.key = key;
     return this;
   }
@@ -53,7 +53,7 @@ export class ApiKeyBuilder extends FullAuthBuilder {
     return r;
   }
 
-  setValue(value: string): ApiKeyBuilder {
+  setValue(value: string): ApiKeyUtil {
     this.value = value;
     return this;
   }
@@ -68,9 +68,9 @@ export class ApiKeyBuilder extends FullAuthBuilder {
     return r;
   }
 
-  setApiKeyLocation(apiKeyLocation: ApiKeyLocation): ApiKeyBuilder;
-  setApiKeyLocation(apiKeyLocation: string): ApiKeyBuilder;
-  setApiKeyLocation(apiKeyLocation: string): ApiKeyBuilder {
+  setApiKeyLocation(apiKeyLocation: ApiKeyLocation): ApiKeyUtil;
+  setApiKeyLocation(apiKeyLocation: string): ApiKeyUtil;
+  setApiKeyLocation(apiKeyLocation: string): ApiKeyUtil {
     this.apiKeyLocation = apiKeyLocation;
     return this;
   }

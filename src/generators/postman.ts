@@ -2,10 +2,6 @@
  * @module postman
  */
 
-/**
- * @todo: change var, method names ...
- */
-
 import {
   Auth,
   AuthAttribute,
@@ -30,7 +26,8 @@ import { PostmanJoiHelper } from './postman/helpers/joiHelper';
 import { formatPath, /*formatType,*/ Log } from './postman/utils';
 import extend from 'extend';
 import { RequestBodyCreator } from './postman/services/requestBodyService';
-import { BasePostmanAuthBuilder } from '../utils/auth/baseAuthBuilder';
+import { BasePostmanAuthUtil } from '../utils/auth/baseAuthUtils';
+import { BasePostmanResponseUtil, BaseResponseUtil } from '../utils/responses/baseResponseUtils';
 
 
 interface ResponsesRecord {
@@ -95,7 +92,7 @@ export interface PostmanCollection {
   [key: string]: unknown;
 }
 
-export enum GenerateFoldersRules {
+export enum GenerateFoldersRule {
   siblings = 'siblings',
   levels = 'levels'
 }
@@ -114,7 +111,7 @@ export class Postman {
 
   #responsesProperty?: string;
 
-  #generateFoldersRule = GenerateFoldersRules.levels;
+  #generateFoldersRule = GenerateFoldersRule.levels;
   #host: string[];
   #folders: Folder[];
 
@@ -143,15 +140,15 @@ export class Postman {
     };
   }
 
-  setGenerateFoldersRule(v: GenerateFoldersRules): Postman {
-    const value: GenerateFoldersRules = GenerateFoldersRules[v];
+  setGenerateFoldersRule(v: GenerateFoldersRule): Postman {
+    const value: GenerateFoldersRule = GenerateFoldersRule[v];
     if (value) {
       this.#generateFoldersRule = value;
     }
     return this;
   }
 
-  getGenerateFoldersRule(): GenerateFoldersRules {
+  getGenerateFoldersRule(): GenerateFoldersRule {
     return this.#generateFoldersRule;
   }
 
@@ -288,9 +285,9 @@ export class Postman {
 
   setAuth(auth: Auth | null): Postman;
   setAuth(type: string, auth?: AuthAttribute[]): Postman;
-  setAuth(auth: BasePostmanAuthBuilder): Postman;
-  setAuth(type: string | Auth | null | BasePostmanAuthBuilder, authAttributes?: AuthAttribute[]): Postman {
-    if (type instanceof BasePostmanAuthBuilder) {
+  setAuth(auth: BasePostmanAuthUtil): Postman;
+  setAuth(type: string | Auth | null | BasePostmanAuthUtil, authAttributes?: AuthAttribute[]): Postman {
+    if (type instanceof BasePostmanAuthUtil) {
       this.#result.auth = type.toPostman();
     } else if (typeof type === 'string') {
       const v: Auth = { type };
@@ -365,9 +362,9 @@ export class Postman {
 
   setDefaultSecurity(auth: Auth): Postman;
   setDefaultSecurity(type: string): Postman;
-  setDefaultSecurity(auth: BasePostmanAuthBuilder): Postman;
-  setDefaultSecurity(v: Auth | string | BasePostmanAuthBuilder): Postman {
-    if (v instanceof BasePostmanAuthBuilder) {
+  setDefaultSecurity(auth: BasePostmanAuthUtil): Postman;
+  setDefaultSecurity(v: Auth | string | BasePostmanAuthUtil): Postman {
+    if (v instanceof BasePostmanAuthUtil) {
       this.#security = v.toPostman();
     } else if (typeof v === 'string') {
       const authTypes: string[] = Object.values(AuthType);
@@ -516,7 +513,10 @@ export class Postman {
     } else {
       tmp = responses;
     }
-    if (Array.isArray(tmp)) {
+    if (tmp instanceof BasePostmanResponseUtil 
+      || tmp instanceof BaseResponseUtil) {
+        r = tmp.toPostman();
+    } else if (Array.isArray(tmp)) {
       r = tmp;
     }
     return r;
@@ -575,7 +575,7 @@ export class Postman {
 
     // format security
     const authTypes: string[] = Object.values(AuthType);
-    if(parameters.security instanceof BasePostmanAuthBuilder) {
+    if(parameters.security instanceof BasePostmanAuthUtil) {
       security = parameters.security.toPostman();
     } else if (!Array.isArray(parameters.security)) {
       if (parameters.security 
@@ -703,7 +703,7 @@ export class Postman {
       tags.forEach(tag => {
         if (typeof tag === 'string') {
           let tmpFolder: Folder | undefined;
-          if (this.#generateFoldersRule === GenerateFoldersRules.siblings) {
+          if (this.#generateFoldersRule === GenerateFoldersRule.siblings) {
             tmpFolder = this.#folders.find(f => f.name === tag);
             if (!tmpFolder) {
               tmpFolder = {
@@ -1473,9 +1473,7 @@ export class Postman {
     this.#folders.forEach(folder => {
       folders.push(extend(true, {}, folder));
     });
-    console.log(`FOLDERS: ${folders.length}`);
     result.item.push(...folders);
-    console.log(`items: ${result.item.length}`);
     return result;
   }
 }

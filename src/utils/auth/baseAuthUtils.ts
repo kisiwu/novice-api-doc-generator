@@ -1,23 +1,23 @@
 import { SecurityRequirementObject, SecuritySchemeObject } from '../../generators/openapi/definitions';
 import { Auth } from '../../generators/postman/definitions';
 
-interface IPostmanAuthBuilder {
+interface IPostmanAuthUtil {
   toPostman(): Auth;
 }
 
-interface IContextOpenAPIAuthBuilder {
+interface IContextOpenAPIAuthUtil {
   toOpenAPISecurity(): SecurityRequirementObject;
 }
 
-interface ISchemeOpenAPIAuthBuilder {
+interface ISchemeOpenAPIAuthUtil {
   toOpenAPI(): SecuritySchemeObject;
 }
 
-interface IFullOpenAPIAuthBuilder 
-  extends IContextOpenAPIAuthBuilder, ISchemeOpenAPIAuthBuilder {
+interface IFullOpenAPIAuthUtil 
+  extends IContextOpenAPIAuthUtil, ISchemeOpenAPIAuthUtil {
 }
 
-interface IAuthBuilder {
+interface IAuthUtil {
   toPostman(): Auth;
   toOpenAPI(): SecuritySchemeObject;
   toOpenAPISecurity(): SecurityRequirementObject;
@@ -27,32 +27,37 @@ interface IAuthBuilder {
   getDescription(): string | undefined;
 }
 
-export abstract class BaseOpenAPIAuthBuilder implements IFullOpenAPIAuthBuilder {
+export abstract class BaseOpenAPIAuthUtil implements IFullOpenAPIAuthUtil {
   abstract toOpenAPI(): SecuritySchemeObject;
   abstract toOpenAPISecurity(scopes?: string[]): SecurityRequirementObject;
 }
 
-export abstract class BasePostmanAuthBuilder implements IPostmanAuthBuilder {
+export abstract class BasePostmanAuthUtil implements IPostmanAuthUtil {
   abstract toPostman(scopes?: string[]): Auth;
 }
 
-export abstract class BaseContextAuthBuilder 
-  extends BasePostmanAuthBuilder
-  implements IPostmanAuthBuilder, IContextOpenAPIAuthBuilder {
+export abstract class BaseContextAuthUtil 
+  extends BasePostmanAuthUtil
+  implements IPostmanAuthUtil, IContextOpenAPIAuthUtil {
   abstract toOpenAPISecurity(scopes?: string[]): SecurityRequirementObject;
 }
 
-export abstract class BaseAuthBuilder 
-  extends BaseContextAuthBuilder
-  implements IPostmanAuthBuilder, IFullOpenAPIAuthBuilder {
+export abstract class BaseAuthUtil 
+  extends BaseContextAuthUtil
+  implements IPostmanAuthUtil, IFullOpenAPIAuthUtil {
   abstract toOpenAPI(): SecuritySchemeObject;
 }
 
-export abstract class FullAuthBuilder extends BaseAuthBuilder implements IAuthBuilder {
+export abstract class FullAuthUtil extends BaseAuthUtil implements IAuthUtil {
   protected description?: string;
   protected securitySchemeName: string;
 
-  abstract setDescription(description: string): FullAuthBuilder;
+  /**
+   * 
+   * @param description A short description for security scheme.
+   * CommonMark syntax MAY be used for rich text representation.
+   */
+  abstract setDescription(description: string): FullAuthUtil;
 
   constructor(securitySchemeName: string) {
     super();

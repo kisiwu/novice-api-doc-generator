@@ -140,8 +140,6 @@ export class RequestBodyCreator {
     const res: RequestBodyObject = {
       disabled: !this.required
     };
-    // JSON.stringify(result.raw, null, "\t")
-
     if (mode === 'raw') {
       res.mode = mode;
       // check body
