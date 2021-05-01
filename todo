@@ -22,16 +22,18 @@ var options = {
 };
 ```
 openapi:
-  - finish todo's in generators/OpenApi
-  - generate doc @done
+  - finish todo's in generators/OpenAPI
+  - generate doc
 
 postman:
   - write generator @done
   - write postman/definitions.ts @done
+  - generate doc
 
 utils:
-  - auth
-  - responses
-    - do not do postman (return empty array)
+  - auth @done
+  - responses @done
+    - do not do postman (return empty array) @done
+  - generate doc
 
 Archive:

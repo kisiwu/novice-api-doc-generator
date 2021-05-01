@@ -4,71 +4,13 @@ import { Postman } from '../../src';
 import { GenerateFoldersRule } from '../../src/generators/postman';
 import Joi from 'joi';
 
-import { 
-  ContextAuthUtil,
-  GroupContextAuthUtil
-} from '../../src/utils/auth/contextAuthUtils';
-import { 
-  ApiKeyUtil, ApiKeyLocation 
-} from '../../src/utils/auth/apiKeyUtil';
-import { 
-  BearerUtil 
-} from '../../src/utils/auth/bearerUtil';
 import {
-  ResponseUtil
-} from '../../src/utils/responses/responseUtil';
-import {
-  ContextResponseUtil,
-  GroupContextResponseUtil
-} from '../../src/utils/responses/contextResponseUtils';
+  GroupCtxtResponse,
+  GroupCtxtAuth
+} from '../testutils';
 
 describe('api doc testpostman', function () {
   const { logger } = this.ctx.kaukau;
-
-  const apiKeyAuth = new ApiKeyUtil('tokenAuth');
-  apiKeyAuth.setApiKeyLocation(ApiKeyLocation.query)
-    .setName('Authorization');
-  const bearerAuth = new BearerUtil('bearerAuth');
-  bearerAuth.setBearerFormat('JWT')
-    .setToken('unknown');
-
-  const GroupCtxtAuth = new GroupContextAuthUtil([
-    new ContextAuthUtil(apiKeyAuth),
-    new ContextAuthUtil(bearerAuth)
-  ]);
-
-  const simpleResponse = new ResponseUtil(200);
-  simpleResponse.setHeaders({
-    'X-Rate-Limit-Limit': {
-      description: 'The number of allowed requests in the current period',
-      schema: {
-        type: 'integer'
-      }
-    },
-    'X-Rate-Limit-Remaining': {
-      description: 'The number of remaining requests in the current period',
-      schema: {
-        type: 'integer'
-      }
-    },
-    'X-Rate-Limit-Reset': {
-      description: 'The number of seconds left in the current period',
-      schema: {
-        type: 'integer'
-      }
-    }
-  })
-  .setDescription('A simple string response')
-  .addMediaType('text/plain', {
-    schema: {
-      type: 'string',
-      example: 'whoa!'
-    }
-  });
-  const GroupCtxtResponse = new GroupContextResponseUtil([
-    (new ContextResponseUtil(simpleResponse))
-      .setDefault(true)
-  ]);
 
   it('postman doc', () => {
     // generator

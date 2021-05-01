@@ -1,5 +1,5 @@
 import extend from 'extend';
-import { BaseAuthUtil, BaseContextAuthUtil } from './baseAuthUtils';
+import { BaseAuthUtil, BaseContextAuthUtil, IContextAuthUtil } from './baseAuthUtils';
 import { Auth } from '../../generators/postman/definitions';
 import { SecurityRequirementObject } from '../../generators/openapi/definitions';
 
@@ -19,15 +19,15 @@ export class ContextAuthUtil extends BaseContextAuthUtil {
     return r;
   }
 
-  toOpenAPISecurity(): SecurityRequirementObject {
+  toOpenAPISecurity(): SecurityRequirementObject[] {
     return this.authUtil.toOpenAPISecurity(this.contextScopes);
   }
 }
 
 export class GroupContextAuthUtil extends BaseContextAuthUtil {
-  protected authUtils: BaseContextAuthUtil[] = [];
+  protected authUtils: IContextAuthUtil[] = [];
 
-  constructor(authUtils: BaseContextAuthUtil[]) {
+  constructor(authUtils: IContextAuthUtil[]) {
     super();
     this.authUtils = authUtils;
   }
@@ -46,10 +46,10 @@ export class GroupContextAuthUtil extends BaseContextAuthUtil {
     return r;
   }
 
-  toOpenAPISecurity(): SecurityRequirementObject {
-    let r: SecurityRequirementObject = {};
+  toOpenAPISecurity(): SecurityRequirementObject[] {
+    let r: SecurityRequirementObject[] = [];
     this.authUtils.forEach(builder => {
-      r = extend(r, builder.toOpenAPISecurity());
+      r = r.concat(builder.toOpenAPISecurity());
     });
     return r;
   }

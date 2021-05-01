@@ -6,10 +6,11 @@ interface IPostmanAuthUtil {
 }
 
 interface IContextOpenAPIAuthUtil {
-  toOpenAPISecurity(): SecurityRequirementObject;
+  toOpenAPISecurity(): SecurityRequirementObject[];
 }
 
 interface ISchemeOpenAPIAuthUtil {
+  getSecuritySchemeName(): string;
   toOpenAPI(): SecuritySchemeObject;
 }
 
@@ -17,19 +18,19 @@ interface IFullOpenAPIAuthUtil
   extends IContextOpenAPIAuthUtil, ISchemeOpenAPIAuthUtil {
 }
 
-interface IAuthUtil {
-  toPostman(): Auth;
-  toOpenAPI(): SecuritySchemeObject;
-  toOpenAPISecurity(): SecurityRequirementObject;
+export interface IContextAuthUtil 
+  extends IPostmanAuthUtil, IContextOpenAPIAuthUtil {
+}
 
-  getSecuritySchemeName(): string;
+interface IAuthUtil extends IFullOpenAPIAuthUtil, IPostmanAuthUtil {
   setDescription(description: string): unknown;
   getDescription(): string | undefined;
 }
 
 export abstract class BaseOpenAPIAuthUtil implements IFullOpenAPIAuthUtil {
+  abstract getSecuritySchemeName(): string;
   abstract toOpenAPI(): SecuritySchemeObject;
-  abstract toOpenAPISecurity(scopes?: string[]): SecurityRequirementObject;
+  abstract toOpenAPISecurity(scopes?: string[]): SecurityRequirementObject[];
 }
 
 export abstract class BasePostmanAuthUtil implements IPostmanAuthUtil {
@@ -38,13 +39,14 @@ export abstract class BasePostmanAuthUtil implements IPostmanAuthUtil {
 
 export abstract class BaseContextAuthUtil 
   extends BasePostmanAuthUtil
-  implements IPostmanAuthUtil, IContextOpenAPIAuthUtil {
-  abstract toOpenAPISecurity(scopes?: string[]): SecurityRequirementObject;
+  implements IContextAuthUtil {
+  abstract toOpenAPISecurity(scopes?: string[]): SecurityRequirementObject[];
 }
 
 export abstract class BaseAuthUtil 
   extends BaseContextAuthUtil
   implements IPostmanAuthUtil, IFullOpenAPIAuthUtil {
+  abstract getSecuritySchemeName(): string;
   abstract toOpenAPI(): SecuritySchemeObject;
 }
 
@@ -78,9 +80,9 @@ export abstract class FullAuthUtil extends BaseAuthUtil implements IAuthUtil {
     return r;
   }
 
-  toOpenAPISecurity(scopes: string[] = []): SecurityRequirementObject {
-    return {
+  toOpenAPISecurity(scopes: string[] = []): SecurityRequirementObject[] {
+    return [{
       [this.securitySchemeName]: scopes
-    };
+    }];
   }
 }

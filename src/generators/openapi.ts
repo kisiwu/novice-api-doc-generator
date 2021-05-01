@@ -6,6 +6,7 @@
  * @todo: change var, method names ...
  */
 
+import extend from 'extend';
 import {
   SchemaObject,
   SecuritySchemeObject,
@@ -28,13 +29,14 @@ import {
   ServerObject,
   SecurityRequirementObject
 } from './openapi/definitions';
-import { OpenApiHelperInterface } from './openapi/helpers/interfaces';
-import { OpenApiJoiHelper } from './openapi/helpers/joiHelper';
+import { OpenAPIHelperInterface } from './openapi/helpers/interfaces';
+import { OpenAPIJoiHelper } from './openapi/helpers/joiHelper';
 import { SchemaCreator } from './openapi/services/schemaService';
 import { ParameterCreator } from './openapi/services/parameterService';
 import { MediaTypeCreator } from './openapi/services/mediaTypeService';
 import { formatPath, formatType, Log } from './openapi/utils';
-import extend from 'extend';
+import { BaseOpenAPIAuthUtil, BaseAuthUtil, BaseContextAuthUtil } from '../utils/auth/baseAuthUtils';
+import { BaseOpenAPIResponseUtil, BaseResponseUtil } from '../utils/responses/baseResponseUtils';
 
 
 interface ResponsesRecord {
@@ -107,16 +109,16 @@ export enum GenerateComponentsRules {
  * Well, at least not tried yet
  * but it definitely doesn't work with alternatives 
  */
-export class OpenApi {
+export class OpenAPI {
   #consumes: string[];
   #result: OpenAPIResult;
   #security: SecurityRequirementObject[];
-  #helperClass: { new(args: unknown): OpenApiHelperInterface };
+  #helperClass: { new(args: unknown): OpenAPIHelperInterface };
 
   #responsesProperty?: string;
   #generateComponentsRule = GenerateComponentsRules.always;
 
-  constructor(helperClass: { new(args: unknown): OpenApiHelperInterface } = OpenApiJoiHelper) {
+  constructor(helperClass: { new(args: unknown): OpenAPIHelperInterface } = OpenAPIJoiHelper) {
     this.#consumes = [];
     this.#helperClass = helperClass;
     this.#result = {
@@ -136,7 +138,7 @@ export class OpenApi {
     this.#security = [];
   }
 
-  setGenerateComponentsRule(v: GenerateComponentsRules): OpenApi {
+  setGenerateComponentsRule(v: GenerateComponentsRules): OpenAPI {
     const value: GenerateComponentsRules = GenerateComponentsRules[v];
     if (value) {
       this.#generateComponentsRule = value;
@@ -148,7 +150,7 @@ export class OpenApi {
     return this.#generateComponentsRule;
   }
 
-  setResponsesProperty(v: string): OpenApi {
+  setResponsesProperty(v: string): OpenAPI {
     this.#responsesProperty = v;
     return this;
   }
@@ -157,7 +159,7 @@ export class OpenApi {
     return this.#responsesProperty;
   }
 
-  setConsumes(consumes: string[]): OpenApi {
+  setConsumes(consumes: string[]): OpenAPI {
     this.#consumes = consumes;
     return this;
   }
@@ -166,7 +168,7 @@ export class OpenApi {
     return this.#consumes;
   }
 
-  setCallbacks(callbacks: Record<string, unknown>): OpenApi {
+  setCallbacks(callbacks: Record<string, unknown>): OpenAPI {
     this.#result.components.callbacks = callbacks;
     return this;
   }
@@ -192,7 +194,7 @@ export class OpenApi {
     return r;
   }
 
-  addCallback(name: string, callback: unknown): OpenApi {
+  addCallback(name: string, callback: unknown): OpenAPI {
     if (!this.#result.components.callbacks) {
       this.#result.components.callbacks = {};
     }
@@ -220,7 +222,7 @@ export class OpenApi {
     return r;
   }
 
-  setLinks(links: Record<string, ReferenceObject | LinkObject>): OpenApi {
+  setLinks(links: Record<string, ReferenceObject | LinkObject>): OpenAPI {
     this.#result.components.links = links;
     return this;
   }
@@ -246,7 +248,7 @@ export class OpenApi {
     return r;
   }
 
-  addLink(name: string, link: ReferenceObject | LinkObject): OpenApi {
+  addLink(name: string, link: ReferenceObject | LinkObject): OpenAPI {
     if (!this.#result.components.links) {
       this.#result.components.links = {};
     }
@@ -274,7 +276,7 @@ export class OpenApi {
     return r;
   }
 
-  setExamples(examples: Record<string, ReferenceObject | ExampleObject>): OpenApi {
+  setExamples(examples: Record<string, ReferenceObject | ExampleObject>): OpenAPI {
     this.#result.components.examples = examples;
     return this;
   }
@@ -300,7 +302,7 @@ export class OpenApi {
     return r;
   }
 
-  addExample(name: string, example: ReferenceObject | ExampleObject): OpenApi {
+  addExample(name: string, example: ReferenceObject | ExampleObject): OpenAPI {
     if (!this.#result.components.examples) {
       this.#result.components.examples = {};
     }
@@ -328,7 +330,7 @@ export class OpenApi {
     return r;
   }
 
-  setSchemas(schemas: Record<string, SchemaObject | ReferenceObject>): OpenApi {
+  setSchemas(schemas: Record<string, SchemaObject | ReferenceObject>): OpenAPI {
     this.#result.components.schemas = schemas;
     return this;
   }
@@ -354,7 +356,7 @@ export class OpenApi {
     return r;
   }
 
-  addSchema(name: string, schema: SchemaObject | ReferenceObject): OpenApi {
+  addSchema(name: string, schema: SchemaObject | ReferenceObject): OpenAPI {
     if (!this.#result.components.schemas) {
       this.#result.components.schemas = {};
     }
@@ -382,7 +384,7 @@ export class OpenApi {
     return r;
   }
 
-  setHeaders(headers: Record<string, ReferenceObject | HeaderObject>): OpenApi {
+  setHeaders(headers: Record<string, ReferenceObject | HeaderObject>): OpenAPI {
     this.#result.components.headers = headers;
     return this;
   }
@@ -408,7 +410,7 @@ export class OpenApi {
     return r;
   }
 
-  addHeader(name: string, header: ReferenceObject | HeaderObject): OpenApi {
+  addHeader(name: string, header: ReferenceObject | HeaderObject): OpenAPI {
     if (!this.#result.components.headers) {
       this.#result.components.headers = {};
     }
@@ -436,7 +438,7 @@ export class OpenApi {
     return r;
   }
 
-  setParameters(parameters: Record<string, ReferenceObject | ParameterObject>): OpenApi {
+  setParameters(parameters: Record<string, ReferenceObject | ParameterObject>): OpenAPI {
     this.#result.components.parameters = parameters;
     return this;
   }
@@ -462,7 +464,7 @@ export class OpenApi {
     return r;
   }
 
-  addParameter(name: string, param: ParameterObject): OpenApi {
+  addParameter(name: string, param: ParameterObject): OpenAPI {
     if (!this.#result.components.parameters) {
       this.#result.components.parameters = {};
     }
@@ -490,7 +492,7 @@ export class OpenApi {
     return r;
   }
 
-  setRequestBodies(requestBodies: Record<string, ReferenceObject | RequestBodyObject>): OpenApi {
+  setRequestBodies(requestBodies: Record<string, ReferenceObject | RequestBodyObject>): OpenAPI {
     this.#result.components.requestBodies = requestBodies;
     return this;
   }
@@ -516,7 +518,7 @@ export class OpenApi {
     return r;
   }
 
-  addRequestBody(name: string, requestBody: ReferenceObject | RequestBodyObject): OpenApi {
+  addRequestBody(name: string, requestBody: ReferenceObject | RequestBodyObject): OpenAPI {
     if (!this.#result.components.requestBodies) {
       this.#result.components.requestBodies = {};
     }
@@ -544,7 +546,7 @@ export class OpenApi {
     return r;
   }
 
-  setResponses(responses: Record<string, ReferenceObject | ResponseObject>): OpenApi {
+  setResponses(responses: Record<string, ReferenceObject | ResponseObject>): OpenAPI {
     this.#result.components.responses = responses;
     return this;
   }
@@ -570,7 +572,7 @@ export class OpenApi {
     return r;
   }
 
-  addResponse(name: string, response: ReferenceObject | ResponseObject): OpenApi {
+  addResponse(name: string, response: ReferenceObject | ResponseObject): OpenAPI {
     if (!this.#result.components.responses) {
       this.#result.components.responses = {};
     }
@@ -598,7 +600,7 @@ export class OpenApi {
     return r;
   }
 
-  setSecuritySchemes(v: Record<string, ReferenceObject | SecuritySchemeObject>): OpenApi {
+  setSecuritySchemes(v: Record<string, ReferenceObject | SecuritySchemeObject>): OpenAPI {
     this.#result.components.securitySchemes = v;
     return this;
   }
@@ -624,11 +626,25 @@ export class OpenApi {
     return r;
   }
 
-  addSecurityScheme(name: string, schema: ReferenceObject | SecuritySchemeObject): OpenApi {
+  addSecurityScheme(name: string, schema: ReferenceObject | SecuritySchemeObject): OpenAPI;
+  addSecurityScheme(schema: BaseOpenAPIAuthUtil | BaseAuthUtil): OpenAPI;
+  addSecurityScheme(
+    name: BaseOpenAPIAuthUtil | BaseAuthUtil | string, 
+    schema?: ReferenceObject | SecuritySchemeObject): OpenAPI {
     if (!this.#result.components.securitySchemes) {
       this.#result.components.securitySchemes = {};
     }
-    this.#result.components.securitySchemes[name] = schema;
+    if (name instanceof BaseOpenAPIAuthUtil) {
+      this.#result
+        .components
+        .securitySchemes[name.getSecuritySchemeName()] = name.toOpenAPI();
+    } else if (name instanceof BaseAuthUtil) {
+      this.#result
+        .components
+        .securitySchemes[name.getSecuritySchemeName()] = name.toOpenAPI()
+    } else if (schema) {
+      this.#result.components.securitySchemes[name] = schema;
+    }
     return this;
   }
 
@@ -652,7 +668,7 @@ export class OpenApi {
     return r;
   }
 
-  setComponents(components: ComponentsObject): OpenApi {
+  setComponents(components: ComponentsObject): OpenAPI {
     this.#result.components = components;
     return this;
   }
@@ -694,7 +710,7 @@ export class OpenApi {
     return r;
   }
 
-  setTags(tags: TagObject[]): OpenApi {
+  setTags(tags: TagObject[]): OpenAPI {
     this.#result.tags = tags;
     return this;
   }
@@ -713,13 +729,13 @@ export class OpenApi {
     return r;
   }
 
-  addTag(tag: TagObject): OpenApi {
+  addTag(tag: TagObject): OpenAPI {
     return this.addTags(tag);
   }
 
-  addTags(tags: TagObject): OpenApi
-  addTags(tags: TagObject[]): OpenApi;
-  addTags(tags: TagObject[] | TagObject): OpenApi {
+  addTags(tags: TagObject): OpenAPI
+  addTags(tags: TagObject[]): OpenAPI;
+  addTags(tags: TagObject[] | TagObject): OpenAPI {
     if (!Array.isArray(tags)) {
       tags = [tags];
     }
@@ -734,11 +750,11 @@ export class OpenApi {
     return this;
   }
 
-  setDefaultSecurity(securityObjects: SecurityRequirementObject[]): OpenApi;
-  setDefaultSecurity(securityObject: SecurityRequirementObject): OpenApi;
-  setDefaultSecurity(security: string[]): OpenApi;
-  setDefaultSecurity(security: string): OpenApi;
-  setDefaultSecurity(v: SecurityRequirementObject[] | SecurityRequirementObject | string[] | string): OpenApi {
+  setDefaultSecurity(securityObjects: SecurityRequirementObject[]): OpenAPI;
+  setDefaultSecurity(securityObject: SecurityRequirementObject): OpenAPI;
+  setDefaultSecurity(security: string[]): OpenAPI;
+  setDefaultSecurity(security: string): OpenAPI;
+  setDefaultSecurity(v: SecurityRequirementObject[] | SecurityRequirementObject | string[] | string): OpenAPI {
     this.#security = [];
     if (Array.isArray(v)) {
       v.forEach((value: SecurityRequirementObject | string) => this.addDefaultSecurity(value));
@@ -748,10 +764,10 @@ export class OpenApi {
     return this;
   }
 
-  addDefaultSecurity(security: SecurityRequirementObject | string): OpenApi;
-  addDefaultSecurity(security: SecurityRequirementObject): OpenApi;
-  addDefaultSecurity(security: string): OpenApi;
-  addDefaultSecurity(v: SecurityRequirementObject | string): OpenApi {
+  addDefaultSecurity(security: SecurityRequirementObject | string): OpenAPI;
+  addDefaultSecurity(security: SecurityRequirementObject): OpenAPI;
+  addDefaultSecurity(security: string): OpenAPI;
+  addDefaultSecurity(v: SecurityRequirementObject | string): OpenAPI {
     if (v) {
       if(typeof v === 'string') {
         this.#security.push({
@@ -768,7 +784,7 @@ export class OpenApi {
     return this.#security;
   }
 
-  setInfo(info: InfoObject): OpenApi {
+  setInfo(info: InfoObject): OpenAPI {
     this.#result.info = info;
     return this;
   }
@@ -777,12 +793,12 @@ export class OpenApi {
     return this.#result.info;
   }
 
-  setInfoProperty(prop: string, value: unknown): OpenApi {
+  setInfoProperty(prop: string, value: unknown): OpenAPI {
     this.#result.info[prop] = value;
     return this;
   }
 
-  setTitle(title: string): OpenApi {
+  setTitle(title: string): OpenAPI {
     this.#result.info.title = title;
     return this;
   }
@@ -791,7 +807,7 @@ export class OpenApi {
     return this.#result.info.title;
   }
 
-  setDescription(description: string): OpenApi {
+  setDescription(description: string): OpenAPI {
     this.#result.info.description = description;
     return this;
   }
@@ -800,7 +816,7 @@ export class OpenApi {
     return this.#result.info.description;
   }
 
-  setTermsOfService(termsOfService: string): OpenApi {
+  setTermsOfService(termsOfService: string): OpenAPI {
     this.#result.info.termsOfService = termsOfService;
     return this;
   }
@@ -809,7 +825,7 @@ export class OpenApi {
     return this.#result.info.termsOfService;
   }
 
-  setVersion(version: string): OpenApi {
+  setVersion(version: string): OpenAPI {
     this.#result.info.version = version;
     return this;
   }
@@ -818,7 +834,7 @@ export class OpenApi {
     return this.#result.info.version;
   }
 
-  setContact(contact: ContactObject): OpenApi {
+  setContact(contact: ContactObject): OpenAPI {
     this.#result.info.contact = contact;
     return this;
   }
@@ -827,9 +843,9 @@ export class OpenApi {
     return this.#result.info.contact;
   }
 
-  setLicense(license: string): OpenApi;
-  setLicense(license: LicenseObject): OpenApi;
-  setLicense(license: LicenseObject | string): OpenApi {
+  setLicense(license: string): OpenAPI;
+  setLicense(license: LicenseObject): OpenAPI;
+  setLicense(license: LicenseObject | string): OpenAPI {
     if (typeof license === 'string') {
       this.#result.info.license = {
         name: license
@@ -844,9 +860,9 @@ export class OpenApi {
     return this.#result.info.license;
   }
 
-  setServers(servers: ServerObject[]): OpenApi;
-  setServers(server: ServerObject): OpenApi;
-  setServers(v: ServerObject[] | ServerObject): OpenApi {
+  setServers(servers: ServerObject[]): OpenAPI;
+  setServers(server: ServerObject): OpenAPI;
+  setServers(v: ServerObject[] | ServerObject): OpenAPI {
     this.#result.servers = [];
     let v2: ServerObject[] = [];
     if (!Array.isArray(v)) {
@@ -862,9 +878,9 @@ export class OpenApi {
     return this.#result.servers;
   }
 
-  addServer(server: ServerObject): OpenApi;
-  addServer(url: string): OpenApi;
-  addServer(v: ServerObject | string): OpenApi {
+  addServer(server: ServerObject): OpenAPI;
+  addServer(url: string): OpenAPI;
+  addServer(v: ServerObject | string): OpenAPI {
     if (typeof v === 'string') {
       v = { url: v }
     }
@@ -874,17 +890,17 @@ export class OpenApi {
 
   /**
    * 
-   * OpenApi.setServers({ url })
+   * OpenAPI.setServers({ url })
    */
-  setHost(url: string): OpenApi {
+  setHost(url: string): OpenAPI {
     return this.setServers({
       url
     });
   }
 
-  setExternalDoc(externalDoc: ExternalDocObject): OpenApi;
-  setExternalDoc(url: string): OpenApi
-  setExternalDoc(externalDoc: ExternalDocObject | string): OpenApi {
+  setExternalDoc(externalDoc: ExternalDocObject): OpenAPI;
+  setExternalDoc(url: string): OpenAPI
+  setExternalDoc(externalDoc: ExternalDocObject | string): OpenAPI {
     if (typeof externalDoc === 'string') {
       this.#result.externalDocs = { url: externalDoc };
     } else {
@@ -901,10 +917,10 @@ export class OpenApi {
    * @example
    * ```typescript
    * import routing from '@novice1/routing';
-   * import { OpenApi } from '@novice1/api-doc-generator';
+   * import { OpenAPI } from '@novice1/api-doc-generator';
    * 
    * const router = routing().post(...);
-   * const openapi = new OpenApi();
+   * const openapi = new OpenAPI();
    * const routes = openapi.add(router.getMeta());
    * const { path, method, schema } = routes[0];
    * ```
@@ -978,7 +994,14 @@ export class OpenApi {
 
   private _getResponsesSchema(responses?: ResponsesRecord): ResponsesRecord {
     let r: ResponsesRecord = {};
+    let tmp: unknown;
     if (responses
+      && this.#responsesProperty) {
+      tmp = responses[this.#responsesProperty];
+    } else {
+      tmp = responses;
+    }
+    /*if (responses
       && this.#responsesProperty) {
       const tmp = responses[this.#responsesProperty];
       if (tmp && typeof tmp === 'object') {
@@ -987,6 +1010,12 @@ export class OpenApi {
       }
     } else {
       r = responses || r;
+    }*/
+    if (tmp instanceof BaseOpenAPIResponseUtil 
+      || tmp instanceof BaseResponseUtil) {
+        r = tmp.toOpenAPI();
+    } else if (tmp && typeof tmp === 'object') {
+      r = extend(true, r, tmp);
     }
     return r;
   }
@@ -1036,7 +1065,11 @@ export class OpenApi {
 
     // format security
     if (!Array.isArray(parameters.security)) {
-      if (parameters.security && typeof parameters.security == 'object') {
+      if (parameters.security instanceof BaseContextAuthUtil
+        || parameters.security instanceof BaseOpenAPIAuthUtil
+        || parameters.security instanceof BaseAuthUtil) {
+        security = parameters.security.toOpenAPISecurity();
+      } else if (parameters.security && typeof parameters.security == 'object') {
         security = [security];
       } else if (parameters.security && typeof parameters.security == 'string') {
         security = [{ [parameters.security]: [] }];
@@ -1115,7 +1148,7 @@ export class OpenApi {
     const res: (ParameterObject | ReferenceObject)[] = [];
 
     const paramsHelper = new this.#helperClass(parameters);
-    let children: Record<string, OpenApiHelperInterface> | undefined;
+    let children: Record<string, OpenAPIHelperInterface> | undefined;
     if (paramsHelper.isValid()) {
       children = paramsHelper.getChildren();
     }
@@ -1160,12 +1193,12 @@ export class OpenApi {
 
   private _pushPathParameters(
     location: ParameterLocations,
-    value: Record<string, unknown> | OpenApiHelperInterface,
+    value: Record<string, unknown> | OpenAPIHelperInterface,
     res: Array<ReferenceObject | ParameterObject>) {
     const valueHelper = value instanceof this.#helperClass ? value : new this.#helperClass(value);
     let valueHelperType: string | undefined;
 
-    let children: Record<string, OpenApiHelperInterface>;
+    let children: Record<string, OpenAPIHelperInterface>;
     if (valueHelper.isValid()) {
       valueHelperType = formatType(valueHelper.getType()).type;
       children = valueHelper.getChildren();
@@ -1178,7 +1211,7 @@ export class OpenApi {
       return Object.keys(value);
     };
 
-    const getChild = (name: string): OpenApiHelperInterface | undefined => {
+    const getChild = (name: string): OpenAPIHelperInterface | undefined => {
       if (children) {
         return children[name];
       }
@@ -1190,7 +1223,7 @@ export class OpenApi {
 
     const handleChild = (
       name: string,
-      helper: OpenApiHelperInterface,
+      helper: OpenAPIHelperInterface,
       style?: string) => {
       if (!helper.isValid()) return;
 
@@ -1247,7 +1280,7 @@ export class OpenApi {
    */
   private _createParameterObject(
     location: string,
-    helper: OpenApiHelperInterface,
+    helper: OpenAPIHelperInterface,
     defaultParameterObject: ParameterObject): ParameterObject {
     const parameter = new ParameterCreator(defaultParameterObject)
       .setRequired(helper.isRequired())
@@ -1340,8 +1373,8 @@ export class OpenApi {
   }
 
   private _pushRequestBody(
-    body: Record<string, unknown> | OpenApiHelperInterface | undefined,
-    files: Record<string, unknown> | OpenApiHelperInterface | undefined,
+    body: Record<string, unknown> | OpenAPIHelperInterface | undefined,
+    files: Record<string, unknown> | OpenAPIHelperInterface | undefined,
     consumes: string[],
     res: RequestBodyObject) {
 
@@ -1350,7 +1383,7 @@ export class OpenApi {
     let bodySchema: SchemaCreator | undefined;
     let filesSchema: SchemaCreator | undefined;
 
-    let helperWithRef: OpenApiHelperInterface | undefined;
+    let helperWithRef: OpenAPIHelperInterface | undefined;
 
     let examples: Record<string, ExampleObject | ReferenceObject> | undefined;
     let encoding: Record<string, EncodingObject> | undefined;
@@ -1506,7 +1539,7 @@ export class OpenApi {
    * @returns 
    */
   private _createBasicSchema(
-    helper: OpenApiHelperInterface,
+    helper: OpenAPIHelperInterface,
     parentProp?: SchemaCreator,
     name?: string,
     format?: string
@@ -1606,7 +1639,7 @@ export class OpenApi {
    * @returns 
    */
   private _createSchema(
-    helper: OpenApiHelperInterface,
+    helper: OpenAPIHelperInterface,
     parentProp?: SchemaCreator,
     name?: string,
     format?: string
@@ -1627,7 +1660,7 @@ export class OpenApi {
    * @returns 
    */
   private _createSchemaObject(
-    helper: OpenApiHelperInterface,
+    helper: OpenAPIHelperInterface,
     parentProp?: SchemaCreator,
     name?: string,
     format?: string
@@ -1645,7 +1678,7 @@ export class OpenApi {
   }
 
   private _createAlternativeSchema(
-    altHelper: OpenApiHelperInterface,
+    altHelper: OpenAPIHelperInterface,
     parentProp?: SchemaCreator,
     name?: string
   ): SchemaCreator {
@@ -1653,7 +1686,7 @@ export class OpenApi {
   }
 
   private _createAlternativeSchemaObject(
-    altHelper: OpenApiHelperInterface,
+    altHelper: OpenAPIHelperInterface,
     parentProp?: SchemaCreator,
     name?: string
   ): SchemaObject {
@@ -1724,7 +1757,7 @@ export class OpenApi {
   }
 
   private _fillArraySchemaObject(
-    helper: OpenApiHelperInterface,
+    helper: OpenAPIHelperInterface,
     propSchema: SchemaCreator,
     format?: string
   ) {
@@ -1756,7 +1789,7 @@ export class OpenApi {
   }
 
   private _fillObjectSchemaObject(
-    helper: OpenApiHelperInterface,
+    helper: OpenAPIHelperInterface,
     propSchema: SchemaCreator
   ) {
     // only for "object"
@@ -1782,7 +1815,7 @@ export class OpenApi {
   }
 
   private _autoSchemaObjectToRef(
-    helper: OpenApiHelperInterface,
+    helper: OpenAPIHelperInterface,
     schemaObject: SchemaObject
   ): SchemaObject {
     let newSchema = schemaObject;
@@ -1815,7 +1848,7 @@ export class OpenApi {
   }
 
   private _autoParameterObjectToRef(
-    helper: OpenApiHelperInterface,
+    helper: OpenAPIHelperInterface,
     paramObject: ParameterObject
   ): ReferenceObject | ParameterObject {
     let newParamObject: ReferenceObject | ParameterObject = paramObject;
@@ -1848,7 +1881,7 @@ export class OpenApi {
   }
 
   private _autoRequestBodyObjectToRef(
-    helper: OpenApiHelperInterface,
+    helper: OpenAPIHelperInterface,
     schemaObject: RequestBodyObject
   ): RequestBodyObject {
     let newSchema = schemaObject;
@@ -1884,7 +1917,7 @@ export class OpenApi {
   }
 
   private _getLocalRef(
-    helper: OpenApiHelperInterface,
+    helper: OpenAPIHelperInterface,
     componentCategory = 'schemas'
   ): string | undefined {
     let r: string | undefined;
@@ -1901,7 +1934,7 @@ export class OpenApi {
   }
 
   private _getRemoteRef(
-    helper: OpenApiHelperInterface
+    helper: OpenAPIHelperInterface
   ): string | undefined {
     let r: string | undefined;
     if (helper.hasRef?.()) {

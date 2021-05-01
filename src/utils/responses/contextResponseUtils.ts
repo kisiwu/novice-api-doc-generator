@@ -2,7 +2,7 @@ import extend from 'extend';
 import {
   LinkObject, 
   ReferenceObject, 
-  ResponseObject as OpenApiResponseObject
+  ResponseObject as OpenAPIResponseObject
 } from '../../generators/openapi/definitions';
 import {
   ResponseObject as PostmanResponseObject
@@ -74,7 +74,7 @@ export class ContextResponseUtil extends BaseResponseUtil {
     return this.responseUtil.toPostman();
   }
 
-  toOpenAPI(): Record<string, OpenApiResponseObject | ReferenceObject> {
+  toOpenAPI(): Record<string, OpenAPIResponseObject | ReferenceObject> {
     const ctxt: IOpenAPIResponseContext = {};
     if (this.ref) {
       ctxt.ref = this.ref;
@@ -105,8 +105,8 @@ export class GroupContextResponseUtil extends BaseResponseUtil {
     return r;
   }
 
-  toOpenAPI(): Record<string, OpenApiResponseObject | ReferenceObject> {
-    let r: Record<string, OpenApiResponseObject | ReferenceObject> = {};
+  toOpenAPI(): Record<string, OpenAPIResponseObject | ReferenceObject> {
+    let r: Record<string, OpenAPIResponseObject | ReferenceObject> = {};
     this.responseUtils.forEach(builder => {
       r = extend(r, builder.toOpenAPI());
     });

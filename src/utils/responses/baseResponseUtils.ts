@@ -3,7 +3,7 @@ import {
   LinkObject, 
   MediaTypeObject, 
   ReferenceObject, 
-  ResponseObject as OpenApiResponseObject
+  ResponseObject as OpenAPIResponseObject
 } from '../../generators/openapi/definitions';
 import {
   ResponseObject as PostmanResponseObject
@@ -20,15 +20,15 @@ interface IPostmanResponseUtil {
 }
 
 interface IOpenAPIResponseUtil {
-  toOpenAPI(ctxt?: IOpenAPIResponseContext): Record<string, OpenApiResponseObject | ReferenceObject>;
+  toOpenAPI(ctxt?: IOpenAPIResponseContext): Record<string, OpenAPIResponseObject | ReferenceObject>;
 }
 
 interface IResponseUtil 
   extends IPostmanResponseUtil, IOpenAPIResponseUtil {}
 
 export abstract class BaseOpenAPIResponseUtil implements IOpenAPIResponseUtil {
-  abstract toOpenAPI(ctxt: IOpenAPIResponseContext): Record<string, OpenApiResponseObject | ReferenceObject>;
-  abstract toOpenAPI(): Record<string, OpenApiResponseObject | ReferenceObject>;
+  abstract toOpenAPI(ctxt: IOpenAPIResponseContext): Record<string, OpenAPIResponseObject | ReferenceObject>;
+  abstract toOpenAPI(): Record<string, OpenAPIResponseObject | ReferenceObject>;
 }
 
 export abstract class BasePostmanResponseUtil implements IPostmanResponseUtil {
@@ -38,8 +38,8 @@ export abstract class BasePostmanResponseUtil implements IPostmanResponseUtil {
 export abstract class BaseResponseUtil 
   implements IResponseUtil {
   abstract toPostman(): PostmanResponseObject[];
-  abstract toOpenAPI(ctxt: IOpenAPIResponseContext): Record<string, OpenApiResponseObject | ReferenceObject>;
-  abstract toOpenAPI(): Record<string, OpenApiResponseObject | ReferenceObject>;
+  abstract toOpenAPI(ctxt: IOpenAPIResponseContext): Record<string, OpenAPIResponseObject | ReferenceObject>;
+  abstract toOpenAPI(): Record<string, OpenAPIResponseObject | ReferenceObject>;
 }
 
 export abstract class FullResponseUtil extends BaseResponseUtil {

@@ -8,7 +8,7 @@ Quickly generate API Documentation.
 $ npm install @novice1/api-doc-generator
 ```
 
-## OpenApi
+## OpenAPI
 
 [Module openapi documentation](https://novice1.000webhostapp.com/api-doc-generator/modules/openapi.html).
 
@@ -18,12 +18,12 @@ By default it understands `joi` schemas.
 
 Example:
 ```ts
-import { OpenApi } from '@novice1/api-doc-generator';
+import { OpenAPI } from '@novice1/api-doc-generator';
 import { GenerateComponentsRules } from '@novice1/api-doc-generator/generators/openapi';
 import routing from '@novice1/routing';
 import Joi from 'joi';
 
-const openapi = new OpenApi();
+const openapi = new OpenAPI();
 
 openapi
   .setTitle('api doc')
@@ -115,7 +115,7 @@ Joi.object()
   })
   .meta({ ref: '#/components/schemas/Pet' })
 ```
-If the reference is local (`#`), it could automatically generate the component depending on the rule you set (see `OpenApi.setGenerateComponentsRule`).
+If the reference is local (`#`), it could automatically generate the component depending on the rule you set (see `OpenAPI.setGenerateComponentsRule`).
 
 List of elements you can configure in `Joi.meta`: 
 - `additionalProperties`

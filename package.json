@@ -1,7 +1,7 @@
 {
   "name": "@novice1/api-doc-generator",
   "private": false,
-  "version": "0.0.1",
+  "version": "0.1.0",
   "description": "Quickly generate API Documentation.",
   "main": "lib/index.js",
   "repository": {
@@ -17,7 +17,8 @@
     "lint": "eslint src/**/*.ts",
     "test": "env TS_NODE_COMPILER_OPTIONS='{\"module\": \"commonjs\"}' kaukau --require ts-node/register --file test --ext .test.ts",
     "testany": "env TS_NODE_COMPILER_OPTIONS='{\"module\": \"commonjs\", \"noImplicitAny\": false}' kaukau --require ts-node/register --file test --ext .test.ts",
-    "testpostman": "env TS_NODE_COMPILER_OPTIONS='{\"module\": \"commonjs\"}' kaukau --require ts-node/register --file test/postman --ext .test.ts"
+    "testpostman": "env TS_NODE_COMPILER_OPTIONS='{\"module\": \"commonjs\"}' kaukau --require ts-node/register --file test/postman --ext .test.ts",
+    "testopenapi": "env TS_NODE_COMPILER_OPTIONS='{\"module\": \"commonjs\"}' kaukau --require ts-node/register --file test/openapi --ext .test.ts"
   },
   "keywords": [
     "openapi",

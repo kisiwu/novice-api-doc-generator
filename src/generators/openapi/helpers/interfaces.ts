@@ -12,11 +12,11 @@ import {
   XMLObject,
 } from '../definitions';
 
-export interface OpenApiHelperInterface extends BaseHelperInterface {
+export interface OpenAPIHelperInterface extends BaseHelperInterface {
   // required
-  getFirstItem(): OpenApiHelperInterface | undefined;
-  getChildren(): Record<string, OpenApiHelperInterface>;
-  getAlternatives(): OpenApiHelperInterface[];
+  getFirstItem(): OpenAPIHelperInterface | undefined;
+  getChildren(): Record<string, OpenAPIHelperInterface>;
+  getAlternatives(): OpenAPIHelperInterface[];
 
   // optionals
   hasStyle?(): boolean;

@@ -3,7 +3,7 @@ import {
   ResponseObject as PostmanResponseObject
 } from '../../generators/postman/definitions';
 import {
-  ResponseObject as OpenApiResponseObject,
+  ResponseObject as OpenAPIResponseObject,
   ReferenceObject,
   LinkObject,
   MediaTypeObject,
@@ -137,9 +137,9 @@ export class ResponseUtil extends FullResponseUtil {
     return [];
   }
 
-  toOpenAPI(): Record<string, OpenApiResponseObject | ReferenceObject>;
-  toOpenAPI(ctxt: IOpenAPIResponseContext): Record<string, OpenApiResponseObject | ReferenceObject>;
-  toOpenAPI(ctxt: IOpenAPIResponseContext = {}): Record<string, OpenApiResponseObject | ReferenceObject> {
+  toOpenAPI(): Record<string, OpenAPIResponseObject | ReferenceObject>;
+  toOpenAPI(ctxt: IOpenAPIResponseContext): Record<string, OpenAPIResponseObject | ReferenceObject>;
+  toOpenAPI(ctxt: IOpenAPIResponseContext = {}): Record<string, OpenAPIResponseObject | ReferenceObject> {
     let name = `${this.code}`;
     if (ctxt.default) {
       name = 'default';
@@ -161,7 +161,7 @@ export class ResponseUtil extends FullResponseUtil {
         }
       };
     }
-    const res: OpenApiResponseObject | ReferenceObject = {
+    const res: OpenAPIResponseObject | ReferenceObject = {
       description: this.description || ''
     };
     if (this.headers) {

@@ -4,37 +4,37 @@
 
 import { JoiHelper, JoiSchema } from '../../../helpers/joiHelper';
 import { AdditionalProperties, DiscriminatorObject, EncodingObject, ExampleObject, ReferenceObject, XMLObject } from '../definitions';
-import { OpenApiHelperInterface } from './interfaces';
+import { OpenAPIHelperInterface } from './interfaces';
 
-export class OpenApiJoiHelper extends JoiHelper implements OpenApiHelperInterface {
-  getFirstItem(): OpenApiJoiHelper | undefined {
+export class OpenAPIJoiHelper extends JoiHelper implements OpenAPIHelperInterface {
+  getFirstItem(): OpenAPIJoiHelper | undefined {
     if (!this.isJoi()) {
       return;
     }
-    let r: OpenApiJoiHelper | undefined;
+    let r: OpenAPIJoiHelper | undefined;
     if (this._joi.$_terms
       && this._joi.$_terms.items
       && this._joi.$_terms.items[0]) {
-      r = new OpenApiJoiHelper(this._joi.$_terms.items[0]);
+      r = new OpenAPIJoiHelper(this._joi.$_terms.items[0]);
     }
     return r;
   }
 
-  getChildren(): Record<string, OpenApiJoiHelper> {
-    const r: Record<string, OpenApiJoiHelper> = {};
+  getChildren(): Record<string, OpenAPIJoiHelper> {
+    const r: Record<string, OpenAPIJoiHelper> = {};
     if (!this.isJoi()) {
       return r;
     }
     if (this._joi.$_terms
       && this._joi.$_terms.keys && this._joi.$_terms.keys.length) {
       this._joi.$_terms.keys.forEach(
-        (c: { key: string, schema?: Record<string, JoiSchema> }) => r[c.key] = new OpenApiJoiHelper(c.schema));
+        (c: { key: string, schema?: Record<string, JoiSchema> }) => r[c.key] = new OpenAPIJoiHelper(c.schema));
     }
     return r;
   }
 
-  getAlternatives(): OpenApiJoiHelper[] {
-    const r: OpenApiJoiHelper[] = [];
+  getAlternatives(): OpenAPIJoiHelper[] {
+    const r: OpenAPIJoiHelper[] = [];
     if (!this.isJoi()) {
       return r;
     }
@@ -43,7 +43,7 @@ export class OpenApiJoiHelper extends JoiHelper implements OpenApiHelperInterfac
       this._joi.$_terms.matches.forEach(
         (c: {schema?: JoiSchema;}) => {
           if(c.schema) {
-            r.push(new OpenApiJoiHelper(c.schema))
+            r.push(new OpenAPIJoiHelper(c.schema))
           }
         }
       );

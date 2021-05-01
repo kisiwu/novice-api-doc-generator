@@ -1,15 +1,22 @@
 //import fs from 'fs';
 import routing from '@novice1/routing';
-import { OpenApi } from '../src';
-import { GenerateComponentsRules } from '../src/generators/openapi';
+import { OpenAPI } from '../../src';
+import { GenerateComponentsRules } from '../../src/generators/openapi';
 import Joi from 'joi';
+
+import {
+  apiKeyAuth,
+  bearerAuth,
+  GroupCtxtAuth,
+  GroupCtxtResponse
+} from '../testutils';
 
 describe('api doc', function () {
   const { logger } = this.ctx.kaukau;
 
   it('oas doc', () => {
     // generator
-    const openapi = new OpenApi();
+    const openapi = new OpenAPI();
     openapi
       .setTitle('api doc')
       .setHost('http://test.kaukau.tst')
@@ -22,7 +29,9 @@ describe('api doc', function () {
           externalDocs: { description: 'Find more info here', url: 'https://swagger.io/specification/' }
         }
       ]).setGenerateComponentsRule(GenerateComponentsRules.ifUndefined)
-      .setResponsesProperty('openapi');
+      .addSecurityScheme(bearerAuth)
+      .addSecurityScheme(apiKeyAuth);
+      //.setResponsesProperty('openapi');
 
     openapi.addRequestBody('AppBody', {
        required: true,
@@ -237,6 +246,8 @@ describe('api doc', function () {
         ref: '#/components/requestBodies/AppBody'
       }),
       path: '/app',
+      responses: GroupCtxtResponse
+      /*
       responses: {
         openapi: {
           default: {
@@ -272,6 +283,7 @@ describe('api doc', function () {
           }
         }
       }
+      */
     }, function (req: { meta: unknown }, res: { json(arg: unknown): void }) {
       res.json(req.meta)
     })
@@ -375,8 +387,10 @@ describe('api doc', function () {
             }
           }),
         consumes: 'application/xml',
+        security: GroupCtxtAuth,
       },
       path: '/app/xml',
+      auth: true
     }, function (req: { meta: unknown }, res: { json(arg: unknown): void }) {
       res.json(req.meta)
     });
@@ -394,7 +408,7 @@ describe('api doc', function () {
 
     // uncomment to test locally
     /*
-    const wStream = fs.createWriteStream('private/result.json', { flags: 'w+' });
+    const wStream = fs.createWriteStream('private/result2.json', { flags: 'w+' });
     wStream.write(JSON.stringify(result, null, ' '), (err: unknown) => {
       if (err) {
         logger.error(err);

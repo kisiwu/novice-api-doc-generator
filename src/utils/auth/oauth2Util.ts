@@ -584,9 +584,9 @@ export class Oauth2Util extends FullAuthUtil {
     return r;
   }
 
-  toOpenAPISecurity(scopes?: string[]): SecurityRequirementObject {
-    return {
+  toOpenAPISecurity(scopes?: string[]): SecurityRequirementObject[] {
+    return [{
       [this.securitySchemeName]: scopes || Object.keys(this.scopes)
-    };
+    }];
   }
 }
