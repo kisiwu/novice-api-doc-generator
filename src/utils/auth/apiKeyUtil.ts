@@ -117,7 +117,7 @@ export class ApiKeyUtil extends FullAuthUtil {
     return r;
   }
 
-  toOpenAPI(): SecuritySchemeObject {
+  toOpenAPI(): Record<string, SecuritySchemeObject> {
     const r: SecuritySchemeObject = {
       type: 'apiKey',
       description: this.description
@@ -128,6 +128,8 @@ export class ApiKeyUtil extends FullAuthUtil {
     if (isDefined(this.key)) {
       r.name = this.key;
     }
-    return r;
+    return {
+      [this.securitySchemeName]: r
+    };
   }
 }

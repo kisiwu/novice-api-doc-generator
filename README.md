@@ -19,7 +19,7 @@ By default it understands `joi` schemas.
 Example:
 ```ts
 import { OpenAPI } from '@novice1/api-doc-generator';
-import { GenerateComponentsRules } from '@novice1/api-doc-generator/generators/openapi';
+import { GenerateComponentsRule } from '@novice1/api-doc-generator/generators/openapi';
 import routing from '@novice1/routing';
 import Joi from 'joi';
 
@@ -35,7 +35,7 @@ openapi
       externalDocs: { description: 'Find more info here', url: 'https://swagger.io/specification/' }
     }
   ])
-  .setGenerateComponentsRule(GenerateComponentsRules.ifUndefined)
+  .setGenerateComponentsRule(GenerateComponentsRule.ifUndefined)
   .setResponsesProperty('openapi')
   .setSecuritySchemes({
     basicAuth: {
@@ -95,7 +95,7 @@ const router = routing()
 openapi.add(router.getMeta());
 
 // get OpenAPI Object (json)
-const oas = openapi.result();
+const doc = openapi.result();
 ```
 
 The `joi` types it can handle are: *alternatives*, *any*, *array*, *boolean*, *date* *function*, *number*, *object*, *string*, *binary*.

@@ -67,12 +67,14 @@ export class BearerUtil extends FullAuthUtil {
     return r;
   }
 
-  toOpenAPI(): SecuritySchemeObject {
+  toOpenAPI(): Record<string, SecuritySchemeObject> {
     return {
-      type: 'http',
-      scheme: 'bearer',
-      bearerFormat: this.bearerFormat,
-      description: this.description
+      [this.securitySchemeName]: {
+        type: 'http',
+        scheme: 'bearer',
+        bearerFormat: this.bearerFormat,
+        description: this.description
+      }
     };
   }
 }

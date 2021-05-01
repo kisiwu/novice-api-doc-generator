@@ -4,7 +4,7 @@
 
 export type AdditionalProperties = boolean | SchemaObject | ReferenceObject;
 
-export enum ParameterLocations {
+export enum ParameterLocation {
   cookie = 'cookie',
   header = 'header',
   path = 'path',
@@ -190,7 +190,7 @@ export interface HeaderObject {
 
 export interface ParameterObject extends HeaderObject {
   name: string;
-  in: string;//ParameterLocations;
+  in: string;//ParameterLocation;
   //in: string; // Possible values are "query", "header", "path" or "cookie".
   allowEmptyValue?: boolean; // Sets the ability to pass empty-valued parameters. This is valid only for query parameters and allows sending a parameter with an empty value. Default value is false. If style is used, and if behavior is n/a (cannot be serialized), the value of allowEmptyValue SHALL be ignored. Use of this property is NOT RECOMMENDED, as it is likely to be removed in a later revision.
 }

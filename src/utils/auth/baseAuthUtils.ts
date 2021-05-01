@@ -10,8 +10,7 @@ interface IContextOpenAPIAuthUtil {
 }
 
 interface ISchemeOpenAPIAuthUtil {
-  getSecuritySchemeName(): string;
-  toOpenAPI(): SecuritySchemeObject;
+  toOpenAPI(): Record<string, SecuritySchemeObject>;
 }
 
 interface IFullOpenAPIAuthUtil 
@@ -28,8 +27,7 @@ interface IAuthUtil extends IFullOpenAPIAuthUtil, IPostmanAuthUtil {
 }
 
 export abstract class BaseOpenAPIAuthUtil implements IFullOpenAPIAuthUtil {
-  abstract getSecuritySchemeName(): string;
-  abstract toOpenAPI(): SecuritySchemeObject;
+  abstract toOpenAPI(): Record<string, SecuritySchemeObject>;
   abstract toOpenAPISecurity(scopes?: string[]): SecurityRequirementObject[];
 }
 
@@ -46,8 +44,7 @@ export abstract class BaseContextAuthUtil
 export abstract class BaseAuthUtil 
   extends BaseContextAuthUtil
   implements IPostmanAuthUtil, IFullOpenAPIAuthUtil {
-  abstract getSecuritySchemeName(): string;
-  abstract toOpenAPI(): SecuritySchemeObject;
+  abstract toOpenAPI(): Record<string, SecuritySchemeObject>;
 }
 
 export abstract class FullAuthUtil extends BaseAuthUtil implements IAuthUtil {

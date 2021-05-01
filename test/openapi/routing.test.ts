@@ -1,14 +1,15 @@
 //import fs from 'fs';
 import routing from '@novice1/routing';
 import { OpenAPI } from '../../src';
-import { GenerateComponentsRules } from '../../src/generators/openapi';
+import { GenerateComponentsRule } from '../../src/generators/openapi';
 import Joi from 'joi';
 
 import {
-  apiKeyAuth,
-  bearerAuth,
+  /*apiKeyAuth,
+  bearerAuth,*/
   GroupCtxtAuth,
-  GroupCtxtResponse
+  GroupCtxtResponse,
+  GroupAuth
 } from '../testutils';
 
 describe('api doc', function () {
@@ -28,9 +29,8 @@ describe('api doc', function () {
           description: 'Testing purpose',
           externalDocs: { description: 'Find more info here', url: 'https://swagger.io/specification/' }
         }
-      ]).setGenerateComponentsRule(GenerateComponentsRules.ifUndefined)
-      .addSecurityScheme(bearerAuth)
-      .addSecurityScheme(apiKeyAuth);
+      ]).setGenerateComponentsRule(GenerateComponentsRule.ifUndefined)
+      .setSecuritySchemes(GroupAuth);
       //.setResponsesProperty('openapi');
 
     openapi.addRequestBody('AppBody', {

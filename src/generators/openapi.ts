@@ -2,11 +2,12 @@
  * @module openapi
  */
 
-/**
- * @todo: change var, method names ...
- */
-
 import extend from 'extend';
+import {
+  DocGenerator,
+  ProcessedRoute,
+  Route
+} from '../commons';
 import {
   SchemaObject,
   SecuritySchemeObject,
@@ -19,7 +20,7 @@ import {
   ExampleObject,
   ComponentsObject,
   ParameterObject,
-  ParameterLocations,
+  ParameterLocation,
   LinkObject,
   HeaderObject,
   InfoObject,
@@ -73,18 +74,6 @@ interface RouteSchema {
   [key: string]: unknown;
 }
 
-export interface Route {
-  path: string;
-  methods: Record<string, unknown>;
-  [key: string]: unknown;
-}
-
-export interface ProcessedRoute {
-  path: string;
-  method: string;
-  schema?: unknown;
-}
-
 export interface OpenAPIResult {
   openapi: string;
   info: InfoObject;
@@ -97,26 +86,30 @@ export interface OpenAPIResult {
   [key: string]: unknown;
 }
 
-export enum GenerateComponentsRules {
+export enum GenerateComponentsRule {
   always = 'always',
   ifUndefined = 'ifUndefined',
   never = 'never',
 }
 
 /**
+ * OpenAPI doc generator.
+ * 
+ * [[include:openapi.md]]
+ * 
  * @note For now it is not possible to only
  * send files outside of object property (multipart). 
  * Well, at least not tried yet
- * but it definitely doesn't work with alternatives 
+ * but it definitely doesn't work with alternatives.
  */
-export class OpenAPI {
+export class OpenAPI implements DocGenerator {
   #consumes: string[];
   #result: OpenAPIResult;
   #security: SecurityRequirementObject[];
   #helperClass: { new(args: unknown): OpenAPIHelperInterface };
 
   #responsesProperty?: string;
-  #generateComponentsRule = GenerateComponentsRules.always;
+  #generateComponentsRule = GenerateComponentsRule.always;
 
   constructor(helperClass: { new(args: unknown): OpenAPIHelperInterface } = OpenAPIJoiHelper) {
     this.#consumes = [];
@@ -138,15 +131,15 @@ export class OpenAPI {
     this.#security = [];
   }
 
-  setGenerateComponentsRule(v: GenerateComponentsRules): OpenAPI {
-    const value: GenerateComponentsRules = GenerateComponentsRules[v];
+  setGenerateComponentsRule(v: GenerateComponentsRule): OpenAPI {
+    const value: GenerateComponentsRule = GenerateComponentsRule[v];
     if (value) {
       this.#generateComponentsRule = value;
     }
     return this;
   }
 
-  getGenerateComponentsRule(): GenerateComponentsRules {
+  getGenerateComponentsRule(): GenerateComponentsRule {
     return this.#generateComponentsRule;
   }
 
@@ -546,8 +539,15 @@ export class OpenAPI {
     return r;
   }
 
-  setResponses(responses: Record<string, ReferenceObject | ResponseObject>): OpenAPI {
-    this.#result.components.responses = responses;
+  setResponses(responses: Record<string, ReferenceObject | ResponseObject>): OpenAPI;
+  setResponses(responses: BaseOpenAPIResponseUtil | BaseResponseUtil): OpenAPI;
+  setResponses(responses: Record<string, ReferenceObject | ResponseObject> | BaseOpenAPIResponseUtil | BaseResponseUtil): OpenAPI {
+    if (responses instanceof BaseOpenAPIResponseUtil
+      || responses instanceof BaseResponseUtil) {
+      this.#result.components.responses = responses.toOpenAPI();
+    } else {
+      this.#result.components.responses = responses;
+    }
     return this;
   }
 
@@ -572,11 +572,20 @@ export class OpenAPI {
     return r;
   }
 
-  addResponse(name: string, response: ReferenceObject | ResponseObject): OpenAPI {
+  addResponse(name: string, response: ReferenceObject | ResponseObject): OpenAPI;
+  addResponse(response: BaseOpenAPIResponseUtil | BaseResponseUtil): OpenAPI;
+  addResponse(name: string | BaseOpenAPIResponseUtil | BaseResponseUtil, response?: ReferenceObject | ResponseObject): OpenAPI {
     if (!this.#result.components.responses) {
       this.#result.components.responses = {};
     }
-    this.#result.components.responses[name] = response;
+    if (name instanceof BaseOpenAPIResponseUtil 
+      || name instanceof BaseResponseUtil) {
+        this.#result.components.responses = extend(
+          this.#result.components.responses,
+          name.toOpenAPI());
+    } else if (response){
+      this.#result.components.responses[name] = response;
+    }
     return this;
   }
 
@@ -600,8 +609,24 @@ export class OpenAPI {
     return r;
   }
 
-  setSecuritySchemes(v: Record<string, ReferenceObject | SecuritySchemeObject>): OpenAPI {
-    this.#result.components.securitySchemes = v;
+  /**
+   * [[include:openapi.setSecuritySchemes.1.md]]
+   */
+  setSecuritySchemes(schemes: Record<string, ReferenceObject | SecuritySchemeObject>): OpenAPI;
+  /**
+   * [[include:openapi.setSecuritySchemes.2.md]]
+   */
+  setSecuritySchemes(schemes: BaseOpenAPIAuthUtil | BaseAuthUtil): OpenAPI;
+  setSecuritySchemes(
+    v: Record<string, ReferenceObject | SecuritySchemeObject> | BaseOpenAPIAuthUtil | BaseAuthUtil): OpenAPI {
+    if (v instanceof BaseOpenAPIAuthUtil
+      || v instanceof BaseAuthUtil) {
+      this.#result
+        .components
+        .securitySchemes = v.toOpenAPI();
+    } else {
+      this.#result.components.securitySchemes = v;
+    }
     return this;
   }
 
@@ -634,14 +659,13 @@ export class OpenAPI {
     if (!this.#result.components.securitySchemes) {
       this.#result.components.securitySchemes = {};
     }
-    if (name instanceof BaseOpenAPIAuthUtil) {
+    if (name instanceof BaseOpenAPIAuthUtil
+      || name instanceof BaseAuthUtil) {
       this.#result
         .components
-        .securitySchemes[name.getSecuritySchemeName()] = name.toOpenAPI();
-    } else if (name instanceof BaseAuthUtil) {
-      this.#result
-        .components
-        .securitySchemes[name.getSecuritySchemeName()] = name.toOpenAPI()
+        .securitySchemes = extend(this.#result
+          .components
+          .securitySchemes, name.toOpenAPI());
     } else if (schema) {
       this.#result.components.securitySchemes[name] = schema;
     }
@@ -750,13 +774,22 @@ export class OpenAPI {
     return this;
   }
 
+
   setDefaultSecurity(securityObjects: SecurityRequirementObject[]): OpenAPI;
   setDefaultSecurity(securityObject: SecurityRequirementObject): OpenAPI;
+  /**
+   * [[include:openapi.setDefaultSecurity.1.md]]
+   */
+  setDefaultSecurity(security: BaseOpenAPIAuthUtil | BaseContextAuthUtil | BaseAuthUtil): OpenAPI;
   setDefaultSecurity(security: string[]): OpenAPI;
   setDefaultSecurity(security: string): OpenAPI;
-  setDefaultSecurity(v: SecurityRequirementObject[] | SecurityRequirementObject | string[] | string): OpenAPI {
+  setDefaultSecurity(v: SecurityRequirementObject[] | SecurityRequirementObject | BaseOpenAPIAuthUtil | BaseContextAuthUtil | BaseAuthUtil | string[] | string): OpenAPI {
     this.#security = [];
-    if (Array.isArray(v)) {
+    if (v instanceof BaseContextAuthUtil
+      || v instanceof BaseOpenAPIAuthUtil
+      || v instanceof BaseAuthUtil) {
+        this.#security = v.toOpenAPISecurity();
+    } else if (Array.isArray(v)) {
       v.forEach((value: SecurityRequirementObject | string) => this.addDefaultSecurity(value));
     } else {
       this.addDefaultSecurity(v);
@@ -766,10 +799,18 @@ export class OpenAPI {
 
   addDefaultSecurity(security: SecurityRequirementObject | string): OpenAPI;
   addDefaultSecurity(security: SecurityRequirementObject): OpenAPI;
+  /**
+   * [[include:openapi.addDefaultSecurity.1.md]]
+   */
+  addDefaultSecurity(security: BaseOpenAPIAuthUtil | BaseContextAuthUtil | BaseAuthUtil): OpenAPI;
   addDefaultSecurity(security: string): OpenAPI;
-  addDefaultSecurity(v: SecurityRequirementObject | string): OpenAPI {
+  addDefaultSecurity(v: SecurityRequirementObject | BaseOpenAPIAuthUtil | BaseContextAuthUtil | BaseAuthUtil | string): OpenAPI {
     if (v) {
-      if(typeof v === 'string') {
+      if (v instanceof BaseContextAuthUtil
+        || v instanceof BaseOpenAPIAuthUtil
+        || v instanceof BaseAuthUtil) {
+          this.#security.push(...v.toOpenAPISecurity());
+      } else if(typeof v === 'string') {
         this.#security.push({
           [v]: []
         });
@@ -1001,16 +1042,6 @@ export class OpenAPI {
     } else {
       tmp = responses;
     }
-    /*if (responses
-      && this.#responsesProperty) {
-      const tmp = responses[this.#responsesProperty];
-      if (tmp && typeof tmp === 'object') {
-        Object.assign(r, tmp);
-        r = extend(true, r, tmp);
-      }
-    } else {
-      r = responses || r;
-    }*/
     if (tmp instanceof BaseOpenAPIResponseUtil 
       || tmp instanceof BaseResponseUtil) {
         r = tmp.toOpenAPI();
@@ -1156,43 +1187,43 @@ export class OpenAPI {
     if (parameters.headers) {
       Log.debug('handle headers');
       this._pushPathParameters(
-        ParameterLocations.header, parameters.headers, res);
+        ParameterLocation.header, parameters.headers, res);
     } else if (children && children.headers) {
       Log.debug('handle headers');
       this._pushPathParameters(
-        ParameterLocations.header, children.headers, res);
+        ParameterLocation.header, children.headers, res);
     }
     if (parameters.params) {
       Log.debug('handle params');
-      this._pushPathParameters(ParameterLocations.path, parameters.params, res);
+      this._pushPathParameters(ParameterLocation.path, parameters.params, res);
     } else if (children && children.params) {
       Log.debug('handle params');
       this._pushPathParameters(
-        ParameterLocations.path, children.params, res);
+        ParameterLocation.path, children.params, res);
     }
     if (parameters.query) {
       Log.debug('handle query');
       this._pushPathParameters(
-        ParameterLocations.query, parameters.query, res);
+        ParameterLocation.query, parameters.query, res);
     } else if (children && children.query) {
       Log.debug('handle query');
-      this._pushPathParameters(ParameterLocations.query, children.query, res);
+      this._pushPathParameters(ParameterLocation.query, children.query, res);
     }
     if (parameters.cookies) {
       Log.debug('handle cookies');
       this._pushPathParameters(
-        ParameterLocations.cookie, parameters.cookies, res);
+        ParameterLocation.cookie, parameters.cookies, res);
     } else if (children && children.cookies) {
       Log.debug('handle cookies');
       this._pushPathParameters(
-        ParameterLocations.cookie, children.cookies, res);
+        ParameterLocation.cookie, children.cookies, res);
     }
 
     return res;
   }
 
   private _pushPathParameters(
-    location: ParameterLocations,
+    location: ParameterLocation,
     value: Record<string, unknown> | OpenAPIHelperInterface,
     res: Array<ReferenceObject | ParameterObject>) {
     const valueHelper = value instanceof this.#helperClass ? value : new this.#helperClass(value);
@@ -1824,10 +1855,10 @@ export class OpenAPI {
     if (ref) {
       const entityName: string = this._localRefToEntityName(ref);
       if (entityName && newSchema) {
-        if (this.#generateComponentsRule === GenerateComponentsRules.always) {
+        if (this.#generateComponentsRule === GenerateComponentsRule.always) {
           Log.debug('generate component "%s"', ref);
           this.addSchema(entityName, newSchema);
-        } else if (this.#generateComponentsRule === GenerateComponentsRules.ifUndefined) {
+        } else if (this.#generateComponentsRule === GenerateComponentsRule.ifUndefined) {
           if (!this.hasSchema(entityName)) {
             Log.debug('generate component "%s"', ref);
             this.addSchema(entityName, newSchema);
@@ -1857,10 +1888,10 @@ export class OpenAPI {
     if (ref) {
       const entityName: string = this._localRefToEntityName(ref);
       if (entityName && newParamObject) {
-        if (this.#generateComponentsRule === GenerateComponentsRules.always) {
+        if (this.#generateComponentsRule === GenerateComponentsRule.always) {
           Log.debug('generate component "%s"', ref);
           this.addParameter(entityName, newParamObject);
-        } else if (this.#generateComponentsRule === GenerateComponentsRules.ifUndefined) {
+        } else if (this.#generateComponentsRule === GenerateComponentsRule.ifUndefined) {
           if (!this.hasParameter(entityName)) {
             Log.debug('generate component "%s"', ref);
             this.addParameter(entityName, newParamObject);
@@ -1893,10 +1924,10 @@ export class OpenAPI {
         if (helper.getDescription()) {
           newSchema.description = helper.getDescription();
         }
-        if (this.#generateComponentsRule === GenerateComponentsRules.always) {
+        if (this.#generateComponentsRule === GenerateComponentsRule.always) {
           Log.debug('generate component "%s"', ref);
           this.addRequestBody(entityName, newSchema);
-        } else if (this.#generateComponentsRule === GenerateComponentsRules.ifUndefined) {
+        } else if (this.#generateComponentsRule === GenerateComponentsRule.ifUndefined) {
           if (!this.hasRequestBody(entityName)) {
             Log.debug('generate component "%s"', ref);
             this.addRequestBody(entityName, newSchema);

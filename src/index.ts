@@ -1,5 +1,14 @@
-import { OpenAPI as OAS } from './generators/openapi';
-import { Postman as PostmanGenerator } from './generators/postman';
-
-export const OpenAPI = OAS
-export const Postman = PostmanGenerator; 
+export {
+  ProcessedRoute,
+  Route
+} from './commons';
+export {
+  OpenAPI,
+  OpenAPIResult,
+  GenerateComponentsRule
+} from './generators/openapi';
+export {
+  Postman,
+  PostmanCollection,
+  GenerateFoldersRule
+} from './generators/postman';

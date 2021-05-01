@@ -3,7 +3,9 @@ import { BaseAuthUtil, BaseContextAuthUtil, IContextAuthUtil } from './baseAuthU
 import { Auth } from '../../generators/postman/definitions';
 import { SecurityRequirementObject } from '../../generators/openapi/definitions';
 
-
+/**
+ * [[include:authUtil.md]]
+ */
 export class ContextAuthUtil extends BaseContextAuthUtil {
   protected authUtil: BaseAuthUtil;
   protected contextScopes: string[] = [];
@@ -24,6 +26,9 @@ export class ContextAuthUtil extends BaseContextAuthUtil {
   }
 }
 
+/**
+ * [[include:authUtil.md]]
+ */
 export class GroupContextAuthUtil extends BaseContextAuthUtil {
   protected authUtils: IContextAuthUtil[] = [];
 

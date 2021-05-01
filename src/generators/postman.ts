@@ -2,6 +2,12 @@
  * @module postman
  */
 
+import extend from 'extend';
+import {
+  DocGenerator,
+  ProcessedRoute,
+  Route
+} from '../commons';
 import {
   Auth,
   AuthAttribute,
@@ -24,7 +30,6 @@ import { PostmanHelperInterface } from './postman/helpers/interfaces';
 import { PostmanJoiHelper } from './postman/helpers/joiHelper';
 
 import { formatPath, /*formatType,*/ Log } from './postman/utils';
-import extend from 'extend';
 import { RequestBodyCreator } from './postman/services/requestBodyService';
 import { BasePostmanAuthUtil } from '../utils/auth/baseAuthUtils';
 import { BasePostmanResponseUtil, BaseResponseUtil } from '../utils/responses/baseResponseUtils';
@@ -70,18 +75,6 @@ interface RouteSchema {
   [key: string]: unknown;
 }
 
-export interface Route {
-  path: string;
-  methods: Record<string, unknown>;
-  [key: string]: unknown;
-}
-
-export interface ProcessedRoute {
-  path: string;
-  method: string;
-  schema?: unknown;
-}
-
 export interface PostmanCollection {
   info: InfoObject;
   item: (Item | Folder)[];
@@ -98,12 +91,15 @@ export enum GenerateFoldersRule {
 }
 
 /**
+ * 
+ * Postman doc generator.
+ * 
  * @note For now it is not possible to only
  * send files outside of object property (multipart). 
  * Well, at least not tried yet
  * but it definitely doesn't work with alternatives 
  */
-export class Postman {
+export class Postman implements DocGenerator {
   #consumes: string[];
   #result: PostmanCollection;
   #security?: Auth;
@@ -393,36 +389,6 @@ export class Postman {
     return r;
   }
 
-  /*
-  setServers(servers: ServerObject[]): Postman;
-  setServers(server: ServerObject): Postman;
-  setServers(v: ServerObject[] | ServerObject): Postman {
-    this.#result.servers = [];
-    let v2: ServerObject[] = [];
-    if (!Array.isArray(v)) {
-      v2 = [v]
-    } else {
-      v2 = v
-    }
-    v2.forEach(el => this.addServer(el))
-    return this;
-  }
-
-  getServers(): ServerObject[] {
-    return this.#result.servers;
-  }
-
-  addServer(server: ServerObject): Postman;
-  addServer(url: string): Postman;
-  addServer(v: ServerObject | string): Postman {
-    if (typeof v === 'string') {
-      v = { url: v }
-    }
-    this.#result.servers.push(v);
-    return this;
-  }
-  */
-
   /**
    * @example
    * ```typescript
@@ -430,8 +396,8 @@ export class Postman {
    * import { Postman } from '@novice1/api-doc-generator';
    * 
    * const router = routing().post(...);
-   * const openapi = new Postman();
-   * const routes = openapi.add(router.getMeta());
+   * const postman = new Postman();
+   * const routes = postman.add(router.getMeta());
    * const { path, method, schema } = routes[0];
    * ```
    * @returns The added/updated routes
@@ -691,7 +657,7 @@ export class Postman {
     if(formattedHeader.length) {
       schema.request.header = formattedHeader;
     }
-    // @todo: format body (body, files)
+    // format body (body, files)
     const formattedBody = this._formatRequestBody(parameters, consumes);
     if(formattedBody) {
       schema.request.body = formattedBody;
@@ -874,23 +840,6 @@ export class Postman {
       children = paramsHelper.getChildren();
     }
 
-    //if (parameters.headers) {
-    //  Log.debug('handle headers');
-    //  this._pushPathParameters(
-    //    ParameterLocations.header, parameters.headers, res);
-    //} else if (children && children.headers) {
-    //  Log.debug('handle headers');
-    //  this._pushPathParameters(
-    //    ParameterLocations.header, children.headers, res);
-    //}
-    //if (parameters.params) {
-    //  Log.debug('handle params');
-    //  this._pushPathParameters(ParameterLocations.path, parameters.params, res);
-    //} else if (children && children.params) {
-    //  Log.debug('handle params');
-    //  this._pushPathParameters(
-    //    ParameterLocations.path, children.params, res);
-    //}
     if (parameters.query) {
       Log.debug('handle query');
       this._pushQueryParam(parameters.query, res);
@@ -1259,213 +1208,6 @@ export class Postman {
       }
     });
   }
-
-  /*
-
-  // -- schema object creation methods
-
-  private _createBasicSchema(
-    helper: PostmanHelperInterface,
-    parentProp?: SchemaCreator,
-    name?: string,
-    format?: string
-  ): SchemaCreator {
-    const prop = new SchemaCreator(formatType(helper.getType()));
-
-    let description = '';
-    // description
-    if (helper.getDescription()) {
-      description = helper.getDescription();
-    }
-
-    // unit
-    if (helper.getUnit()) {
-      if (description) {
-        description += ` (${helper.getUnit()})`
-      } else {
-        description = `(${helper.getUnit()})`
-      }
-    }
-
-    // description
-    if (description) {
-      prop.setDescription(
-        description
-      );
-    }
-
-    // default
-    if (helper.hasDefaultValue()) {
-      prop.setDefault(
-        helper.getDefaultValue()
-      );
-    }
-
-    // example
-    if (helper.hasExampleValue()) {
-      prop.setExample(
-        helper.getExampleValue()
-      );
-    }
-
-    // enum
-    if (helper.getEnum().length) {
-      prop.setEnum(helper.getEnum());
-    }
-
-    // required
-    if (helper.isRequired()) {
-      if (parentProp?.isType('object') && name) {
-        parentProp.addRequired(name);
-      } else if (parentProp?.isType('array')) {
-        parentProp.setMin(
-          typeof parentProp.getMin() !== 'undefined' ?
-            parentProp.getMin() : 1
-        );
-      }
-    }
-
-    // min, max, ...
-    if (helper.hasMin()) {
-      prop.setMin(helper.getMin());
-    }
-    if (helper.hasMax()) {
-      prop.setMax(helper.getMax());
-    }
-
-    if (prop.isType('array')) {
-      this._fillArraySchemaObject(helper, prop, format);
-    } else if (format) {
-      prop.setFormat(format);
-      if (format === 'binary') {
-        prop.setType('string');
-      }
-    }
-
-    if (prop.isType('object')) {
-      this._fillObjectSchemaObject(helper, prop);
-    }
-
-    if (helper.hasXml?.()) {
-      const xml = helper.getXml?.();
-      if (xml) {
-        prop.setXml(xml);
-      }
-    }
-
-    return prop;
-  }
-
-  private _createSchema(
-    helper: PostmanHelperInterface,
-    parentProp?: SchemaCreator,
-    name?: string,
-    format?: string
-  ): SchemaCreator {
-    if (helper.getType() === 'alternatives') {
-      return this._createAlternativeSchema(helper, parentProp, name);
-    }
-
-    return this._createBasicSchema(helper, parentProp, name, format);
-  }
-
-  private _createSchemaObject(
-    helper: PostmanHelperInterface,
-    parentProp?: SchemaCreator,
-    name?: string,
-    format?: string
-  ): SchemaObject {
-
-    if (helper.getType() === 'alternatives') {
-      return this._createAlternativeSchemaObject(helper, parentProp, name);
-    }
-
-    const prop = this._createBasicSchema(helper, parentProp, name, format);
-
-    // ReferenceObject | SchemaObject
-    const schemaObject = this._autoSchemaObjectToRef(helper, prop.toObject());
-    return schemaObject;
-  }
-
-  private _createAlternativeSchema(
-    altHelper: PostmanHelperInterface,
-    parentProp?: SchemaCreator,
-    name?: string
-  ): SchemaCreator {
-    return new SchemaCreator(this._createAlternativeSchemaObject(altHelper, parentProp, name));
-  }
-
-  private _createAlternativeSchemaObject(
-    altHelper: PostmanHelperInterface,
-    parentProp?: SchemaCreator,
-    name?: string
-  ): SchemaObject {
-    const prop = new SchemaCreator({ oneOf: [] });
-
-    let description = '';
-    // description
-    if (altHelper.getDescription()) {
-      description = altHelper.getDescription();
-    }
-
-    // unit
-    if (altHelper.getUnit()) {
-      if (description) {
-        description += ` (${altHelper.getUnit()})`
-      } else {
-        description = `(${altHelper.getUnit()})`
-      }
-    }
-
-    // description
-    if (description) {
-      prop.setDescription(
-        description
-      );
-    }
-
-    // default
-    if (altHelper.hasDefaultValue()) {
-      prop.setDefault(
-        altHelper.getDefaultValue()
-      );
-    }
-
-    // example
-    if (altHelper.hasExampleValue()) {
-      prop.setExample(
-        altHelper.getExampleValue()
-      );
-    }
-
-    // required
-    if (altHelper.isRequired()) {
-      if (parentProp?.isType('object') && name) {
-        parentProp.addRequired(name);
-      } else if (parentProp?.isType('array')) {
-        parentProp.setMin(parentProp.getMin() || 1);
-      }
-    }
-
-    // discriminator
-    if (altHelper.hasDiscriminator?.()) {
-      const discriminator = altHelper.getDiscriminator?.();
-      if (discriminator) {
-        prop.setDiscriminator(discriminator);
-      }
-    }
-
-    const altSchemaObject = prop.toObject();
-    altHelper.getAlternatives().forEach(
-      helper => {
-        if (helper.isValid()) {
-          altSchemaObject?.oneOf?.push(this._createSchemaObject(helper));
-        }
-      }
-    );
-    return altSchemaObject;
-  }
-  */
 
   result(): PostmanCollection {
     const result: PostmanCollection = extend(true, {}, this.#result);

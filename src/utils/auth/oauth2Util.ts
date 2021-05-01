@@ -35,6 +35,9 @@ export enum ChallengeAlgorithm {
   S256 = 'S256'
 }
 
+/**
+ * [[include:oauth2Util.md]]
+ */
 export class Oauth2Util extends FullAuthUtil {
 
   protected clientAuthentication?: string; // client_authentication
@@ -554,7 +557,7 @@ export class Oauth2Util extends FullAuthUtil {
     return r;
   }
 
-  toOpenAPI(): SecuritySchemeObject {
+  toOpenAPI(): Record<string, SecuritySchemeObject> {
     const flows: OAuthFlowsObject = {};
     const flow: OAuthFlowObject = {
       authorizationUrl: this.authUrl,
@@ -581,7 +584,9 @@ export class Oauth2Util extends FullAuthUtil {
       flows.password = flow;
     }
 
-    return r;
+    return {
+      [this.securitySchemeName]: r
+    };
   }
 
   toOpenAPISecurity(scopes?: string[]): SecurityRequirementObject[] {

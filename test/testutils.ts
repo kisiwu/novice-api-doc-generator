@@ -1,28 +1,21 @@
 // auth utils
 import {
-  ContextAuthUtil,
+  //NoAuthUtil,
+  ApiKeyUtil, 
+  ApiKeyLocation,
+  BearerUtil,
+  GroupAuthUtil,
+  //ContextAuthUtil,
   GroupContextAuthUtil
-} from '../src/utils/auth/contextAuthUtils';
-import {
-  ApiKeyUtil, ApiKeyLocation
-} from '../src/utils/auth/apiKeyUtil';
-import {
-  BearerUtil
-} from '../src/utils/auth/bearerUtil';
-import {
-  //NoAuthUtil
-} from '../src/utils/auth/noAuthUtil';
+} from '../src/utils/auth/all';
 // response utils
 import {
-  ResponseUtil
-} from '../src/utils/responses/responseUtil';
-import {
+  ResponseUtil,
   ContextResponseUtil,
   GroupContextResponseUtil
-} from '../src/utils/responses/contextResponseUtils';
+} from '../src/utils/responses/all';
 
 // auth
-
 export const apiKeyAuth = new ApiKeyUtil('Google-auth');
 apiKeyAuth.setApiKeyLocation(ApiKeyLocation.query)
   .setName('Authorization');
@@ -32,8 +25,15 @@ bearerAuth.setBearerFormat('JWT')
 
 export const GroupCtxtAuth = new GroupContextAuthUtil([
   //new NoAuthUtil(),
-  new ContextAuthUtil(bearerAuth),
+  //new ContextAuthUtil(bearerAuth),
   //new ContextAuthUtil(apiKeyAuth),
+  bearerAuth,
+  apiKeyAuth
+]);
+
+export const GroupAuth = new GroupAuthUtil([
+  bearerAuth,
+  apiKeyAuth,
 ]);
 
 // responses

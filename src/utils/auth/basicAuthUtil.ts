@@ -67,11 +67,13 @@ export class BasicAuthUtil extends FullAuthUtil {
     return r;
   }
 
-  toOpenAPI(): SecuritySchemeObject {
+  toOpenAPI(): Record<string, SecuritySchemeObject> {
     return {
-      type: 'http',
-      scheme: 'basic',
-      description: this.description
+      [this.securitySchemeName]: {
+        type: 'http',
+        scheme: 'basic',
+        description: this.description
+      }
     };
   }
 }
