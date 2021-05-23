@@ -1,5 +1,5 @@
 .github
-docIncludes
+typedocIncludes
 docs
 private
 src
