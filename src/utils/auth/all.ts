@@ -29,6 +29,6 @@ export {
   ChallengeAlgorithm,
   ClientAuthentication,
   GrantType,
-  Oauth2Util,
+  OAuth2Util,
   TokenLocation
-} from './oauth2Util';
+} from './oAuth2Util';

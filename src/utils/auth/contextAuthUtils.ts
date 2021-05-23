@@ -1,10 +1,17 @@
+/**
+ * @module utils-auth-contextAuthUtils
+ */
+
 import extend from 'extend';
 import { BaseAuthUtil, BaseContextAuthUtil, IContextAuthUtil } from './baseAuthUtils';
 import { Auth } from '../../generators/postman/definitions';
 import { SecurityRequirementObject } from '../../generators/openapi/definitions';
 
 /**
- * [[include:authUtil.md]]
+ * Helps defining scopes for security requirements
+ * of a route.
+ * 
+ * [[include:auth/oAuth2Util.md]]
  */
 export class ContextAuthUtil extends BaseContextAuthUtil {
   protected authUtil: BaseAuthUtil;
@@ -27,7 +34,7 @@ export class ContextAuthUtil extends BaseContextAuthUtil {
 }
 
 /**
- * [[include:authUtil.md]]
+ * [[include:auth/groupContextAuthUtil.md]]
  */
 export class GroupContextAuthUtil extends BaseContextAuthUtil {
   protected authUtils: IContextAuthUtil[] = [];

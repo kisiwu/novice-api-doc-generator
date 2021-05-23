@@ -1,3 +1,7 @@
+/**
+ * @module utils-auth-baseAuthUtils
+ */
+
 import { SecurityRequirementObject, SecuritySchemeObject } from '../../generators/openapi/definitions';
 import { Auth } from '../../generators/postman/definitions';
 
@@ -41,6 +45,9 @@ export abstract class BaseContextAuthUtil
   abstract toOpenAPISecurity(scopes?: string[]): SecurityRequirementObject[];
 }
 
+/**
+ * [[include:auth/baseAuthUtil.md]]
+ */
 export abstract class BaseAuthUtil 
   extends BaseContextAuthUtil
   implements IPostmanAuthUtil, IFullOpenAPIAuthUtil {

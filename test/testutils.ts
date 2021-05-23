@@ -6,7 +6,7 @@ import {
   BearerUtil,
   GroupAuthUtil,
   //ContextAuthUtil,
-  GroupContextAuthUtil
+  GroupContextAuthUtil,
 } from '../src/utils/auth/all';
 // response utils
 import {

@@ -1,3 +1,7 @@
+/**
+ * @module utils-auth-bearerUtil
+ */
+
 import { FullAuthUtil } from './baseAuthUtils';
 import { Auth } from '../../generators/postman/definitions';
 import { SecuritySchemeObject } from '../../generators/openapi/definitions';
@@ -6,6 +10,9 @@ function isDefined(v: unknown) {
   return typeof v !== 'undefined';
 }
 
+/**
+ * [[include:auth/bearerUtil.md]]
+ */
 export class BearerUtil extends FullAuthUtil {
   protected token?: string;
   protected bearerFormat?: string;

@@ -1,3 +1,7 @@
+/**
+ * @module utils-auth-basicAuthUtil
+ */
+
 import { FullAuthUtil } from './baseAuthUtils';
 import { Auth } from '../../generators/postman/definitions';
 import { SecuritySchemeObject } from '../../generators/openapi/definitions';
@@ -6,6 +10,9 @@ function isDefined(v: unknown) {
   return typeof v !== 'undefined';
 }
 
+/**
+ * [[include:auth/basicAuthUtil.md]]
+ */
 export class BasicAuthUtil extends FullAuthUtil {
   protected password?: string;
   protected username?: string;

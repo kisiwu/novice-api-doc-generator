@@ -23,12 +23,16 @@ var options = {
 ```
 openapi:
   - finish todo's in generators/OpenAPI
+  - doc auth methods @done
+  - typedoc response methods
   - generate typedoc
 
 postman:
   - write generator @done
   - write postman/definitions.ts @done
   - readme doc
+  - typedoc auth methods
+  - typedoc response methods
   - generate typedoc
 
 utils:
@@ -36,6 +40,7 @@ utils:
   - responses @done
     - do not do postman (return empty array) @done
   - auth: toOpenAPI should return record of schemes @done
-  - generate typedoc
+  - auth typedoc @done
+  - response typedoc
 
 Archive:

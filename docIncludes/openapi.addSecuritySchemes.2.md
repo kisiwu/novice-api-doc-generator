@@ -6,5 +6,5 @@ import {
 
 const basicAuth = new BasicAuthUtil('basicAuth');
 
-openapi.setSecuritySchemes(basicAuth);
+openapi.addSecuritySchemes(basicAuth);
 ```

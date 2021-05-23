@@ -1,3 +1,7 @@
+/**
+ * @module utils-auth-apiKeyUtil
+ */
+
 import { FullAuthUtil } from './baseAuthUtils';
 import { Auth } from '../../generators/postman/definitions';
 import { SecuritySchemeObject } from '../../generators/openapi/definitions';
@@ -12,6 +16,9 @@ export enum ApiKeyLocation {
   cookie = 'cookie'
 }
 
+/**
+ * [[include:auth/apiKeyUtil.md]]
+ */
 export class ApiKeyUtil extends FullAuthUtil {
 
   protected key?: string;

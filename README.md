@@ -136,6 +136,7 @@ The possible value for each of them is defined in the [OpenAPI Specification](ht
 
 - [@novice1/api-doc-generator documentation](https://novice1.000webhostapp.com/api-doc-generator/)
 - [OpenAPI Specification](https://swagger.io/specification/)
+- [Postman Collection Format v2.1.0](https://schema.postman.com/collection/json/v2.1.0/draft-07/docs/index.html)
 - [@novice1/routing](https://www.npmjs.com/package/@novice1/routing)
 - [@novice1/validator-joi](https://www.npmjs.com/package/@novice1/validator-joi)
 - [joi](https://www.npmjs.com/package/joi)

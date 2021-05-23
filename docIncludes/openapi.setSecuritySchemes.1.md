@@ -2,7 +2,7 @@ Example:
 ```ts
 openapi
   .setSecuritySchemes({
-    basicAuthName: {
+    basicAuth: {
       type: 'http',
       scheme: 'basic'
     }

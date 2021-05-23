@@ -651,7 +651,13 @@ export class OpenAPI implements DocGenerator {
     return r;
   }
 
+  /**
+   * [[include:openapi.addSecuritySchemes.1.md]]
+   */
   addSecurityScheme(name: string, schema: ReferenceObject | SecuritySchemeObject): OpenAPI;
+  /**
+   * [[include:openapi.addSecuritySchemes.2.md]]
+   */
   addSecurityScheme(schema: BaseOpenAPIAuthUtil | BaseAuthUtil): OpenAPI;
   addSecurityScheme(
     name: BaseOpenAPIAuthUtil | BaseAuthUtil | string, 
@@ -775,13 +781,27 @@ export class OpenAPI implements DocGenerator {
   }
 
 
-  setDefaultSecurity(securityObjects: SecurityRequirementObject[]): OpenAPI;
-  setDefaultSecurity(securityObject: SecurityRequirementObject): OpenAPI;
   /**
    * [[include:openapi.setDefaultSecurity.1.md]]
    */
   setDefaultSecurity(security: BaseOpenAPIAuthUtil | BaseContextAuthUtil | BaseAuthUtil): OpenAPI;
+  setDefaultSecurity(securityObjects: SecurityRequirementObject[]): OpenAPI;
+  /**
+   * Example:
+   * ```ts
+   * openapi.setDefaultSecurity({
+   *  basicAuth: []
+   * });
+   * ```
+   */
+  setDefaultSecurity(securityObject: SecurityRequirementObject): OpenAPI;
   setDefaultSecurity(security: string[]): OpenAPI;
+  /**
+   * Example:
+   * ```ts
+   * openapi.setDefaultSecurity('basicAuth');
+   * ```
+   */
   setDefaultSecurity(security: string): OpenAPI;
   setDefaultSecurity(v: SecurityRequirementObject[] | SecurityRequirementObject | BaseOpenAPIAuthUtil | BaseContextAuthUtil | BaseAuthUtil | string[] | string): OpenAPI {
     this.#security = [];
@@ -797,12 +817,34 @@ export class OpenAPI implements DocGenerator {
     return this;
   }
 
-  addDefaultSecurity(security: SecurityRequirementObject | string): OpenAPI;
-  addDefaultSecurity(security: SecurityRequirementObject): OpenAPI;
   /**
    * [[include:openapi.addDefaultSecurity.1.md]]
    */
   addDefaultSecurity(security: BaseOpenAPIAuthUtil | BaseContextAuthUtil | BaseAuthUtil): OpenAPI;
+  /**
+   * Example:
+   * ```ts
+   * openapi.addDefaultSecurity({
+   *  basicAuth: []
+   * });
+   * ```
+   */
+  addDefaultSecurity(security: SecurityRequirementObject | string): OpenAPI;
+  /**
+   * Example:
+   * ```ts
+   * openapi.addDefaultSecurity({
+   *  basicAuth: []
+   * });
+   * ```
+   */
+  addDefaultSecurity(security: SecurityRequirementObject): OpenAPI;
+  /**
+   * Example:
+   * ```ts
+   * openapi.addDefaultSecurity('basicAuth');
+   * ```
+   */
   addDefaultSecurity(security: string): OpenAPI;
   addDefaultSecurity(v: SecurityRequirementObject | BaseOpenAPIAuthUtil | BaseContextAuthUtil | BaseAuthUtil | string): OpenAPI {
     if (v) {

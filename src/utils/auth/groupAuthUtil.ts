@@ -1,10 +1,15 @@
+/**
+ * @module utils-auth-groupAuthUtil
+ */
+
 import extend from 'extend';
 import { SecurityRequirementObject, SecuritySchemeObject } from '../../generators/openapi/definitions';
 import { Auth } from '../../generators/postman/definitions';
 import { BaseAuthUtil } from './baseAuthUtils';
 
 /**
- * [[include:authUtil.md]]
+ * [[include:auth/openapi/groupAuthUtil.md]]
+ * [[include:auth/postman/groupAuthUtil.md]]
  */
 export class GroupAuthUtil extends BaseAuthUtil {
   protected authUtils: BaseAuthUtil[] = [];
