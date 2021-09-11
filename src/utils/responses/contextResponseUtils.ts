@@ -8,6 +8,9 @@ import {
 } from '../../generators/postman/definitions';
 import { BaseResponseUtil, IOpenAPIResponseContext, IPostmanResponseContext } from './baseResponseUtils';
 
+/**
+ * [[include:responses/contextResponseUtil.md]]
+ */
 export class ContextResponseUtil extends BaseResponseUtil {
   protected responseUtil: BaseResponseUtil;
   protected code?: number;

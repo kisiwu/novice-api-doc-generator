@@ -41,6 +41,9 @@ export abstract class BasePostmanResponseUtil implements IPostmanResponseUtil {
   abstract toPostman(): PostmanResponseObject[];
 }
 
+/**
+ * [[include:responses/responseUtil.md]]
+ */
 export abstract class BaseResponseUtil 
   implements IResponseUtil {
   abstract toPostman(ctxt: IPostmanResponseContext): PostmanResponseObject[];
@@ -49,6 +52,9 @@ export abstract class BaseResponseUtil
   abstract toOpenAPI(): Record<string, OpenAPIResponseObject | ReferenceObject>;
 }
 
+/**
+ * [[include:responses/responseUtil.md]]
+ */
 export abstract class FullResponseUtil extends BaseResponseUtil {
   protected name: string;
   protected code?: number;

@@ -21,6 +21,7 @@ export {
   ResponseUtil
 } from './utils/responses/all';
 export {
+  DocGenerator,
   ProcessedRoute
 } from './commons';
 export {
@@ -29,7 +30,13 @@ export {
   GenerateComponentsRule
 } from './generators/openapi';
 export {
+  OpenAPIHelperInterface
+} from './generators/openapi/helpers/interfaces';
+export {
   Postman,
   PostmanCollection,
   GenerateFoldersRule
 } from './generators/postman';
+export {
+  PostmanHelperInterface
+} from './generators/postman/helpers/interfaces';

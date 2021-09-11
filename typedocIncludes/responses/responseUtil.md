@@ -1,4 +1,8 @@
+**Usage**:
 ```ts
+/**
+ * ResponseUtil extends FullResponseUtil extends BaseResponseUtil
+ */
 const simpleResponse = new ResponseUtil('TextResponse');
 simpleResponse.setHeaders({
   'X-Rate-Limit-Limit': {

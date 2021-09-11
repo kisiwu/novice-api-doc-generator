@@ -1,7 +1,3 @@
-/**
- * @module helpers-joi
- */
-
 import { BaseHelperInterface } from './baseHelper';
 import { VALID_TYPES } from '../utils/genericUtils';
 import { Schema } from 'joi'

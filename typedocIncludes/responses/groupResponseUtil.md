@@ -1,3 +1,4 @@
+**Usage**:
 ```ts
 import routing from '@novice1/routing';
 import {
@@ -19,6 +20,9 @@ const notFound = new ResponseUtil('NotFound');
 notFound
   .setDescription('Entity not found.');
 
+/**
+ * GroupResponseUtil extends BaseResponseUtil
+ */ 
 const GroupCtxtResponse = new GroupResponseUtil([
   (new ContextResponseUtil(simpleResponse))
     .setCode(200)

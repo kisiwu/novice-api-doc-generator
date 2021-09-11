@@ -1,8 +1,4 @@
-/**
- * @module postman-helpers-joi
- */
-
- import { JoiHelper, JoiSchema } from '../../../helpers/joiHelper';
+import { JoiHelper, JoiSchema } from '../../../helpers/joiHelper';
 import { XMLObject } from '../../openapi/definitions';
  import { PostmanHelperInterface } from './interfaces';
  

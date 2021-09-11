@@ -1,8 +1,3 @@
-/**
- * @module utils-auth-noAuthUtil
- */
-
-
 import { Auth } from '../../generators/postman/definitions';
 import { SecurityRequirementObject } from '../../generators/openapi/definitions';
 import { BaseContextAuthUtil } from './baseAuthUtils';

@@ -1,7 +1,3 @@
-/**
- * @module utils-auth-groupAuthUtil
- */
-
 import extend from 'extend';
 import { SecurityRequirementObject, SecuritySchemeObject } from '../../generators/openapi/definitions';
 import { Auth } from '../../generators/postman/definitions';

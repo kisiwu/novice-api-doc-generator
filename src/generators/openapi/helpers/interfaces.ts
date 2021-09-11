@@ -1,7 +1,3 @@
-/**
- * @module openapi-helpers-interfaces
- */
-
 import { BaseHelperInterface } from '../../../helpers/baseHelper';
 import {
   AdditionalProperties,

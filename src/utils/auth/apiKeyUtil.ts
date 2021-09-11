@@ -1,7 +1,3 @@
-/**
- * @module utils-auth-apiKeyUtil
- */
-
 import { FullAuthUtil } from './baseAuthUtils';
 import { Auth } from '../../generators/postman/definitions';
 import { SecuritySchemeObject } from '../../generators/openapi/definitions';

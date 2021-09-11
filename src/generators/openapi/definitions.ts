@@ -1,7 +1,3 @@
-/**
- * @module openapi-definitions
- */
-
 export type AdditionalProperties = boolean | SchemaObject | ReferenceObject;
 
 export enum ParameterLocation {

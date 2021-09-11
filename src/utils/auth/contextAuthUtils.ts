@@ -1,7 +1,3 @@
-/**
- * @module utils-auth-contextAuthUtils
- */
-
 import extend from 'extend';
 import { BaseAuthUtil, BaseContextAuthUtil, IContextAuthUtil } from './baseAuthUtils';
 import { Auth } from '../../generators/postman/definitions';

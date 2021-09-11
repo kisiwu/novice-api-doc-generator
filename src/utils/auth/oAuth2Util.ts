@@ -1,7 +1,3 @@
-/**
- * @module utils-auth-oAuth2Util
- */
-
 import extend from 'extend';
 import { FullAuthUtil } from './baseAuthUtils';
 import { Auth } from '../../generators/postman/definitions';

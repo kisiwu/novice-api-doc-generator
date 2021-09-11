@@ -1,7 +1,3 @@
-/**
- * @module postman-definitions
- */
-
 export type Description = string | DescriptionObject | null;
 
 export type FormParameter = ValueFormParameter | SrcFormParameter;

@@ -1,7 +1,3 @@
-/**
- * @module helpers-base
- */
-
 export interface BaseHelperInterface {
   isValid(): boolean;
   getType(): string;

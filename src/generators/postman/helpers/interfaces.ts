@@ -1,8 +1,4 @@
-/**
- * @module postman-helpers-interfaces
- */
-
- import { BaseHelperInterface } from '../../../helpers/baseHelper';
+import { BaseHelperInterface } from '../../../helpers/baseHelper';
 import { XMLObject } from '../../openapi/definitions';
  
  export interface PostmanHelperInterface extends BaseHelperInterface {

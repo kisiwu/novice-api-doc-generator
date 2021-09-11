@@ -1,3 +1,4 @@
+**Usage**:
 ```ts
 import routing from '@novice1/routing';
 import {
@@ -15,6 +16,9 @@ const router = routing()
     path: '/something',
     auth: true,
     parameters: {
+      /**
+       * ContextResponseUtil extends BaseResponseUtil
+       */
       responses: (new ContextResponseUtil(notFound))
         .setCode(404)
     }

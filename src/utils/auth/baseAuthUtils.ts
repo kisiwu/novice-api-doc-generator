@@ -1,7 +1,3 @@
-/**
- * @module utils-auth-baseAuthUtils
- */
-
 import { SecurityRequirementObject, SecuritySchemeObject } from '../../generators/openapi/definitions';
 import { Auth } from '../../generators/postman/definitions';
 

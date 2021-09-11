@@ -1,7 +1,3 @@
-/**
- * @module openapi
- */
-
 import extend from 'extend';
 import { RouteMeta } from '@novice1/routing';
 import {
@@ -2055,7 +2051,7 @@ export class OpenAPI implements DocGenerator {
     return entityName;
   }
 
-  result(): Record<string, unknown> {
+  result(): OpenAPIResult {
     return extend(true, {}, this.#result);
   }
 }

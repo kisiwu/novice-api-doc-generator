@@ -8,7 +8,7 @@ import {
 } from '@novice1/api-doc-generator';
 
 /**
- * BearerUtil <= BaseAuthUtil <= BaseContextAuthUtil
+ * BearerUtil extends BaseAuthUtil extends BaseContextAuthUtil
  */
 const bearerAuth = new BearerUtil('bearerName');
 

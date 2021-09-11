@@ -1,7 +1,3 @@
-/**
- * @module postman
- */
-
 import extend from 'extend';
 import { RouteMeta } from '@novice1/routing';
 import {
