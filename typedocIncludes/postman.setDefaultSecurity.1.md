@@ -6,5 +6,5 @@ import {
 
 const basicAuth = new BasicAuthUtil('basicAuthName');
 
-openapi.setDefaultSecurity(basicAuth);
+postman.setDefaultSecurity(basicAuth);
 ```

@@ -6,7 +6,7 @@ import { OpenAPI, Postman } from '@novice1/api-doc-generator';
 import {
   ApiKeyUtil,
   ApiKeyLocation
-} from '@novice1/api-doc-generator/utils/auth/all';
+} from '@novice1/api-doc-generator';
 
 const apiKey = new ApiKeyUtil('ApiKeyAuth');
 apiKey

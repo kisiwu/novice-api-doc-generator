@@ -3,10 +3,10 @@
  */
 
 import extend from 'extend';
+import { RouteMeta } from '@novice1/routing';
 import {
   DocGenerator,
-  ProcessedRoute,
-  Route
+  ProcessedRoute
 } from '../commons';
 import {
   Auth,
@@ -279,8 +279,26 @@ export class Postman implements DocGenerator {
     return this;
   }
 
+  /**
+   * Example:
+   * ```ts
+   * postman.setAuth({
+   *  type: 'basic',
+   *  basic: []
+   * });
+   * ```
+   */
   setAuth(auth: Auth | null): Postman;
+  /**
+   * Example:
+   * ```ts
+   * postman.setAuth('basic', []);
+   * ```
+   */
   setAuth(type: string, auth?: AuthAttribute[]): Postman;
+  /**
+   * [[include:postman.setAuth.1.md]]
+   */
   setAuth(auth: BasePostmanAuthUtil): Postman;
   setAuth(type: string | Auth | null | BasePostmanAuthUtil, authAttributes?: AuthAttribute[]): Postman {
     if (type instanceof BasePostmanAuthUtil) {
@@ -356,9 +374,27 @@ export class Postman implements DocGenerator {
     return this;
   }
 
-  setDefaultSecurity(auth: Auth): Postman;
-  setDefaultSecurity(type: string): Postman;
+  /**
+   * [[include:postman.setDefaultSecurity.1.md]]
+   */
   setDefaultSecurity(auth: BasePostmanAuthUtil): Postman;
+  /**
+   * Example:
+   * ```ts
+   * postman.setDefaultSecurity({
+   *  type: 'basic',
+   *  basic: []
+   * });
+   * ```
+   */
+  setDefaultSecurity(auth: Auth): Postman;
+  /**
+   * Example:
+   * ```ts
+   * postman.setDefaultSecurity('basic');
+   * ```
+   */
+  setDefaultSecurity(type: string): Postman;
   setDefaultSecurity(v: Auth | string | BasePostmanAuthUtil): Postman {
     if (v instanceof BasePostmanAuthUtil) {
       this.#security = v.toPostman();
@@ -402,11 +438,11 @@ export class Postman implements DocGenerator {
    * ```
    * @returns The added/updated routes
    */
-  add(routes: Route[]): ProcessedRoute[];
-  add(routes: Route): ProcessedRoute[];
-  add(routes: Route[] | Route): ProcessedRoute[] {
+  add(routes: RouteMeta[]): ProcessedRoute[];
+  add(routes: RouteMeta): ProcessedRoute[];
+  add(routes: RouteMeta[] | RouteMeta): ProcessedRoute[] {
 
-    let routes2: Route[] = [];
+    let routes2: RouteMeta[] = [];
 
     if (!Array.isArray(routes)) {
       routes2 = [routes];
@@ -422,13 +458,19 @@ export class Postman implements DocGenerator {
         if (!route.methods[method]) {
           return;
         }
+        if (typeof route.path !== 'string') {
+          return;
+        }
         const r: RouteSchema = {
           path: route.path,
           method,
+          name: route.name,
+          description: route.description,
+          tags: route.tags,
+          auth: route.auth,
+          parameters: route.parameters,
+          responses: route.responses
         };
-        Object.keys(route).forEach((p) => {
-          r[p] = route[p];
-        });
         const added = this._add(r);
         if (added) {
           results.push(added);

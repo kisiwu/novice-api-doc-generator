@@ -7,7 +7,7 @@ import {
   ContextAuthUtil,
   OAuth2Util,
   GrantType
-} from '@novice1/api-doc-generator/utils/auth/all';
+} from '@novice1/api-doc-generator';
 
 // OAuth2 specifications
 const oauth2 = new OAuth2Util('oAuth2AuthCode');

@@ -31,7 +31,7 @@ postman:
   - write generator @done
   - write postman/definitions.ts @done
   - readme doc
-  - typedoc auth methods
+  - typedoc auth methods @done
   - typedoc response methods
   - generate typedoc
 

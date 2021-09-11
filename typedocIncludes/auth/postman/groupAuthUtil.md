@@ -5,7 +5,7 @@ import {
   BasicAuthUtil,
   BearerUtil,
   GroupAuthUtil
-} from '@novice1/api-doc-generator/utils/auth/all';
+} from '@novice1/api-doc-generator';
 
 const basicAuth = new BasicAuthUtil('basicAuthName');
 const bearerAuth = new BearerUtil('bearerName');

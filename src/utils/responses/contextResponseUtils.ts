@@ -1,4 +1,3 @@
-import extend from 'extend';
 import {
   LinkObject, 
   ReferenceObject, 
@@ -7,10 +6,11 @@ import {
 import {
   ResponseObject as PostmanResponseObject
 } from '../../generators/postman/definitions';
-import { BaseResponseUtil, IOpenAPIResponseContext } from './baseResponseUtils';
+import { BaseResponseUtil, IOpenAPIResponseContext, IPostmanResponseContext } from './baseResponseUtils';
 
 export class ContextResponseUtil extends BaseResponseUtil {
   protected responseUtil: BaseResponseUtil;
+  protected code?: number;
   protected default?: boolean;
   protected links?: Record<string, LinkObject | ReferenceObject>;
   protected ref?: string;
@@ -27,6 +27,21 @@ export class ContextResponseUtil extends BaseResponseUtil {
 
   isDefault(): boolean {
     return this.default ? this.default : false;
+  }
+
+  setCode(code: number): ContextResponseUtil {
+    this.code = code;
+    return this;
+  }
+
+  getCode(): number | undefined {
+    return this.code;
+  }
+
+  removeCode(): number | undefined {
+    const r = this.code;
+    this.code = undefined;
+    return r;
   }
 
   setRef(ref: string): ContextResponseUtil {
@@ -71,11 +86,18 @@ export class ContextResponseUtil extends BaseResponseUtil {
   }
 
   toPostman(): PostmanResponseObject[] {
-    return this.responseUtil.toPostman();
+    const ctxt: IPostmanResponseContext = {};
+    if (this.code) {
+      ctxt.code = this.code;
+    }
+    return this.responseUtil.toPostman(ctxt);
   }
 
   toOpenAPI(): Record<string, OpenAPIResponseObject | ReferenceObject> {
     const ctxt: IOpenAPIResponseContext = {};
+    if (this.code) {
+      ctxt.code = this.code;
+    }
     if (this.ref) {
       ctxt.ref = this.ref;
     }
@@ -86,30 +108,5 @@ export class ContextResponseUtil extends BaseResponseUtil {
       ctxt.default = this.default;
     }
     return this.responseUtil.toOpenAPI(ctxt); 
-  }
-}
-
-export class GroupContextResponseUtil extends BaseResponseUtil {
-  protected responseUtils: BaseResponseUtil[] = [];
-
-  constructor(responseUtils: BaseResponseUtil[]) {
-    super();
-    this.responseUtils = responseUtils;
-  }
-
-  toPostman(): PostmanResponseObject[] {
-    let r: PostmanResponseObject[] = [];
-    this.responseUtils.forEach(builder => {
-      r = r.concat(builder.toPostman());
-    });
-    return r;
-  }
-
-  toOpenAPI(): Record<string, OpenAPIResponseObject | ReferenceObject> {
-    let r: Record<string, OpenAPIResponseObject | ReferenceObject> = {};
-    this.responseUtils.forEach(builder => {
-      r = extend(r, builder.toOpenAPI());
-    });
-    return r;
   }
 }

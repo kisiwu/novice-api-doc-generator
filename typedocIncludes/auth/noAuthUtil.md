@@ -6,7 +6,7 @@ import {
   BasicAuthUtil,
   NoAuthUtil,
   GroupContextAuthUtil
-} from '@novice1/api-doc-generator/utils/auth/all';
+} from '@novice1/api-doc-generator';
 
 const basicAuth = new BasicAuthUtil('basicAuth');
 

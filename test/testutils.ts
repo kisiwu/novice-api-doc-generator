@@ -7,13 +7,13 @@ import {
   GroupAuthUtil,
   //ContextAuthUtil,
   GroupContextAuthUtil,
-} from '../src/utils/auth/all';
+} from '../src/index';
 // response utils
 import {
   ResponseUtil,
   ContextResponseUtil,
-  GroupContextResponseUtil
-} from '../src/utils/responses/all';
+  GroupResponseUtil
+} from '../src/index';
 
 // auth
 export const apiKeyAuth = new ApiKeyUtil('Google-auth');
@@ -38,8 +38,7 @@ export const GroupAuth = new GroupAuthUtil([
 
 // responses
 
-const simpleResponse = new ResponseUtil(200);
-simpleResponse.setHeaders({
+export const simpleResponse = new ResponseUtil('SimpleResponse').setHeaders({
   'X-Rate-Limit-Limit': {
     description: 'The number of allowed requests in the current period',
     schema: {
@@ -67,7 +66,9 @@ simpleResponse.setHeaders({
     }
   });
 
-export const GroupCtxtResponse = new GroupContextResponseUtil([
+export const GroupCtxtResponse = new GroupResponseUtil([
   (new ContextResponseUtil(simpleResponse))
     .setDefault(true)
+    .setCode(200)
+    .setRef('#/components/responses/SimpleResponse')
 ]);

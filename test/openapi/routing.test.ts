@@ -1,4 +1,4 @@
-//import fs from 'fs';
+import fs from 'fs';
 import routing from '@novice1/routing';
 import { OpenAPI } from '../../src';
 import { GenerateComponentsRule } from '../../src/generators/openapi';
@@ -9,6 +9,7 @@ import {
   bearerAuth,*/
   GroupCtxtAuth,
   GroupCtxtResponse,
+  simpleResponse,
   GroupAuth
 } from '../testutils';
 
@@ -58,6 +59,9 @@ describe('api doc', function () {
       summary: 'lang country example',
       value: 'fr_BE'
     });
+
+    // add components/response
+    openapi.addResponse(simpleResponse);
 
     /*
     // add components/schema
@@ -407,7 +411,6 @@ describe('api doc', function () {
     logger.silly('openapi:', result.openapi);
 
     // uncomment to test locally
-    /*
     const wStream = fs.createWriteStream('private/result2.json', { flags: 'w+' });
     wStream.write(JSON.stringify(result, null, ' '), (err: unknown) => {
       if (err) {
@@ -415,7 +418,6 @@ describe('api doc', function () {
       }
       wStream.close();
     });
-    */
 
     //logger.silly(openapi.remove('/app', 'post'));
   });

@@ -10,13 +10,18 @@ import {
 } from '../../generators/postman/definitions';
 
 export interface IOpenAPIResponseContext {
+  code?: number;
   default?: boolean;
   links?: Record<string, LinkObject | ReferenceObject>;
   ref?: string;
 }
 
+export interface IPostmanResponseContext {
+  code?: number;
+}
+
 interface IPostmanResponseUtil {
-  toPostman(): PostmanResponseObject[];
+  toPostman(ctxt?: IPostmanResponseContext): PostmanResponseObject[];
 }
 
 interface IOpenAPIResponseUtil {
@@ -32,18 +37,21 @@ export abstract class BaseOpenAPIResponseUtil implements IOpenAPIResponseUtil {
 }
 
 export abstract class BasePostmanResponseUtil implements IPostmanResponseUtil {
+  abstract toPostman(ctxt: IPostmanResponseContext): PostmanResponseObject[];
   abstract toPostman(): PostmanResponseObject[];
 }
 
 export abstract class BaseResponseUtil 
   implements IResponseUtil {
+  abstract toPostman(ctxt: IPostmanResponseContext): PostmanResponseObject[];
   abstract toPostman(): PostmanResponseObject[];
   abstract toOpenAPI(ctxt: IOpenAPIResponseContext): Record<string, OpenAPIResponseObject | ReferenceObject>;
   abstract toOpenAPI(): Record<string, OpenAPIResponseObject | ReferenceObject>;
 }
 
 export abstract class FullResponseUtil extends BaseResponseUtil {
-  protected code: number;
+  protected name: string;
+  protected code?: number;
   protected headers?: Record<string, HeaderObject | ReferenceObject>;
   
   // body
@@ -63,12 +71,16 @@ export abstract class FullResponseUtil extends BaseResponseUtil {
    */
   abstract setDescription(description: string): FullResponseUtil;
 
-  constructor(code: number) {
+  constructor(name?: string) {
     super();
-    this.code = code;
+    this.name = name || this.constructor.name;
   }
 
   getDescription(): string | undefined {
     return this.description;
+  }
+
+  getName(): string {
+    return this.name;
   }
 }

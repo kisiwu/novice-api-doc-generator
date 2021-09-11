@@ -5,7 +5,7 @@ import routing from '@novice1/routing';
 
 import {
   BearerUtil
-} from '@novice1/api-doc-generator/utils/auth/all';
+} from '@novice1/api-doc-generator';
 
 /**
  * BearerUtil <= BaseAuthUtil <= BaseContextAuthUtil

@@ -19,7 +19,7 @@ By default it understands `joi` schemas.
 Example:
 ```ts
 import { OpenAPI } from '@novice1/api-doc-generator';
-import { GenerateComponentsRule } from '@novice1/api-doc-generator/generators/openapi';
+import { GenerateComponentsRule } from '@novice1/api-doc-generator';
 import routing from '@novice1/routing';
 import Joi from 'joi';
 

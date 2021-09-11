@@ -5,7 +5,7 @@ import { OpenAPI, Postman } from '@novice1/api-doc-generator';
 
 import {
   BearerUtil
-} from '@novice1/api-doc-generator/utils/auth/all';
+} from '@novice1/api-doc-generator';
 
 const bearer = new BearerUtil('bearerAuth');
 bearer.setBearerFormat('JWT');

@@ -6,12 +6,12 @@ export {
   IOpenAPIResponseContext
 } from './baseResponseUtils';
 export {
-  ContextResponseUtil,
-  GroupContextResponseUtil
+  ContextResponseUtil
 } from './contextResponseUtils';
 export {
   MediaTypeUtil
 } from './mediaTypeUtil';
 export {
-  ResponseUtil
+  ResponseUtil,
+  GroupResponseUtil
 } from './responseUtil';

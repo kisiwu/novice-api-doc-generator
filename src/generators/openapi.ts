@@ -3,10 +3,10 @@
  */
 
 import extend from 'extend';
+import { RouteMeta } from '@novice1/routing';
 import {
   DocGenerator,
-  ProcessedRoute,
-  Route
+  ProcessedRoute
 } from '../commons';
 import {
   SchemaObject,
@@ -540,6 +540,9 @@ export class OpenAPI implements DocGenerator {
   }
 
   setResponses(responses: Record<string, ReferenceObject | ResponseObject>): OpenAPI;
+  /**
+   * [[include:openapi.setResponses.md]]
+   */
   setResponses(responses: BaseOpenAPIResponseUtil | BaseResponseUtil): OpenAPI;
   setResponses(responses: Record<string, ReferenceObject | ResponseObject> | BaseOpenAPIResponseUtil | BaseResponseUtil): OpenAPI {
     if (responses instanceof BaseOpenAPIResponseUtil
@@ -572,7 +575,26 @@ export class OpenAPI implements DocGenerator {
     return r;
   }
 
+  /**
+   * Example:
+   * ```ts
+   * openapi.addResponse('200', {
+   *    "description": "A simple string response",
+   *    "content": {
+   *      "text/plain": {
+   *        "schema": {
+   *          "type": "string",
+   *          "example": "whoa!"
+   *        }
+   *      }
+   *    }
+   * });
+   * ```
+   */
   addResponse(name: string, response: ReferenceObject | ResponseObject): OpenAPI;
+  /**
+   * [[include:openapi.addResponse.md]]
+   */
   addResponse(response: BaseOpenAPIResponseUtil | BaseResponseUtil): OpenAPI;
   addResponse(name: string | BaseOpenAPIResponseUtil | BaseResponseUtil, response?: ReferenceObject | ResponseObject): OpenAPI {
     if (!this.#result.components.responses) {
@@ -1009,11 +1031,11 @@ export class OpenAPI implements DocGenerator {
    * ```
    * @returns The added/updated routes
    */
-  add(routes: Route[]): ProcessedRoute[];
-  add(routes: Route): ProcessedRoute[];
-  add(routes: Route[] | Route): ProcessedRoute[] {
+  add(routes: RouteMeta[]): ProcessedRoute[];
+  add(routes: RouteMeta): ProcessedRoute[];
+  add(routes: RouteMeta[] | RouteMeta): ProcessedRoute[] {
 
-    let routes2: Route[] = [];
+    let routes2: RouteMeta[] = [];
 
     if (!Array.isArray(routes)) {
       routes2 = [routes];
@@ -1029,13 +1051,20 @@ export class OpenAPI implements DocGenerator {
         if (!route.methods[method]) {
           return;
         }
+        if (typeof route.path !== 'string') {
+          return;
+        }
         const r: RouteSchema = {
           path: route.path,
           method,
+          name: route.name,
+          description: route.description,
+          tags: route.tags,
+          auth: route.auth,
+          parameters: route.parameters,
+          responses: route.responses
         };
-        Object.keys(route).forEach((p) => {
-          r[p] = route[p];
-        });
+
         const added = this._add(r);
         if (added) {
           results.push(added);

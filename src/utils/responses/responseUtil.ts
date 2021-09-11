@@ -1,4 +1,4 @@
-import { FullResponseUtil, IOpenAPIResponseContext } from './baseResponseUtils';
+import { BaseResponseUtil, FullResponseUtil, IOpenAPIResponseContext, IPostmanResponseContext } from './baseResponseUtils';
 import {
   ResponseObject as PostmanResponseObject
 } from '../../generators/postman/definitions';
@@ -10,8 +10,14 @@ import {
   HeaderObject
 } from '../../generators/openapi/definitions';
 import { MediaTypeUtil } from './mediaTypeUtil';
+import extend from 'extend';
 
 export class ResponseUtil extends FullResponseUtil {
+
+  setName(name: string): ResponseUtil {
+    this.name = name;
+    return this;
+  }
 
   setDescription(description: string): ResponseUtil {
     this.description = description;
@@ -133,6 +139,8 @@ export class ResponseUtil extends FullResponseUtil {
     return r;
   }
 
+  toPostman(): PostmanResponseObject[];
+  toPostman(ctxt: IPostmanResponseContext): PostmanResponseObject[];
   toPostman(): PostmanResponseObject[] {
     return [];
   }
@@ -140,7 +148,13 @@ export class ResponseUtil extends FullResponseUtil {
   toOpenAPI(): Record<string, OpenAPIResponseObject | ReferenceObject>;
   toOpenAPI(ctxt: IOpenAPIResponseContext): Record<string, OpenAPIResponseObject | ReferenceObject>;
   toOpenAPI(ctxt: IOpenAPIResponseContext = {}): Record<string, OpenAPIResponseObject | ReferenceObject> {
-    let name = `${this.code}`;
+    let name = this.name;
+    if(this.code) {
+      name = `${this.code}`; 
+    }
+    if (ctxt.code) {
+      name = `${ctxt.code}`;
+    }
     if (ctxt.default) {
       name = 'default';
     }
@@ -179,5 +193,30 @@ export class ResponseUtil extends FullResponseUtil {
     return {
       [name]: res
     };
+  }
+}
+
+export class GroupResponseUtil extends BaseResponseUtil {
+  protected responseUtils: BaseResponseUtil[] = [];
+
+  constructor(responseUtils: BaseResponseUtil[]) {
+    super();
+    this.responseUtils = responseUtils;
+  }
+
+  toPostman(): PostmanResponseObject[] {
+    let r: PostmanResponseObject[] = [];
+    this.responseUtils.forEach(builder => {
+      r = r.concat(builder.toPostman());
+    });
+    return r;
+  }
+
+  toOpenAPI(): Record<string, OpenAPIResponseObject | ReferenceObject> {
+    let r: Record<string, OpenAPIResponseObject | ReferenceObject> = {};
+    this.responseUtils.forEach(builder => {
+      r = extend(r, builder.toOpenAPI());
+    });
+    return r;
   }
 }
