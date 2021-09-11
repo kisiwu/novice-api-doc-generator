@@ -1,4 +1,4 @@
-import fs from 'fs';
+//import fs from 'fs';
 import routing from '@novice1/routing';
 import { OpenAPI } from '../../src';
 import { GenerateComponentsRule } from '../../src/generators/openapi';
@@ -411,6 +411,7 @@ describe('api doc', function () {
     logger.silly('openapi:', result.openapi);
 
     // uncomment to test locally
+    /*
     const wStream = fs.createWriteStream('private/result2.json', { flags: 'w+' });
     wStream.write(JSON.stringify(result, null, ' '), (err: unknown) => {
       if (err) {
@@ -418,6 +419,7 @@ describe('api doc', function () {
       }
       wStream.close();
     });
+    */
 
     //logger.silly(openapi.remove('/app', 'post'));
   });
