@@ -1,7 +1,6 @@
 //import fs from 'fs';
 import routing from '@novice1/routing';
-import { OpenAPI } from '../../src';
-import { GenerateComponentsRule } from '../../src/generators/openapi';
+import { GenerateComponentsRule, OpenAPI } from '../../src';
 import Joi from 'joi';
 
 import {

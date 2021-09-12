@@ -1,7 +1,6 @@
 //import fs from 'fs';
 import routing from '@novice1/routing';
-import { Postman } from '../../src';
-import { GenerateFoldersRule } from '../../src/generators/postman';
+import { GenerateFoldersRule, Postman } from '../../src';
 import Joi from 'joi';
 
 import {

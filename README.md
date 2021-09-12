@@ -10,16 +10,18 @@ $ npm install @novice1/api-doc-generator
 
 ## OpenAPI
 
-[Module openapi documentation](https://novice1.000webhostapp.com/api-doc-generator/modules/openapi.html).
+[Module openapi documentation](https://novice1.000webhostapp.com/api-doc-generator/modules/generators_openapi.html).
 
 ### Default
 
-By default it understands `joi` schemas.
+By default it handles `joi` schemas.
 
 Example:
 ```ts
-import { OpenAPI } from '@novice1/api-doc-generator';
-import { GenerateComponentsRule } from '@novice1/api-doc-generator';
+import { 
+  GenerateComponentsRule, 
+  OpenAPI 
+} from '@novice1/api-doc-generator';
 import routing from '@novice1/routing';
 import Joi from 'joi';
 
@@ -53,7 +55,7 @@ const router = routing()
   .get({
     name: 'Main app',
     path: '/app',
-    auth: false,
+    auth: true,
     tags: ['default'],
     parameters: {
       query: {
@@ -68,9 +70,10 @@ const router = routing()
       operationId: 'default-app',
       undoc: false, // set to `true` to not display the route in the documentation
 
-      // overwite
+      // override consumes
       consumes: ['application/json'],
-      security: [],
+      // override default security
+      security: ['basicAuth'],
     },
     responses: {
       openapi: {
@@ -98,6 +101,86 @@ openapi.add(router.getMeta());
 const doc = openapi.result();
 ```
 
+## Postman
+
+[Module postman documentation](https://novice1.000webhostapp.com/api-doc-generator/modules/generators_postman.html).
+
+### Default
+
+By default it handles `joi` schemas.
+
+Example:
+```ts
+import { 
+  GenerateFoldersRule, 
+  Postman 
+} from '@novice1/api-doc-generator';
+import routing from '@novice1/routing';
+import Joi from 'joi';
+
+const postman = new Postman();
+
+postman
+      .setName('api doc')
+      .setHost('http://localhost:8000')
+      .setConsumes(['multipart/form-data', 'application/json'])
+      .setFolders([
+        {
+          name: 'default',
+          description: 'A folder is just an ordered set of requests.',
+          item: [],
+        }
+      ])
+      .setGenerateFoldersRule(GenerateFoldersRule.siblings)
+      .setResponsesProperty('postman')
+      .setDefaultSecurity({
+        type: 'basic',
+        basic: []
+      });
+
+const router = routing()
+  .get({
+    name: 'Main app',
+    path: '/app',
+    auth: true,
+    tags: ['default'], // folders
+    parameters: {
+      query: {
+        version: Joi.number()
+          .description('version number')
+          .min(1)
+          .max(3)
+          .default(2)
+          .example(2)
+      },
+
+      operationId: 'default-app',
+
+      // override consumes
+      consumes: ['application/json'],
+      // override default security
+      security: ['basic'],
+    },
+    responses: {
+      postman: {
+        //...
+      }
+    }
+  }, function (req, res) {
+    res.json(req.query.version)
+  });
+
+// add router metadata
+postman.add(router.getMeta());
+
+// get Postman Collection (json)
+const doc = postman.result();
+```
+
+## Schema helpers
+
+### Default helper
+
 The `joi` types it can handle are: *alternatives*, *any*, *array*, *boolean*, *date* *function*, *number*, *object*, *string*, *binary*.
 
 It also handles format methods like `Joi.string().email()`, `Joi.string().url()` and more.
@@ -105,6 +188,29 @@ It also handles format methods like `Joi.string().email()`, `Joi.string().url()`
 #### Joi.meta
 
 In some cases you might have to precise the format in `Joi.meta`. For example `Joi.string().meta({format: 'password'})`, `Joi.date().meta({format: 'datetime'})` or more.
+
+Valid values for `format` are:
+- `boolean`
+- `object`
+- `array`
+- `number`
+- `string`
+- `date`
+- `date-time`
+- `datetime`
+- `float`
+- `double`
+- `integer`
+- `int32`
+- `int64`
+- `byte`
+- `binary`
+- `password`
+- `email`
+- `guid`
+- `uuid`
+- `uri`
+- `dataUri`
 
 You can also define a [reference](https://swagger.io/specification/#reference-object). For example:
 ```js
@@ -131,6 +237,38 @@ List of elements you can configure in `Joi.meta`:
 - `xml`
 
 The possible value for each of them is defined in the [OpenAPI Specification](https://swagger.io/specification/).
+
+### Custom helper
+
+You can create your own helper to handle another schema than `joi`.
+The helper 
+- needs to be a class that implements 
+  - `OpenAPIHelperInterface` (for `OpenAPI`)
+  - or `PostmanHelperInterface` (for `Postman`)
+- should be given to the generator's constructor.
+
+Example:
+```ts
+import { OpenAPI, Postman } from '@novice1/api-doc-generator';
+import { 
+  CustomOpenAPIHelperClass,
+  CustomPostmanHelperClass
+} from './custom';
+
+const openapi = new OpenAPI(CustomOpenAPIHelperClass);
+
+const postman = new Postman(CustomPostmanHelperClass);
+```
+
+## Utils
+
+### Auth
+
+#### Context
+
+### Responses
+
+#### Context
 
 ## References
 

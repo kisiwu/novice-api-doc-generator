@@ -1,4 +1,6 @@
 general:
+  - readme
+  - add more comment to code (properties, etc) for typedoc
   - postman: xml root element
   - try xml post with fast-xml-parser (parse to json, works best if "ignoreAttributes" and "ignoreNameSpace")
 ```
@@ -22,18 +24,18 @@ var options = {
 };
 ```
 openapi:
-  - finish todo's in generators/OpenAPI
+  - finish todo's in generators/OpenAPI @done
   - doc auth methods @done
-  - typedoc response methods
-  - generate typedoc
+  - typedoc response methods @done
+  - generate typedoc @done
 
 postman:
   - write generator @done
   - write postman/definitions.ts @done
-  - readme doc
+  - readme doc @done
   - typedoc auth methods @done
-  - typedoc response methods
-  - generate typedoc
+  - typedoc response methods @done
+  - generate typedoc @done
 
 utils:
   - auth @done
@@ -41,6 +43,6 @@ utils:
     - do not do postman (return empty array) @done
   - auth: toOpenAPI should return record of schemes @done
   - auth typedoc @done
-  - response typedoc
+  - response typedoc @done
 
 Archive:
