@@ -12,6 +12,8 @@ $ npm install @novice1/api-doc-generator
 
 [Reference](https://novice1.000webhostapp.com/api-doc-generator/modules/generators_openapi.html).
 
+[OpenAPI Specification 3.0.3](https://spec.openapis.org/oas/v3.0.3).
+
 ### Default
 
 By default it handles `joi` schemas.
@@ -105,6 +107,8 @@ const doc = openapi.result();
 
 [Reference](https://novice1.000webhostapp.com/api-doc-generator/modules/generators_postman.html).
 
+[Postman Collection Format v2.1.0](https://schema.postman.com/collection/json/v2.1.0/draft-07/docs/index.html).
+
 ### Default
 
 By default it handles `joi` schemas.
@@ -181,15 +185,15 @@ const doc = postman.result();
 
 ### Default helper
 
-The `joi` types it can handle are: *alternatives*, *any*, *array*, *boolean*, *date* *function*, *number*, *object*, *string*, *binary*.
+#### Types
+
+The default helper handles the following `joi` types: `alternatives`, `any`, `array`, `boolean`, `date` `function`, `number`, `object`, `string`, `binary`.
 
 It also handles format methods like `Joi.string().email()`, `Joi.string().url()` and more.
 
-#### Joi.meta
-
 In some cases you might have to precise the format in `Joi.meta`. For example `Joi.string().meta({format: 'password'})`, `Joi.date().meta({format: 'datetime'})` or more.
 
-Valid values for `format` are:
+Handled formats are:
 - `boolean`
 - `object`
 - `array`
@@ -212,7 +216,9 @@ Valid values for `format` are:
 - `uri`
 - `dataUri`
 
-You can also define a [reference](https://swagger.io/specification/#reference-object). For example:
+#### Joi.meta
+
+You can configure multiple elements in `Joi.meta` like a [reference](https://swagger.io/specification/#reference-object) to a component. For example:
 ```js
 Joi.object()
   .keys({
@@ -243,8 +249,8 @@ The possible value for each of them is defined in the [OpenAPI Specification](ht
 You can create your own helper to handle another schema than `joi`.
 The helper 
 - needs to be a class that implements 
-  - `OpenAPIHelperInterface` (for `OpenAPI`)
-  - or `PostmanHelperInterface` (for `Postman`)
+  - [`OpenAPIHelperInterface`](https://novice1.000webhostapp.com/api-doc-generator/interfaces/generators_openapi_helpers_interfaces.OpenAPIHelperInterface.html) (for `OpenAPI`)
+  - or [`PostmanHelperInterface`](https://novice1.000webhostapp.com/api-doc-generator/interfaces/generators_postman_helpers_interfaces.PostmanHelperInterface.html) (for `Postman`)
 - should be given to the generator's constructor.
 
 Example:
@@ -262,16 +268,16 @@ const postman = new Postman(CustomPostmanHelperClass);
 
 ## Utils
 
-As the documentation format differs between specifications, there are classes you can use in case you need to generate the documentation following multiple specifications. 
+As the format differs between specifications, some classes can help you generate the documentation following multiple specifications. 
 
 ### Auth
 
 Classes:
-- `ApiKeyUtil`
-- `BasicAuthUtil`
-- `BearerUtil`
-- `NoAuthUtil`
-- `OAuth2Util`
+- [`ApiKeyUtil`](https://novice1.000webhostapp.com/api-doc-generator/classes/utils_auth_apiKeyUtil.ApiKeyUtil.html)
+- [`BasicAuthUtil`](https://novice1.000webhostapp.com/api-doc-generator/classes/utils_auth_basicAuthUtil.BasicAuthUtil.html)
+- [`BearerUtil`](https://novice1.000webhostapp.com/api-doc-generator/classes/utils_auth_bearerUtil.BearerUtil.html)
+- [`NoAuthUtil`](https://novice1.000webhostapp.com/api-doc-generator/classes/utils_auth_noAuthUtil.NoAuthUtil.html)
+- [`OAuth2Util`](https://novice1.000webhostapp.com/api-doc-generator/classes/utils_auth_oAuth2Util.OAuth2Util.html)
 
 Example:
 ```ts
@@ -282,6 +288,7 @@ import {
 } from '@novice1/api-doc-generator';
 import routing from '@novice1/routing';
 
+// security scheme
 const bearerAuth = new BearerUtil('bearerName');
 
 // add it to OpenAPI security schemes
@@ -308,7 +315,7 @@ const router = routing()
 
 #### Context
 
-You can wrap the instance with a context to define some properties (e.g.: `scope`) depending on the route. You do that with `ContextAuthUtil`.
+You can wrap the instance with a context to define a `scope` depending on the route. You do that with [`ContextAuthUtil`](https://novice1.000webhostapp.com/api-doc-generator/classes/utils_auth_contextAuthUtils.ContextAuthUtil.html).
 
 Example:
 ```ts
@@ -365,7 +372,7 @@ const router = routing()
 
 #### Group
 
-You can group security schemes at your convenience with `GroupAuthUtil` and `GroupContextAuthUtil`.
+You can group security schemes at your convenience with [`GroupAuthUtil`](https://novice1.000webhostapp.com/api-doc-generator/classes/utils_auth_groupAuthUtil.GroupAuthUtil.html) and [`GroupContextAuthUtil`](https://novice1.000webhostapp.com/api-doc-generator/classes/utils_auth_contextAuthUtils.GroupContextAuthUtil.html).
 
 Exemple:
 ```ts
@@ -413,8 +420,8 @@ const router = routing()
 ### Responses
 
 Classes:
-- `ResponseUtil`
-- `GroupResponseUtil`
+- [`ResponseUtil`](https://novice1.000webhostapp.com/api-doc-generator/classes/utils_responses_responseUtil.ResponseUtil.html)
+- [`GroupResponseUtil`](https://novice1.000webhostapp.com/api-doc-generator/classes/utils_responses_responseUtil.GroupResponseUtil.html)
 
 Example:
 ```ts
@@ -469,8 +476,9 @@ const router = routing()
 
 #### Context
 
-You can wrap the instance with a context if you want to define `default`, `code`, `ref` and/or `links` differently depending on the route. You do that with `ContextResponseUtil`.
+You can wrap the instance with a context if you want to define `default`, `code`, `ref` and/or `links` depending on the route. You do that with [`ContextResponseUtil`](https://novice1.000webhostapp.com/api-doc-generator/classes/utils_responses_contextResponseUtils.ContextResponseUtil.html).
 
+Example:
 ```ts
 const generalError = new ResponseUtil('GeneralError');
 generalError
@@ -505,7 +513,7 @@ const router = routing()
 
 ## References
 
-- [@novice1/api-doc-generator documentation](https://novice1.000webhostapp.com/api-doc-generator/)
+- [@novice1/api-doc-generator](https://novice1.000webhostapp.com/api-doc-generator/)
 - [OpenAPI Specification](https://swagger.io/specification/)
 - [Postman Collection Format v2.1.0](https://schema.postman.com/collection/json/v2.1.0/draft-07/docs/index.html)
 - [@novice1/routing](https://www.npmjs.com/package/@novice1/routing)
