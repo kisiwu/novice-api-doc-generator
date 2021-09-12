@@ -1,7 +1,7 @@
 **Usage** (OpenAPI):
 ```ts
-import { OpenAPI } from '@novice1/api-doc-generator';
 import {
+  OpenAPI,
   BasicAuthUtil,
   BearerUtil,
   GroupAuthUtil

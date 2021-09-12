@@ -1,7 +1,8 @@
 **Usage**:
 ```ts
-import { OpenAPI, Postman } from '@novice1/api-doc-generator';
 import {
+  OpenAPI,
+  Postman,
   BasicAuthUtil,
   BearerUtil,
   GroupAuthUtil

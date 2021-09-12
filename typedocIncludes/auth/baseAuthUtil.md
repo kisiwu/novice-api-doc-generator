@@ -1,9 +1,8 @@
 **Usage**:
 ```ts
-import { OpenAPI } from '@novice1/api-doc-generator';
 import routing from '@novice1/routing';
-
 import {
+  OpenAPI,
   BearerUtil
 } from '@novice1/api-doc-generator';
 

@@ -23,7 +23,6 @@ const responses = new GroupResponseUtil([
   illegalInput
 ]);
 
-// or 
 openapi.addResponse(responses);
 // or
 openapi

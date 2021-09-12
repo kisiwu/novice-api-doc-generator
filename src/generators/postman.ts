@@ -88,7 +88,7 @@ export enum GenerateFoldersRule {
 
 /**
  * 
- * Postman doc generator.
+ * Postman collection generator.
  * 
  * @note For now it is not possible to only
  * send files outside of object property (multipart). 

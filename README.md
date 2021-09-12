@@ -1,6 +1,6 @@
 # @novice1/api-doc-generator
 
-Quickly generate API Documentation.
+Generate API documentation directly from application.
 
 ## Installation
 
@@ -8,9 +8,9 @@ Quickly generate API Documentation.
 $ npm install @novice1/api-doc-generator
 ```
 
-## OpenAPI
+## OpenAPI Specification
 
-[Module openapi documentation](https://novice1.000webhostapp.com/api-doc-generator/modules/generators_openapi.html).
+[Reference](https://novice1.000webhostapp.com/api-doc-generator/modules/generators_openapi.html).
 
 ### Default
 
@@ -101,9 +101,9 @@ openapi.add(router.getMeta());
 const doc = openapi.result();
 ```
 
-## Postman
+## Postman Specification
 
-[Module postman documentation](https://novice1.000webhostapp.com/api-doc-generator/modules/generators_postman.html).
+[Reference](https://novice1.000webhostapp.com/api-doc-generator/modules/generators_postman.html).
 
 ### Default
 
@@ -163,7 +163,7 @@ const router = routing()
     },
     responses: {
       postman: {
-        //...
+        // ...
       }
     }
   }, function (req, res) {
@@ -262,13 +262,246 @@ const postman = new Postman(CustomPostmanHelperClass);
 
 ## Utils
 
+As the documentation format differs between specifications, there are classes you can use in case you need to generate the documentation following multiple specifications. 
+
 ### Auth
 
+Classes:
+- `ApiKeyUtil`
+- `BasicAuthUtil`
+- `BearerUtil`
+- `NoAuthUtil`
+- `OAuth2Util`
+
+Example:
+```ts
+import {
+  OpenAPI,
+  Postman,
+  BearerUtil
+} from '@novice1/api-doc-generator';
+import routing from '@novice1/routing';
+
+const bearerAuth = new BearerUtil('bearerName');
+
+// add it to OpenAPI security schemes
+const openapi = new OpenAPI();
+openapi.addSecuritySchemes(bearerAuth);
+
+// add it to Postman global authentication
+const postman = new Postman();
+postman.setAuth(bearerAuth);
+
+// router
+const router = routing()
+  .get({
+    path: '/something',
+    auth: true,
+    parameters: {
+      // add security requirements for this route
+      security: bearerAuth
+    }
+  }, function (req, res) {
+    // ...
+  });
+```
+
 #### Context
+
+You can wrap the instance with a context to define some properties (e.g.: `scope`) depending on the route. You do that with `ContextAuthUtil`.
+
+Example:
+```ts
+import routing from '@novice1/routing';
+import {
+  OpenAPI, 
+  Postman,
+  ContextAuthUtil,
+  OAuth2Util,
+  GrantType
+} from '@novice1/api-doc-generator';
+
+// OAuth2 specifications
+const oauth2 = new OAuth2Util('oAuth2AuthCode');
+oauth2
+  .setDescription('For more information, see https://api.slack.com/docs/oauth')
+  .setGrantType(GrantType.authorizationCode)
+  .setAuthUrl('https://slack.com/oauth/authorize')
+  .setAccessTokenUrl('https://slack.com/api/oauth.access')
+  .setScopes({
+    'users:read': 'Read user information',
+    'users:write': 'Modify user information',
+    'im:read': 'Read messages',
+    'im:write': 'Write messages',
+    'im:history': 'Access the message archive',
+    'search:read': 'Search messages, files, and so on'
+  });
+ 
+// add it to OpenAPI security schemes
+const openapi = new OpenAPI();
+openapi.addSecuritySchemes(oauth2);
+
+// add it to Postman global authentication
+const postman = new Postman();
+postman.setAuth(oauth2);
+
+// router
+const router = routing()
+  .get({
+    path: '/messages',
+    auth: true,
+    parameters: {
+      // add security requirements for this route
+      security: new ContextAuthUtil(
+        oauth2,
+        // OAuth2 scopes for this route
+        ['im:read']
+      )
+    }
+  }, function (req, res) {
+    // ...
+  });
+```
+
+#### Group
+
+You can group security schemes at your convenience with `GroupAuthUtil` and `GroupContextAuthUtil`.
+
+Exemple:
+```ts
+import {
+  OpenAPI,
+  Postman,
+  BasicAuthUtil,
+  BearerUtil,
+  GroupAuthUtil,
+  GroupContextAuthUtil
+} from '@novice1/api-doc-generator';
+
+const basicAuth = new BasicAuthUtil('basicAuthName');
+const bearerAuth = new BearerUtil('bearerName');
+
+const groupAuth = new GroupAuthUtil([
+  basicAuth,
+  bearerAuth
+]);
+
+// add it to OpenAPI security schemes
+const openapi = new OpenAPI();
+openapi.addSecuritySchemes(groupAuth);
+
+// add it to Postman global authentication
+const postman = new Postman();
+postman.setAuth(groupAuth);
+
+const router = routing()
+  .get({
+    path: '/something',
+    auth: true,
+    parameters: {
+      // add security requirements for this route
+      security: new GroupContextAuthUtil([
+        basicAuth,
+        bearerAuth,
+      ])
+    }
+  }, function (req, res) {
+    // ...
+  });
+```
 
 ### Responses
 
+Classes:
+- `ResponseUtil`
+- `GroupResponseUtil`
+
+Example:
+```ts
+import {
+  ResponseUtil,
+  GroupResponseUtil
+} from '@novice1/api-doc-generator';
+
+const generalError = new ResponseUtil('GeneralError');
+generalError
+  .setDescription('General Error')
+  .addMediaType('application/json', {
+    schema: {
+      $ref: '#/components/schemas/GeneralError'
+    }
+  })
+  .setCode(500);
+
+const illegalInput = new ResponseUtil('IllegalInput');
+illegalInput
+  .setDescription('Illegal input for operation.')
+  .setCode(400);
+
+const responses = new GroupResponseUtil([
+  generalError,
+  illegalInput
+]);
+
+openapi.setResponses(responses);
+// or 
+openapi.addResponse(responses);
+// or
+openapi
+  .addResponse(generalError)
+  .addResponse(illegalInput);
+
+// router
+const router = routing()
+  .post({
+    path: '/something',
+    auth: true,
+    parameters: {
+      body: {
+        something: Joi.string().max(14)
+      },
+      responses
+    }
+  }, function (req, res) {
+    // ...
+  });
+```
+
 #### Context
+
+You can wrap the instance with a context if you want to define `default`, `code`, `ref` and/or `links` differently depending on the route. You do that with `ContextResponseUtil`.
+
+```ts
+const generalError = new ResponseUtil('GeneralError');
+generalError
+  .setDescription('General Error')
+  .addMediaType('application/json', {
+    schema: {
+      $ref: '#/components/schemas/GeneralError'
+    }
+  });
+
+const illegalInput = new ResponseUtil('IllegalInput');
+illegalInput
+  .setDescription('Illegal input for operation.');
+
+// router
+const router = routing()
+  .get({
+    path: '/something',
+    auth: true,
+    parameters: {
+      responses: new GroupResponseUtil([
+        (new ContextResponseUtil(generalError))
+          .setCode(500).setDefault(),
+        (new ContextResponseUtil(illegalInput))
+          .setCode(400)
+      ])
+    }
+  }, function (req, res) {
+    // ...
+  });
+```
 
 ## References
 

@@ -1,9 +1,9 @@
 **Usage**:
 ```ts
 import routing from '@novice1/routing';
-import { OpenAPI, Postman } from '@novice1/api-doc-generator';
-
 import {
+  OpenAPI, 
+  Postman,
   ContextAuthUtil,
   OAuth2Util,
   GrantType
