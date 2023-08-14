@@ -4,6 +4,7 @@
   "version": "0.2.0",
   "description": "Quickly generate API Documentation.",
   "main": "lib/index.js",
+  "homepage": "https://kisiwu.github.io/novice-api-doc-generator/latest/",
   "repository": {
     "type": "git",
     "url": "https://github.com/kisiwu/novice-api-doc-generator.git"
