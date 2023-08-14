@@ -584,7 +584,8 @@ export class Postman implements DocGenerator {
     } else if (!Array.isArray(parameters.security)) {
       if (parameters.security 
         && typeof parameters.security === 'object') {
-        const v: Record<string, unknown> = extend({}, parameters.security);
+        const securityObject = parameters.security as unknown;
+        const v: Record<string, unknown> = extend({}, securityObject);
         if (typeof v.type === 'string' && authTypes.find(t => t === v.type)) {
           const authType: string = v.type;
           const vauth: Auth = {type: authType, [authType]: []};

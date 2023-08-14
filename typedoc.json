@@ -2,7 +2,7 @@
   "entryPoints": [
     "src/index.ts", 
     "src/commons.ts",
-    "src/utils",
+    "src/utils/*",
     "src/helpers",
     "src/generators/openapi.ts", 
     "src/generators/openapi/definitions.ts",
@@ -13,6 +13,7 @@
   ],
   "out": "docs",
 
+  "entryPointStrategy": "expand",
   "excludeInternal": true,
   "excludePrivate": true,
   "includeVersion": true,
