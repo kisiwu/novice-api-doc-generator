@@ -10,7 +10,7 @@ $ npm install @novice1/api-doc-generator
 
 ## OpenAPI Specification
 
-[Reference](https://novice1.000webhostapp.com/api-doc-generator/modules/generators_openapi.html).
+[Reference](https://kisiwu.github.io/novice-api-doc-generator/latest/modules/generators_openapi.html).
 
 [OpenAPI Specification 3.0.3](https://spec.openapis.org/oas/v3.0.3).
 
@@ -105,7 +105,7 @@ const doc = openapi.result();
 
 ## Postman Specification
 
-[Reference](https://novice1.000webhostapp.com/api-doc-generator/modules/generators_postman.html).
+[Reference](https://kisiwu.github.io/novice-api-doc-generator/latest/modules/generators_postman.html).
 
 [Postman Collection Format v2.1.0](https://schema.postman.com/collection/json/v2.1.0/draft-07/docs/index.html).
 
@@ -249,8 +249,8 @@ The possible value for each of them is defined in the [OpenAPI Specification](ht
 You can create your own helper to handle another schema than `joi`.
 The helper 
 - needs to be a class that implements 
-  - [`OpenAPIHelperInterface`](https://novice1.000webhostapp.com/api-doc-generator/interfaces/generators_openapi_helpers_interfaces.OpenAPIHelperInterface.html) (for `OpenAPI`)
-  - or [`PostmanHelperInterface`](https://novice1.000webhostapp.com/api-doc-generator/interfaces/generators_postman_helpers_interfaces.PostmanHelperInterface.html) (for `Postman`)
+  - [`OpenAPIHelperInterface`](https://kisiwu.github.io/novice-api-doc-generator/latest/interfaces/generators_openapi_helpers_interfaces.OpenAPIHelperInterface.html) (for `OpenAPI`)
+  - or [`PostmanHelperInterface`](https://kisiwu.github.io/novice-api-doc-generator/latest/interfaces/generators_postman_helpers_interfaces.PostmanHelperInterface.html) (for `Postman`)
 - should be given to the generator's constructor.
 
 Example:
@@ -273,11 +273,11 @@ As the format differs between specifications, some classes can help you generate
 ### Auth
 
 Classes:
-- [`ApiKeyUtil`](https://novice1.000webhostapp.com/api-doc-generator/classes/utils_auth_apiKeyUtil.ApiKeyUtil.html)
-- [`BasicAuthUtil`](https://novice1.000webhostapp.com/api-doc-generator/classes/utils_auth_basicAuthUtil.BasicAuthUtil.html)
-- [`BearerUtil`](https://novice1.000webhostapp.com/api-doc-generator/classes/utils_auth_bearerUtil.BearerUtil.html)
-- [`NoAuthUtil`](https://novice1.000webhostapp.com/api-doc-generator/classes/utils_auth_noAuthUtil.NoAuthUtil.html)
-- [`OAuth2Util`](https://novice1.000webhostapp.com/api-doc-generator/classes/utils_auth_oAuth2Util.OAuth2Util.html)
+- [`ApiKeyUtil`](https://kisiwu.github.io/novice-api-doc-generator/latest/classes/utils_auth_apiKeyUtil.ApiKeyUtil.html)
+- [`BasicAuthUtil`](https://kisiwu.github.io/novice-api-doc-generator/latest/classes/utils_auth_basicAuthUtil.BasicAuthUtil.html)
+- [`BearerUtil`](https://kisiwu.github.io/novice-api-doc-generator/latest/classes/utils_auth_bearerUtil.BearerUtil.html)
+- [`NoAuthUtil`](https://kisiwu.github.io/novice-api-doc-generator/latest/classes/utils_auth_noAuthUtil.NoAuthUtil.html)
+- [`OAuth2Util`](https://kisiwu.github.io/novice-api-doc-generator/latest/classes/utils_auth_oAuth2Util.OAuth2Util.html)
 
 Example:
 ```ts
@@ -315,7 +315,7 @@ const router = routing()
 
 #### Context
 
-You can wrap the instance with a context to define a `scope` depending on the route. You do that with [`ContextAuthUtil`](https://novice1.000webhostapp.com/api-doc-generator/classes/utils_auth_contextAuthUtils.ContextAuthUtil.html).
+You can wrap the instance with a context to define a `scope` depending on the route. You do that with [`ContextAuthUtil`](https://kisiwu.github.io/novice-api-doc-generator/latest/classes/utils_auth_contextAuthUtils.ContextAuthUtil.html).
 
 Example:
 ```ts
@@ -372,7 +372,7 @@ const router = routing()
 
 #### Group
 
-You can group security schemes at your convenience with [`GroupAuthUtil`](https://novice1.000webhostapp.com/api-doc-generator/classes/utils_auth_groupAuthUtil.GroupAuthUtil.html) and [`GroupContextAuthUtil`](https://novice1.000webhostapp.com/api-doc-generator/classes/utils_auth_contextAuthUtils.GroupContextAuthUtil.html).
+You can group security schemes at your convenience with [`GroupAuthUtil`](https://kisiwu.github.io/novice-api-doc-generator/latest/classes/utils_auth_groupAuthUtil.GroupAuthUtil.html) and [`GroupContextAuthUtil`](https://kisiwu.github.io/novice-api-doc-generator/latest/classes/utils_auth_contextAuthUtils.GroupContextAuthUtil.html).
 
 Exemple:
 ```ts
@@ -420,8 +420,8 @@ const router = routing()
 ### Responses
 
 Classes:
-- [`ResponseUtil`](https://novice1.000webhostapp.com/api-doc-generator/classes/utils_responses_responseUtil.ResponseUtil.html)
-- [`GroupResponseUtil`](https://novice1.000webhostapp.com/api-doc-generator/classes/utils_responses_responseUtil.GroupResponseUtil.html)
+- [`ResponseUtil`](https://kisiwu.github.io/novice-api-doc-generator/latest/classes/utils_responses_responseUtil.ResponseUtil.html)
+- [`GroupResponseUtil`](https://kisiwu.github.io/novice-api-doc-generator/latest/classes/utils_responses_responseUtil.GroupResponseUtil.html)
 
 Example:
 ```ts
@@ -476,7 +476,7 @@ const router = routing()
 
 #### Context
 
-You can wrap the instance with a context if you want to define `default`, `code`, `ref` and/or `links` depending on the route. You do that with [`ContextResponseUtil`](https://novice1.000webhostapp.com/api-doc-generator/classes/utils_responses_contextResponseUtils.ContextResponseUtil.html).
+You can wrap the instance with a context if you want to define `default`, `code`, `ref` and/or `links` depending on the route. You do that with [`ContextResponseUtil`](https://kisiwu.github.io/novice-api-doc-generator/latest/classes/utils_responses_contextResponseUtils.ContextResponseUtil.html).
 
 Example:
 ```ts
@@ -513,7 +513,7 @@ const router = routing()
 
 ## References
 
-- [@novice1/api-doc-generator](https://novice1.000webhostapp.com/api-doc-generator/)
+- [@novice1/api-doc-generator](https://kisiwu.github.io/novice-api-doc-generator/latest/)
 - [OpenAPI Specification](https://swagger.io/specification/)
 - [Postman Collection Format v2.1.0](https://schema.postman.com/collection/json/v2.1.0/draft-07/docs/index.html)
 - [@novice1/routing](https://www.npmjs.com/package/@novice1/routing)
