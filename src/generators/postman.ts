@@ -508,6 +508,46 @@ export class Postman implements DocGenerator {
   }
   */
 
+  /**
+   * remove all routes
+   * @returns The removed routes
+   */
+  removeAll(): ProcessedRoute[] {
+    const r: ProcessedRoute[] = [];
+
+    const removeItem = (item: Item) => {
+      let path = '/'
+        const requestpath = item.request.url?.path || '/'
+        if (Array.isArray(requestpath)) {
+          path = requestpath.join('/')
+        } else if (requestpath) {
+          path = requestpath
+        }
+        r.push({
+          path: path,
+          method: item.request.method || 'GET',
+          schema: item
+        })
+    }
+
+    const loopThroughResultItem = (item: Item | Folder) => {
+      if ('request' in item) {
+        removeItem(item)
+      } else {
+        item.item.forEach(subItem => {
+          loopThroughResultItem(subItem)
+        })
+      }
+    }
+
+    this.#result.item.forEach(loopThroughResultItem)
+
+    this.#result.item = []
+    this.#folders = []
+
+    return r;
+  }
+
   private _getResponsesSchema(responses?: ResponsesRecord): ResponseObject[] {
     let r: ResponseObject[] = [];
     let tmp: unknown;

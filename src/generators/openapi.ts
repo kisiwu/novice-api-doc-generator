@@ -1100,6 +1100,20 @@ export class OpenAPI implements DocGenerator {
     return r;
   }
 
+  /**
+   * remove all routes
+   * @returns The removed routes
+   */
+  removeAll(): ProcessedRoute[] {
+    let r: ProcessedRoute[] = [];
+    Object.keys(this.#result.paths).forEach(
+      path => {
+        r = r.concat(this.remove(path))
+      }
+    )
+    return r;
+  }
+
   private _getResponsesSchema(responses?: ResponsesRecord): ResponsesRecord {
     let r: ResponsesRecord = {};
     let tmp: unknown;
