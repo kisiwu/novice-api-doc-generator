@@ -7,7 +7,7 @@
   "homepage": "https://kisiwu.github.io/novice-api-doc-generator/latest/",
   "repository": {
     "type": "git",
-    "url": "https://github.com/kisiwu/novice-api-doc-generator.git"
+    "url": "git+https://github.com/kisiwu/novice-api-doc-generator.git"
   },
   "engines": {
     "node": ">=14"
