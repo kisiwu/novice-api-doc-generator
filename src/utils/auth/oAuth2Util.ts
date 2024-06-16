@@ -59,6 +59,12 @@ export class OAuth2Util extends FullAuthUtil {
   protected username?: string; 
   protected refreshUrl?: string;
 
+  /**
+   * Very optional.
+   * If set, it will be used for postman, concatenating accessTokenUrl and authUrl.
+   */
+  protected host?: string;
+
   setDescription(description: string): OAuth2Util {
     this.description = description;
     return this;
@@ -184,6 +190,21 @@ export class OAuth2Util extends FullAuthUtil {
   removeClientId(): string | undefined {
     const r = this.clientId;
     this.clientId = undefined;
+    return r;
+  }
+
+  setHost(host: string): this {
+    this.host = host;
+    return this;
+  }
+
+  getHost(): string | undefined {
+    return this.host;
+  }
+
+  removeHost(): string | undefined {
+    const r = this.host;
+    this.host = undefined;
     return r;
   }
 
@@ -472,14 +493,14 @@ export class OAuth2Util extends FullAuthUtil {
     if (isDefined(this.accessTokenUrl)) {
       r.oauth2?.push({
         key: 'accessTokenUrl',
-        value: this.accessTokenUrl,
+        value: isDefined(this.host) ? `${this.host}${this.accessTokenUrl}` : this.accessTokenUrl,
         type: 'string'
       });
     }
     if (isDefined(this.authUrl)) {
       r.oauth2?.push({
         key: 'authUrl',
-        value: this.authUrl,
+        value: isDefined(this.host) ? `${this.host}${this.authUrl}` : this.authUrl,
         type: 'string'
       });
     }
