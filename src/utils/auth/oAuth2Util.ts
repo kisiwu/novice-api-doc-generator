@@ -497,6 +497,13 @@ export class OAuth2Util extends FullAuthUtil {
         type: 'string'
       });
     }
+    if (isDefined(this.refreshUrl)) {
+      r.oauth2?.push({
+        key: 'refreshTokenUrl',
+        value: isDefined(this.host) ? `${this.host}${this.refreshUrl}` : this.refreshUrl,
+        type: 'string'
+      });
+    }
     if (isDefined(this.authUrl)) {
       r.oauth2?.push({
         key: 'authUrl',
