@@ -1,7 +1,7 @@
 {
   "name": "@novice1/api-doc-generator",
   "private": false,
-  "version": "0.2.5",
+  "version": "0.2.6",
   "description": "Quickly generate API Documentation.",
   "main": "lib/index.js",
   "homepage": "https://kisiwu.github.io/novice-api-doc-generator/latest/",
@@ -32,7 +32,7 @@
   ],
   "license": "MIT",
   "devDependencies": {
-    "@novice1/routing": "^1.1.6",
+    "@novice1/routing": "^1.1.7",
     "@types/chai": "^4.3.16",
     "@types/extend": "^3.0.4",
     "@types/jsontoxml": "^1.0.6",
