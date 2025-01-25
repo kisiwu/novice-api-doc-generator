@@ -5,7 +5,7 @@ Generate API documentation directly from application.
 ## Installation
 
 ```bash
-$ npm install @novice1/api-doc-generator
+npm install @novice1/api-doc-generator
 ```
 
 ## OpenAPI Specification
