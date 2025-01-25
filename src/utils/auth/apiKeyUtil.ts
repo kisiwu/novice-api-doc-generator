@@ -13,7 +13,7 @@ export enum ApiKeyLocation {
 }
 
 /**
- * [[include:auth/apiKeyUtil.md]]
+ * {@include ../../../typedocIncludes/auth/apiKeyUtil.md}
  */
 export class ApiKeyUtil extends FullAuthUtil {
 

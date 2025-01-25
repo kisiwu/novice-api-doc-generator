@@ -6,7 +6,7 @@ import { BaseContextAuthUtil } from './baseAuthUtils';
  * Define authentication as optional.
 
  *
- * [[include:auth/noAuthUtil.md]]
+ * {@include ../../../typedocIncludes/auth/noAuthUtil.md}
  */
 export class NoAuthUtil extends BaseContextAuthUtil {
 

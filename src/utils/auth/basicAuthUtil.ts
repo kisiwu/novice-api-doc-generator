@@ -7,7 +7,7 @@ function isDefined(v: unknown) {
 }
 
 /**
- * [[include:auth/basicAuthUtil.md]]
+ * {@include ../../../typedocIncludes/auth/basicAuthUtil.md}
  */
 export class BasicAuthUtil extends FullAuthUtil {
   protected password?: string;

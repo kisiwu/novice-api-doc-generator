@@ -7,7 +7,7 @@ function isDefined(v: unknown) {
 }
 
 /**
- * [[include:auth/bearerUtil.md]]
+ * {@include ../../../typedocIncludes/auth/bearerUtil.md}
  */
 export class BearerUtil extends FullAuthUtil {
   protected token?: string;

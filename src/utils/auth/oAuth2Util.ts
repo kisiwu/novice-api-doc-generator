@@ -36,7 +36,7 @@ export enum ChallengeAlgorithm {
 }
 
 /**
- * [[include:auth/oAuth2Util.md]]
+ * {@include ../../../typedocIncludes/auth/oAuth2Util.md}
  */
 export class OAuth2Util extends FullAuthUtil {
 

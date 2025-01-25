@@ -42,7 +42,7 @@ export abstract class BaseContextAuthUtil
 }
 
 /**
- * [[include:auth/baseAuthUtil.md]]
+ * {@include ../../../typedocIncludes/auth/baseAuthUtil.md}
  */
 export abstract class BaseAuthUtil 
   extends BaseContextAuthUtil

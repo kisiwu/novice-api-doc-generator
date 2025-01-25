@@ -13,7 +13,7 @@ import { MediaTypeUtil } from './mediaTypeUtil';
 import extend from 'extend';
 
 /**
- * [[include:responses/responseUtil.md]]
+ * {@include ../../../typedocIncludes/responses/responseUtil.md}
  */
 export class ResponseUtil extends FullResponseUtil {
 
@@ -200,7 +200,7 @@ export class ResponseUtil extends FullResponseUtil {
 }
 
 /**
- * [[include:responses/groupResponseUtil.md]]
+ * {@include ../../../typedocIncludes/responses/groupResponseUtil.md}
  */
 export class GroupResponseUtil extends BaseResponseUtil {
   protected responseUtils: BaseResponseUtil[] = [];

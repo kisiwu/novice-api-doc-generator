@@ -91,7 +91,8 @@ export enum GenerateComponentsRule {
 /**
  * OpenAPI doc generator.
  * 
- * [[include:openapi.md]]
+ * {@include ../../typedocIncludes/openapi.md}
+ *  
  * 
  * @note For now it is not possible to only
  * send files outside of object property (multipart). 
@@ -537,7 +538,7 @@ export class OpenAPI implements DocGenerator {
 
   setResponses(responses: Record<string, ReferenceObject | ResponseObject>): OpenAPI;
   /**
-   * [[include:openapi.setResponses.md]]
+   * {@include ../../typedocIncludes/openapi.setResponses.md}
    */
   setResponses(responses: BaseOpenAPIResponseUtil | BaseResponseUtil): OpenAPI;
   setResponses(responses: Record<string, ReferenceObject | ResponseObject> | BaseOpenAPIResponseUtil | BaseResponseUtil): OpenAPI {
@@ -589,7 +590,7 @@ export class OpenAPI implements DocGenerator {
    */
   addResponse(name: string, response: ReferenceObject | ResponseObject): OpenAPI;
   /**
-   * [[include:openapi.addResponse.md]]
+   * {@include ../../typedocIncludes/openapi.addResponse.md}
    */
   addResponse(response: BaseOpenAPIResponseUtil | BaseResponseUtil): OpenAPI;
   addResponse(name: string | BaseOpenAPIResponseUtil | BaseResponseUtil, response?: ReferenceObject | ResponseObject): OpenAPI {
@@ -628,11 +629,11 @@ export class OpenAPI implements DocGenerator {
   }
 
   /**
-   * [[include:openapi.setSecuritySchemes.1.md]]
+   * {@include ../../typedocIncludes/openapi.setSecuritySchemes.1.md}
    */
   setSecuritySchemes(schemes: Record<string, ReferenceObject | SecuritySchemeObject>): OpenAPI;
   /**
-   * [[include:openapi.setSecuritySchemes.2.md]]
+   * {@include ../../typedocIncludes/openapi.setSecuritySchemes.2.md}
    */
   setSecuritySchemes(schemes: BaseOpenAPIAuthUtil | BaseAuthUtil): OpenAPI;
   setSecuritySchemes(
@@ -670,11 +671,11 @@ export class OpenAPI implements DocGenerator {
   }
 
   /**
-   * [[include:openapi.addSecuritySchemes.1.md]]
+   * {@include ../../typedocIncludes/openapi.addSecuritySchemes.1.md}
    */
   addSecurityScheme(name: string, schema: ReferenceObject | SecuritySchemeObject): OpenAPI;
   /**
-   * [[include:openapi.addSecuritySchemes.2.md]]
+   * {@include ../../typedocIncludes/openapi.addSecuritySchemes.2.md}
    */
   addSecurityScheme(schema: BaseOpenAPIAuthUtil | BaseAuthUtil): OpenAPI;
   addSecurityScheme(
@@ -800,10 +801,14 @@ export class OpenAPI implements DocGenerator {
 
 
   /**
-   * [[include:openapi.setDefaultSecurity.1.md]]
+   * {@include ../../typedocIncludes/openapi.setDefaultSecurity.1.md}
    */
   setDefaultSecurity(security: BaseOpenAPIAuthUtil | BaseContextAuthUtil | BaseAuthUtil): OpenAPI;
+  /**
+   * 
+   */
   setDefaultSecurity(securityObjects: SecurityRequirementObject[]): OpenAPI;
+
   /**
    * Example:
    * ```ts
@@ -813,6 +818,9 @@ export class OpenAPI implements DocGenerator {
    * ```
    */
   setDefaultSecurity(securityObject: SecurityRequirementObject): OpenAPI;
+  /**
+   * 
+   */
   setDefaultSecurity(security: string[]): OpenAPI;
   /**
    * Example:
@@ -836,7 +844,7 @@ export class OpenAPI implements DocGenerator {
   }
 
   /**
-   * [[include:openapi.addDefaultSecurity.1.md]]
+   * {@include ../../typedocIncludes/openapi.addDefaultSecurity.1.md}
    */
   addDefaultSecurity(security: BaseOpenAPIAuthUtil | BaseContextAuthUtil | BaseAuthUtil): OpenAPI;
   /**

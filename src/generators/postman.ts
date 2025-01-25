@@ -293,7 +293,7 @@ export class Postman implements DocGenerator {
    */
   setAuth(type: string, auth?: AuthAttribute[]): Postman;
   /**
-   * [[include:postman.setAuth.1.md]]
+   * {@include ../../typedocIncludes/postman.setAuth.1.md}
    */
   setAuth(auth: BasePostmanAuthUtil): Postman;
   setAuth(type: string | Auth | null | BasePostmanAuthUtil, authAttributes?: AuthAttribute[]): Postman {
@@ -371,7 +371,7 @@ export class Postman implements DocGenerator {
   }
 
   /**
-   * [[include:postman.setDefaultSecurity.1.md]]
+   * {@include ../../typedocIncludes/postman.setDefaultSecurity.1.md}
    */
   setDefaultSecurity(auth: BasePostmanAuthUtil): Postman;
   /**

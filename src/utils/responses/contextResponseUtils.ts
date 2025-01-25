@@ -9,7 +9,7 @@ import {
 import { BaseResponseUtil, IOpenAPIResponseContext, IPostmanResponseContext } from './baseResponseUtils';
 
 /**
- * [[include:responses/contextResponseUtil.md]]
+ * {@include ../../../typedocIncludes/responses/contextResponseUtil.md}
  */
 export class ContextResponseUtil extends BaseResponseUtil {
   protected responseUtil: BaseResponseUtil;

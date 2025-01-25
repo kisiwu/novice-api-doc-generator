@@ -4,8 +4,8 @@ import { Auth } from '../../generators/postman/definitions';
 import { BaseAuthUtil } from './baseAuthUtils';
 
 /**
- * [[include:auth/openapi/groupAuthUtil.md]]
- * [[include:auth/postman/groupAuthUtil.md]]
+ * {@include ../../../typedocIncludes/auth/openapi/groupAuthUtil.md}
+ * {@include ../../../typedocIncludes/auth/postman/groupAuthUtil.md}
  */
 export class GroupAuthUtil extends BaseAuthUtil {
   protected authUtils: BaseAuthUtil[] = [];

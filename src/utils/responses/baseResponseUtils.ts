@@ -42,7 +42,7 @@ export abstract class BasePostmanResponseUtil implements IPostmanResponseUtil {
 }
 
 /**
- * [[include:responses/responseUtil.md]]
+ * {@include ../../../typedocIncludes/responses/responseUtil.md}
  */
 export abstract class BaseResponseUtil 
   implements IResponseUtil {
@@ -53,7 +53,7 @@ export abstract class BaseResponseUtil
 }
 
 /**
- * [[include:responses/responseUtil.md]]
+ * {@include ../../../typedocIncludes/responses/responseUtil.md}
  */
 export abstract class FullResponseUtil extends BaseResponseUtil {
   protected name: string;
