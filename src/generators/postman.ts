@@ -46,6 +46,7 @@ interface RouteParameters {
 
   // others
   operationId?: string;
+  story?: string;
   consumes?: unknown;
   produces?: unknown;
   security?: unknown;
@@ -582,6 +583,7 @@ export class Postman implements DocGenerator {
     const auth = route.auth;
 
     const operationId = parameters.operationId;
+    const story = parameters.story;
     const undoc = parameters.undoc;
 
     const descriptionType = parameters.descriptionType || ''; // e.g. 'text/markdown'
@@ -682,11 +684,19 @@ export class Postman implements DocGenerator {
 
     if (descriptionType 
       && typeof descriptionType === 'string'
-      && typeof description === 'string') {
-      schema.description = {
-        content: description,
-        type: descriptionType
-      };
+    ) {
+      if (typeof story === 'string') {
+        schema.description = {
+          content: story,
+          type: descriptionType
+        };
+      } else if (typeof description === 'string') {
+        schema.description = {
+          content: description,
+          type: descriptionType
+        };
+      }
+      
     }
 
     if (operationId) {
