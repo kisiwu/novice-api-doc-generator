@@ -543,7 +543,8 @@ export class Postman implements DocGenerator {
     this.#result.item.forEach(loopThroughResultItem)
 
     this.#result.item = []
-    this.#folders = []
+    // call setFolders to reset folders
+    //this.#folders = []
 
     return r;
   }

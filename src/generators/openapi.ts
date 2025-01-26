@@ -51,6 +51,7 @@ interface RouteParameters {
 
   // others
   operationId?: string;
+  story?: string;
   consumes?: unknown;
   produces?: unknown;
   security?: unknown;
@@ -1152,6 +1153,7 @@ export class OpenAPI implements DocGenerator {
     const auth = route.auth;
 
     const operationId = parameters.operationId;
+    const story = parameters.story;
     const undoc = parameters.undoc;
 
     let consumes: string[] = ['application/json'];
@@ -1209,6 +1211,10 @@ export class OpenAPI implements DocGenerator {
       summary: description,
       tags: tags,
     };
+
+    if (story) {
+      schema.description = story;
+    }
 
     if (operationId) {
       schema.operationId = operationId;

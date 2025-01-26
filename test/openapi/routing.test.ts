@@ -295,6 +295,16 @@ describe('api doc', function () {
       description: 'testing purpose... again',
       tags: ['Test'],
       parameters: {
+        story: `## Test alt
+We are just testing stuff like
+\`\`\`js
+const test = new Test();
+test.run();
+\`\`\`
+1. Instanciate test
+2. Run test
+3. **Go go go!**
+`,        
         query: Joi.object({
           lang: Joi.string().example('en').meta({
             examples: {
