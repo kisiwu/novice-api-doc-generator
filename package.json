@@ -1,7 +1,7 @@
 {
   "name": "@novice1/api-doc-generator",
   "private": false,
-  "version": "0.2.8",
+  "version": "0.3.0",
   "description": "Quickly generate API Documentation.",
   "main": "lib/index.js",
   "homepage": "https://kisiwu.github.io/novice-api-doc-generator/latest/",
@@ -10,7 +10,7 @@
     "url": "git+https://github.com/kisiwu/novice-api-doc-generator.git"
   },
   "engines": {
-    "node": ">=14"
+    "node": ">=16"
   },
   "scripts": {
     "doc": "typedoc",
@@ -32,22 +32,22 @@
   ],
   "license": "MIT",
   "devDependencies": {
-    "@novice1/routing": "^1.1.7",
-    "@types/chai": "^4.3.16",
+    "@novice1/routing": "^2.0.0",
+    "@types/chai": "^5.2.1",
     "@types/extend": "^3.0.4",
     "@types/jsontoxml": "^1.0.6",
     "@types/mocha": "^10.0.10",
-    "@types/node": "^22.10.10",
-    "@typescript-eslint/eslint-plugin": "^8.21.0",
-    "@typescript-eslint/parser": "^8.21.0",
+    "@types/node": "^22.14.1",
+    "@typescript-eslint/eslint-plugin": "^8.31.0",
+    "@typescript-eslint/parser": "^8.31.0",
     "eslint": "^8.57.0",
-    "kaukau": "^4.0.0",
+    "kaukau": "^4.1.5",
     "ts-node": "^10.9.2",
-    "typedoc": "^0.27.6",
-    "typescript": "^5.7.3"
+    "typedoc": "^0.28.3",
+    "typescript": "^5.8.3"
   },
   "dependencies": {
-    "@novice1/logger": "^1.5.0",
+    "@novice1/logger": "^1.6.0",
     "extend": "^3.0.2",
     "joi": "^17.13.3",
     "jsontoxml": "^1.0.1",
