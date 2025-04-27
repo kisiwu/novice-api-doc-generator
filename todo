@@ -1,3 +1,11 @@
+notes:
+  - `npm version premajor --preid=alpha` to create an alpha version of your next major release.
+  - `npm version prerelease` to increase the version of your alpha.
+  - `npm publish --tag next` to publish your alpha version without affecting all users.
+  - `npm version major` to promote your alpha to the next major version.
+  - `npm publish --access public` to publish your next major version for all users.
+  - `npm dist-tag rm @novice1/api-doc-generator next` to remove the next tag.
+
 general:
   - readme
   - add more comment to code (properties, etc) for typedoc
@@ -24,7 +32,7 @@ var options = {
 };
 ```
 IMPORTANT:
-    - contructor argument of helpers should be an object like {root: boolean, args: unknown} so when root=true it means that args is the whole parameters object
+    - contructor argument of helpers should be an object like {isRoot?: boolean, value?: unknown} so when isRoot=true it means that args is the whole parameters object @done
 
 openapi:
   - finish todo's in generators/OpenAPI @done
