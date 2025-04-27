@@ -35,7 +35,7 @@ interface ResponsesRecord {
   [key: string]: unknown;
 }
 
-interface RouteParameters {
+interface SchemasParameters {
   // validate
   params?: Record<string, unknown>;
   body?: Record<string, unknown>;
@@ -43,7 +43,9 @@ interface RouteParameters {
   files?: Record<string, unknown>;
   headers?: Record<string, unknown>;
   cookies?: Record<string, unknown>;
+}
 
+interface RouteParameters extends SchemasParameters {
   // others
   operationId?: string;
   story?: string;
@@ -87,6 +89,8 @@ export enum GenerateFoldersRule {
   levels = 'levels'
 }
 
+export type PostmanHelperClass = { new(args: { isRoot?: boolean, value: unknown }): PostmanHelperInterface }
+
 /**
  * 
  * Postman collection generator.
@@ -100,7 +104,8 @@ export class Postman implements DocGenerator {
   #consumes: string[];
   #result: PostmanCollection;
   #security?: Auth;
-  #helperClass: { new(args: unknown): PostmanHelperInterface };
+  #helperClass: PostmanHelperClass;
+  #helperSchemaProperty?: string
 
   #responsesProperty?: string;
 
@@ -108,10 +113,11 @@ export class Postman implements DocGenerator {
   #host: string[];
   #folders: Folder[];
 
-  constructor(helperClass: { new(args: unknown): PostmanHelperInterface } = PostmanJoiHelper) {
+  constructor(options?: { helperClass?: PostmanHelperClass, helperSchemaProperty?: string }) {
     this.#consumes = [];
     this.#folders = [];
-    this.#helperClass = helperClass;
+    this.#helperClass = options?.helperClass || PostmanJoiHelper;
+    this.#helperSchemaProperty = options?.helperSchemaProperty;
     this.#host = [];
     this.#result = {
       info: {
@@ -120,15 +126,15 @@ export class Postman implements DocGenerator {
         schema: 'https://schema.getpostman.com/json/collection/v2.1.0/collection.json'
       },
       item: [],
-     /* variable: [
-        {
-          id: 'host',
-          key: 'host',
-          value: 'http://0.0.0.0',
-          type: 'string'
-        }
-      ],
-      */
+      /* variable: [
+         {
+           id: 'host',
+           key: 'host',
+           value: 'http://0.0.0.0',
+           type: 'string'
+         }
+       ],
+       */
       protocolProfileBehavior: {}
     };
   }
@@ -252,7 +258,7 @@ export class Postman implements DocGenerator {
   }
 
   addVariable(variable: Variable): Postman {
-    if(!this.#result.variable) {
+    if (!this.#result.variable) {
       this.#result.variable = [];
     }
     this.#result.variable.push(variable);
@@ -269,7 +275,7 @@ export class Postman implements DocGenerator {
   }
 
   addEvent(event: EventObject): Postman {
-    if(!this.#result.event) {
+    if (!this.#result.event) {
       this.#result.event = [];
     }
     this.#result.event.push(event);
@@ -474,7 +480,7 @@ export class Postman implements DocGenerator {
         }
       });
     });
-  
+
     return results;
   }
 
@@ -518,17 +524,17 @@ export class Postman implements DocGenerator {
 
     const removeItem = (item: Item) => {
       let path = '/'
-        const requestpath = item.request.url?.path || '/'
-        if (Array.isArray(requestpath)) {
-          path = requestpath.join('/')
-        } else if (requestpath) {
-          path = requestpath
-        }
-        r.push({
-          path: path,
-          method: item.request.method || 'GET',
-          schema: item
-        })
+      const requestpath = item.request.url?.path || '/'
+      if (Array.isArray(requestpath)) {
+        path = requestpath.join('/')
+      } else if (requestpath) {
+        path = requestpath
+      }
+      r.push({
+        path: path,
+        method: item.request.method || 'GET',
+        schema: item
+      })
     }
 
     const loopThroughResultItem = (item: Item | Folder) => {
@@ -544,7 +550,7 @@ export class Postman implements DocGenerator {
     this.#result.item.forEach(loopThroughResultItem)
 
     this.#result.item = []
- 
+
     this.#folders.forEach(f => {
       f.item = []
     })
@@ -561,9 +567,9 @@ export class Postman implements DocGenerator {
     } else {
       tmp = responses;
     }
-    if (tmp instanceof BasePostmanResponseUtil 
+    if (tmp instanceof BasePostmanResponseUtil
       || tmp instanceof BaseResponseUtil) {
-        r = tmp.toPostman();
+      r = tmp.toPostman();
     } else if (Array.isArray(tmp)) {
       r = tmp;
     }
@@ -574,8 +580,21 @@ export class Postman implements DocGenerator {
 
     const parameters = route.parameters || {};
     const responses: ResponseObject[] = this._getResponsesSchema(route.responses);
+    let schemasParameters: SchemasParameters = {};
+    if (this.#helperSchemaProperty) {
+      const tmp = parameters[this.#helperSchemaProperty]
+      if (tmp && typeof tmp === 'object') {
+        schemasParameters = tmp as Record<string, unknown>
+      }
+    } else {
+      schemasParameters = parameters
+    }
+    const parametersHelper = new this.#helperClass({ isRoot: true, value: schemasParameters });
 
-    const path = formatPath(route.path, parameters.params);
+    const path = formatPath(
+      route.path, 
+      schemasParameters.params || (parametersHelper.isValid() ? parametersHelper.getChildren().params?.getChildren() : undefined)
+    );
     const method = route.method;
     const name = route.name || '';
     const description = route.description || '';
@@ -624,21 +643,21 @@ export class Postman implements DocGenerator {
 
     // format security
     const authTypes: string[] = Object.values(AuthType);
-    if(parameters.security instanceof BasePostmanAuthUtil) {
+    if (parameters.security instanceof BasePostmanAuthUtil) {
       security = parameters.security.toPostman();
     } else if (!Array.isArray(parameters.security)) {
-      if (parameters.security 
+      if (parameters.security
         && typeof parameters.security === 'object') {
         const securityObject = parameters.security as unknown;
         const v: Record<string, unknown> = extend({}, securityObject);
         if (typeof v.type === 'string' && authTypes.find(t => t === v.type)) {
           const authType: string = v.type;
-          const vauth: Auth = {type: authType, [authType]: []};
+          const vauth: Auth = { type: authType, [authType]: [] };
           const authAttributes = v[authType];
           if (Array.isArray(authAttributes)) {
             authAttributes.forEach(attr => {
               if (typeof attr?.key === 'string') {
-                const a: AuthAttribute = {key: attr.key};
+                const a: AuthAttribute = { key: attr.key };
                 if (attr.value) {
                   a.value = attr.value;
                 }
@@ -660,7 +679,7 @@ export class Postman implements DocGenerator {
             };
           }
         }
-      } else if (parameters.security 
+      } else if (parameters.security
         && typeof parameters.security == 'string'
         && authTypes.find(t => t === parameters.security)) {
         security = { type: parameters.security };
@@ -670,7 +689,7 @@ export class Postman implements DocGenerator {
         return authTypes.includes(s);
       });
       if (authType) {
-        security = {type: authType};
+        security = { type: authType };
       }
     }
 
@@ -682,7 +701,7 @@ export class Postman implements DocGenerator {
       request: {}
     };
 
-    if (descriptionType 
+    if (descriptionType
       && typeof descriptionType === 'string'
     ) {
       if (typeof story === 'string') {
@@ -696,7 +715,7 @@ export class Postman implements DocGenerator {
           type: descriptionType
         };
       }
-      
+
     }
 
     if (operationId) {
@@ -743,15 +762,15 @@ export class Postman implements DocGenerator {
     }
 
     // format url (params, query)
-    schema.request.url= this._formatUrl(path, parameters);
+    schema.request.url = this._formatUrl(path, schemasParameters, parametersHelper);
     // format header (headers)
-    const formattedHeader = this._formatHeader(parameters, consumes);
-    if(formattedHeader.length) {
+    const formattedHeader = this._formatHeader(schemasParameters, parametersHelper, consumes);
+    if (formattedHeader.length) {
       schema.request.header = formattedHeader;
     }
     // format body (body, files)
-    const formattedBody = this._formatRequestBody(parameters, consumes);
-    if(formattedBody) {
+    const formattedBody = this._formatRequestBody(schemasParameters, parametersHelper, consumes);
+    if (formattedBody) {
       schema.request.body = formattedBody;
     }
 
@@ -771,7 +790,7 @@ export class Postman implements DocGenerator {
             }
             folders.push(tmpFolder);
           } else {
-            if(!currentFolder) {
+            if (!currentFolder) {
               tmpFolder = this.#folders.find(f => f.name === tag);
               if (!tmpFolder) {
                 tmpFolder = {
@@ -782,7 +801,7 @@ export class Postman implements DocGenerator {
               }
             } else {
               tmpFolder = <Folder | undefined>currentFolder.item.find(f => f.name === tag);
-              if(!tmpFolder) {
+              if (!tmpFolder) {
                 tmpFolder = {
                   name: tag,
                   item: []
@@ -823,7 +842,8 @@ export class Postman implements DocGenerator {
   }
 
   private _formatRequestBody(
-    parameters: RouteParameters,
+    parameters: SchemasParameters,
+    bodyHelper: PostmanHelperInterface,
     consumes: string[]
   ): RequestBodyObject | undefined {
     let res: RequestBodyObject | undefined;
@@ -834,7 +854,6 @@ export class Postman implements DocGenerator {
       this._pushRequestBody(parameters.body, parameters.files, consumes, rq);
       res = rq.toObject();
     } else {
-      const bodyHelper = new this.#helperClass(parameters);
       if (bodyHelper.isValid()) {
         const children = bodyHelper.getChildren();
         if (children.body || children.files) {
@@ -849,12 +868,12 @@ export class Postman implements DocGenerator {
   }
 
   private _formatHeader(
-    parameters: RouteParameters,
+    parameters: SchemasParameters,
+    paramsHelper: PostmanHelperInterface,
     consumes: string[]
   ): HeaderObject[] {
     const res: HeaderObject[] = [];
 
-    const paramsHelper = new this.#helperClass(parameters);
     let children: Record<string, PostmanHelperInterface> | undefined;
     if (paramsHelper.isValid()) {
       children = paramsHelper.getChildren();
@@ -869,7 +888,7 @@ export class Postman implements DocGenerator {
     }
 
     // add default Content-Type
-    if(consumes.length && !res.find(h => h.key === 'Content-Type')) {
+    if (consumes.length && !res.find(h => h.key === 'Content-Type')) {
       res.push({
         key: 'Content-Type',
         value: consumes[0]
@@ -880,31 +899,31 @@ export class Postman implements DocGenerator {
   }
 
   private _formatUrl(
-    path: string, 
-    parameters: RouteParameters
+    path: string,
+    parameters: SchemasParameters,
+    helper: PostmanHelperInterface
   ): UrlObject {
-   const url: UrlObject = {
-			host: this.#host,
-			path: path.substring(1).split('/'),
-   };
+    const url: UrlObject = {
+      host: this.#host,
+      path: path.substring(1).split('/'),
+    };
 
-   const variables = this._formatUrlVariable(parameters);
-   if (variables.length) {
-     url.variable = variables;
-   }
+    const variables = this._formatUrlVariable(parameters, helper);
+    if (variables.length) {
+      url.variable = variables;
+    }
 
-   const queryParams = this._formatUrlQuery(parameters);
-   if (queryParams.length) {
-     url.query = queryParams;
-   }
+    const queryParams = this._formatUrlQuery(parameters, helper);
+    if (queryParams.length) {
+      url.query = queryParams;
+    }
 
-   return url;
+    return url;
   }
 
-  private _formatUrlVariable(parameters: RouteParameters): Variable[] {
+  private _formatUrlVariable(parameters: SchemasParameters, paramsHelper: PostmanHelperInterface): Variable[] {
     const res: Variable[] = [];
 
-    const paramsHelper = new this.#helperClass(parameters);
     let children: Record<string, PostmanHelperInterface> | undefined;
     if (paramsHelper.isValid()) {
       children = paramsHelper.getChildren();
@@ -922,11 +941,10 @@ export class Postman implements DocGenerator {
   }
 
   // format parameters methods
-  private _formatUrlQuery(parameters: RouteParameters): QueryParam[] {
+  private _formatUrlQuery(parameters: SchemasParameters, paramsHelper: PostmanHelperInterface): QueryParam[] {
     // format parameters
     const res: QueryParam[] = [];
 
-    const paramsHelper = new this.#helperClass(parameters);
     let children: Record<string, PostmanHelperInterface> | undefined;
     if (paramsHelper.isValid()) {
       children = paramsHelper.getChildren();
@@ -953,7 +971,7 @@ export class Postman implements DocGenerator {
 
     if (body) {
       Log.debug('handle body');
-      const bodyHelper = body instanceof this.#helperClass ? body : new this.#helperClass(body);
+      const bodyHelper = body instanceof this.#helperClass ? body : new this.#helperClass({ value: body });
       if (bodyHelper.isValid()) {
         res.setFieldsBody(bodyHelper);
         if (bodyHelper.getType() === 'object') {
@@ -975,7 +993,7 @@ export class Postman implements DocGenerator {
       } else if (!(body instanceof this.#helperClass)) {
         Object.keys(body).forEach(
           name => {
-            const childHelper = new this.#helperClass(body[name]);
+            const childHelper = new this.#helperClass({ value: body[name] });
             if (!childHelper.isValid()) {
               return;
             }
@@ -987,9 +1005,9 @@ export class Postman implements DocGenerator {
 
     if (files && !res.hasBody()) {
       Log.debug('handle files');
-      const filesHelper = files instanceof this.#helperClass ? files : new this.#helperClass(files);
+      const filesHelper = files instanceof this.#helperClass ? files : new this.#helperClass({ value: files });
       if (filesHelper.isValid()) {
-        if(!res.hasFieldsBody()) {
+        if (!res.hasFieldsBody()) {
           res.setFieldsBody(filesHelper);
         }
         if (!res.hasFields() && filesHelper.getType() !== 'object') {
@@ -1012,7 +1030,7 @@ export class Postman implements DocGenerator {
       } else if (!(files instanceof this.#helperClass)) {
         Object.keys(files).forEach(
           name => {
-            const childHelper = new this.#helperClass(files[name]);
+            const childHelper = new this.#helperClass({ value: files[name] });
             if (!childHelper.isValid()) {
               return;
             }
@@ -1025,7 +1043,7 @@ export class Postman implements DocGenerator {
 
     res.setRequired(contentIsRequired);
 
-    if(consumes.length && !res.getMode()) {
+    if (consumes.length && !res.getMode()) {
       res.setFormat(consumes[0]);
     }
   }
@@ -1033,7 +1051,7 @@ export class Postman implements DocGenerator {
   private _pushHeader(
     value: Record<string, unknown> | PostmanHelperInterface,
     res: HeaderObject[]) {
-    const valueHelper = value instanceof this.#helperClass ? value : new this.#helperClass(value);
+    const valueHelper = value instanceof this.#helperClass ? value : new this.#helperClass({ value });
 
     let children: Record<string, PostmanHelperInterface>;
     if (valueHelper.isValid()) {
@@ -1054,7 +1072,7 @@ export class Postman implements DocGenerator {
       if (value instanceof this.#helperClass) {
         return;
       }
-      return new this.#helperClass(value[name]);
+      return new this.#helperClass({ value: value[name] });
     };
 
     const handleChild = (
@@ -1064,20 +1082,20 @@ export class Postman implements DocGenerator {
 
       let value = '';
 
-      if(helper.hasDefaultValue()) {
+      if (helper.hasDefaultValue()) {
         const defaultValue = helper.getDefaultValue();
         if (typeof defaultValue === 'string') {
           value = defaultValue;
-        } else if(defaultValue && typeof defaultValue === 'object'){
+        } else if (defaultValue && typeof defaultValue === 'object') {
           value = JSON.stringify(defaultValue);
         } else {
           value = `${defaultValue}`;
         }
-      } else if(helper.hasExampleValue()) {
+      } else if (helper.hasExampleValue()) {
         const exampleValue = helper.getExampleValue();
         if (typeof exampleValue === 'string') {
           value = exampleValue;
-        } else if(exampleValue && typeof exampleValue === 'object'){
+        } else if (exampleValue && typeof exampleValue === 'object') {
           value = JSON.stringify(exampleValue);
         } else {
           value = `${exampleValue}`;
@@ -1091,7 +1109,7 @@ export class Postman implements DocGenerator {
         value
       };
 
-      const description: string = helper.getDescription(); 
+      const description: string = helper.getDescription();
       const unit: string = helper.getUnit();
 
       if (description) {
@@ -1100,11 +1118,11 @@ export class Postman implements DocGenerator {
         };
         if (helper.hasDescriptionType?.()
           && helper.getDescriptionType) {
-            header.description.type = helper.getDescriptionType();
-        } else if(unit) {
+          header.description.type = helper.getDescriptionType();
+        } else if (unit) {
           header.description.content = `${description} (${unit})`;
         }
-      } else if(unit) {
+      } else if (unit) {
         header.description = `(${unit})`;
       }
 
@@ -1131,7 +1149,7 @@ export class Postman implements DocGenerator {
     res: Variable[]) {
 
     const VALID_VARIABLE_TYPES = ['string', 'boolean', 'any', 'number'];
-    const valueHelper = value instanceof this.#helperClass ? value : new this.#helperClass(value);
+    const valueHelper = value instanceof this.#helperClass ? value : new this.#helperClass({ value });
 
     let children: Record<string, PostmanHelperInterface>;
     if (valueHelper.isValid()) {
@@ -1152,7 +1170,7 @@ export class Postman implements DocGenerator {
       if (value instanceof this.#helperClass) {
         return;
       }
-      return new this.#helperClass(value[name]);
+      return new this.#helperClass({ value: value[name] });
     };
 
     const handleChild = (
@@ -1211,7 +1229,7 @@ export class Postman implements DocGenerator {
   private _pushQueryParam(
     value: Record<string, unknown> | PostmanHelperInterface,
     res: QueryParam[]) {
-    const valueHelper = value instanceof this.#helperClass ? value : new this.#helperClass(value);
+    const valueHelper = value instanceof this.#helperClass ? value : new this.#helperClass({ value });
 
     let children: Record<string, PostmanHelperInterface>;
     if (valueHelper.isValid()) {
@@ -1232,7 +1250,7 @@ export class Postman implements DocGenerator {
       if (value instanceof this.#helperClass) {
         return;
       }
-      return new this.#helperClass(value[name]);
+      return new this.#helperClass({ value: value[name] });
     };
 
     const handleChild = (
@@ -1244,7 +1262,7 @@ export class Postman implements DocGenerator {
         key
       };
 
-      const description: string = helper.getDescription(); 
+      const description: string = helper.getDescription();
       const unit: string = helper.getUnit();
 
       if (description) {
@@ -1254,10 +1272,10 @@ export class Postman implements DocGenerator {
         if (helper.hasDescriptionType?.()
           && helper.getDescriptionType) {
           queryParam.description.type = helper.getDescriptionType();
-        } else if(unit) {
+        } else if (unit) {
           queryParam.description.content = `${description} (${unit})`;
         }
-      } else if(unit) {
+      } else if (unit) {
         queryParam.description = `(${unit})`;
       }
 
@@ -1265,20 +1283,20 @@ export class Postman implements DocGenerator {
         queryParam.disabled = true;
       }
 
-      if(helper.hasDefaultValue()) {
+      if (helper.hasDefaultValue()) {
         const defaultValue = helper.getDefaultValue();
         if (typeof defaultValue === 'string') {
           queryParam.value = defaultValue;
-        } else if(defaultValue && typeof defaultValue === 'object'){
+        } else if (defaultValue && typeof defaultValue === 'object') {
           queryParam.value = JSON.stringify(defaultValue);
         } else {
           queryParam.value = `${defaultValue}`;
         }
-      } else if(helper.hasExampleValue()) {
+      } else if (helper.hasExampleValue()) {
         const exampleValue = helper.getExampleValue();
         if (typeof exampleValue === 'string') {
           queryParam.value = exampleValue;
-        } else if(exampleValue && typeof exampleValue === 'object'){
+        } else if (exampleValue && typeof exampleValue === 'object') {
           queryParam.value = JSON.stringify(exampleValue);
         } else {
           queryParam.value = `${exampleValue}`;

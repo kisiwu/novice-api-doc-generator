@@ -315,7 +315,7 @@ describe('api doc testpostman', function () {
 
     // uncomment to test locally
     /*
-    const wStream = fs.createWriteStream('private/postman.json', { flags: 'w+' });
+    const wStream = fs.createWriteStream('private/postman4.json', { flags: 'w+' });
     wStream.write(JSON.stringify(result, null, ' '), (err: unknown) => {
       if (err) {
         logger.error(err);

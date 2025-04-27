@@ -55,7 +55,7 @@ export function formatPath(path: string, params?: Record<string, unknown>): stri
       path = '';
 
       while (pos > -1) {
-        const fromParamPath: string = pathEnd.substr(pos + 2);
+        const fromParamPath: string = pathEnd.substring(pos + 2);
         const endPos: number = fromParamPath.indexOf('/');
 
         // path param name

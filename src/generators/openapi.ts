@@ -40,7 +40,7 @@ interface ResponsesRecord {
   [key: string]: ResponseObject | ReferenceObject;
 }
 
-interface RouteParameters {
+interface SchemasParameters {
   // validate
   params?: Record<string, unknown>;
   body?: Record<string, unknown>;
@@ -48,7 +48,9 @@ interface RouteParameters {
   files?: Record<string, unknown>;
   headers?: Record<string, unknown>;
   cookies?: Record<string, unknown>;
+}
 
+interface RouteParameters extends SchemasParameters {
   // others
   operationId?: string;
   story?: string;
@@ -89,6 +91,8 @@ export enum GenerateComponentsRule {
   never = 'never',
 }
 
+export type OpenAPIHelperClass = { new(args: { isRoot?: boolean, value: unknown }): OpenAPIHelperInterface }
+
 /**
  * OpenAPI doc generator.
  * 
@@ -104,14 +108,16 @@ export class OpenAPI implements DocGenerator {
   #consumes: string[];
   #result: OpenAPIResult;
   #security: SecurityRequirementObject[];
-  #helperClass: { new(args: unknown): OpenAPIHelperInterface };
+  #helperClass: OpenAPIHelperClass;
+  #helperSchemaProperty?: string
 
   #responsesProperty?: string;
   #generateComponentsRule = GenerateComponentsRule.always;
 
-  constructor(helperClass: { new(args: unknown): OpenAPIHelperInterface } = OpenAPIJoiHelper) {
+  constructor(options?: { helperClass?: OpenAPIHelperClass, helperSchemaProperty?: string }) {
     this.#consumes = [];
-    this.#helperClass = helperClass;
+    this.#helperClass = options?.helperClass || OpenAPIJoiHelper;
+    this.#helperSchemaProperty = options?.helperSchemaProperty;
     this.#result = {
       openapi: '3.0.0',
       info: {
@@ -598,12 +604,12 @@ export class OpenAPI implements DocGenerator {
     if (!this.#result.components.responses) {
       this.#result.components.responses = {};
     }
-    if (name instanceof BaseOpenAPIResponseUtil 
+    if (name instanceof BaseOpenAPIResponseUtil
       || name instanceof BaseResponseUtil) {
-        this.#result.components.responses = extend(
-          this.#result.components.responses,
-          name.toOpenAPI());
-    } else if (response){
+      this.#result.components.responses = extend(
+        this.#result.components.responses,
+        name.toOpenAPI());
+    } else if (response) {
       this.#result.components.responses[name] = response;
     }
     return this;
@@ -680,7 +686,7 @@ export class OpenAPI implements DocGenerator {
    */
   addSecurityScheme(schema: BaseOpenAPIAuthUtil | BaseAuthUtil): OpenAPI;
   addSecurityScheme(
-    name: BaseOpenAPIAuthUtil | BaseAuthUtil | string, 
+    name: BaseOpenAPIAuthUtil | BaseAuthUtil | string,
     schema?: ReferenceObject | SecuritySchemeObject): OpenAPI {
     if (!this.#result.components.securitySchemes) {
       this.#result.components.securitySchemes = {};
@@ -835,7 +841,7 @@ export class OpenAPI implements DocGenerator {
     if (v instanceof BaseContextAuthUtil
       || v instanceof BaseOpenAPIAuthUtil
       || v instanceof BaseAuthUtil) {
-        this.#security = v.toOpenAPISecurity();
+      this.#security = v.toOpenAPISecurity();
     } else if (Array.isArray(v)) {
       v.forEach((value: SecurityRequirementObject | string) => this.addDefaultSecurity(value));
     } else {
@@ -878,8 +884,8 @@ export class OpenAPI implements DocGenerator {
       if (v instanceof BaseContextAuthUtil
         || v instanceof BaseOpenAPIAuthUtil
         || v instanceof BaseAuthUtil) {
-          this.#security.push(...v.toOpenAPISecurity());
-      } else if(typeof v === 'string') {
+        this.#security.push(...v.toOpenAPISecurity());
+      } else if (typeof v === 'string') {
         this.#security.push({
           [v]: []
         });
@@ -1017,7 +1023,7 @@ export class OpenAPI implements DocGenerator {
       this.#result.externalDocs = externalDoc;
     }
     return this;
-  } 
+  }
 
   getExternalDoc(): ExternalDocObject | undefined {
     return this.#result.externalDocs;
@@ -1076,7 +1082,7 @@ export class OpenAPI implements DocGenerator {
         }
       });
     });
-  
+
     return results;
   }
 
@@ -1132,9 +1138,9 @@ export class OpenAPI implements DocGenerator {
     } else {
       tmp = responses;
     }
-    if (tmp instanceof BaseOpenAPIResponseUtil 
+    if (tmp instanceof BaseOpenAPIResponseUtil
       || tmp instanceof BaseResponseUtil) {
-        r = tmp.toOpenAPI();
+      r = tmp.toOpenAPI();
     } else if (tmp && typeof tmp === 'object') {
       r = extend(true, r, tmp);
     }
@@ -1145,8 +1151,21 @@ export class OpenAPI implements DocGenerator {
 
     const parameters = route.parameters || {};
     const responses = this._getResponsesSchema(route.responses);
+    let schemasParameters: SchemasParameters = {};
+    if (this.#helperSchemaProperty) {
+      const tmp = parameters[this.#helperSchemaProperty]
+      if (tmp && typeof tmp === 'object') {
+        schemasParameters = tmp as Record<string, unknown>
+      }
+    } else {
+      schemasParameters = parameters
+    }
+    const parametersHelper = new this.#helperClass({ isRoot: true, value: schemasParameters });
 
-    const path = formatPath(route.path, parameters.params);
+    const path = formatPath(
+      route.path, 
+      schemasParameters.params || (parametersHelper.isValid() ? parametersHelper.getChildren().params?.getChildren() : undefined)
+    );
     const method = route.method;
     const description = route.description || '';
     const tags = route.tags || [];
@@ -1230,8 +1249,8 @@ export class OpenAPI implements DocGenerator {
     }
 
     // format parameters, requestBody, responses
-    const formattedParameters: (ParameterObject | ReferenceObject)[] = this._formatParameters(parameters);
-    const formattedRequestBody: RequestBodyObject = this._formatRequestBody(parameters, consumes);
+    const formattedParameters: (ParameterObject | ReferenceObject)[] = this._formatParameters(schemasParameters, parametersHelper);
+    const formattedRequestBody: RequestBodyObject = this._formatRequestBody(schemasParameters, parametersHelper, consumes);
     schema.responses = this._formatResponses(responses);
 
     if (formattedRequestBody && Object.keys(formattedRequestBody).length) {
@@ -1269,11 +1288,10 @@ export class OpenAPI implements DocGenerator {
   }
 
   // format parameters methods
-  private _formatParameters(parameters: RouteParameters): (ParameterObject | ReferenceObject)[] {
+  private _formatParameters(parameters: SchemasParameters, paramsHelper: OpenAPIHelperInterface): (ParameterObject | ReferenceObject)[] {
     // format parameters
     const res: (ParameterObject | ReferenceObject)[] = [];
 
-    const paramsHelper = new this.#helperClass(parameters);
     let children: Record<string, OpenAPIHelperInterface> | undefined;
     if (paramsHelper.isValid()) {
       children = paramsHelper.getChildren();
@@ -1321,7 +1339,7 @@ export class OpenAPI implements DocGenerator {
     location: ParameterLocation,
     value: Record<string, unknown> | OpenAPIHelperInterface,
     res: Array<ReferenceObject | ParameterObject>) {
-    const valueHelper = value instanceof this.#helperClass ? value : new this.#helperClass(value);
+    const valueHelper = value instanceof this.#helperClass ? value : new this.#helperClass({ value });
     let valueHelperType: string | undefined;
 
     let children: Record<string, OpenAPIHelperInterface>;
@@ -1344,7 +1362,7 @@ export class OpenAPI implements DocGenerator {
       if (value instanceof this.#helperClass) {
         return;
       }
-      return new this.#helperClass(value[name]);
+      return new this.#helperClass({ value: value[name] });
     };
 
     const handleChild = (
@@ -1474,7 +1492,7 @@ export class OpenAPI implements DocGenerator {
   }
 
   // format body methods
-  private _formatRequestBody(parameters: RouteParameters, consumes: string[]) {
+  private _formatRequestBody(parameters: SchemasParameters, bodyHelper: OpenAPIHelperInterface, consumes: string[]) {
     // format body
     let res: RequestBodyObject = {};
 
@@ -1483,7 +1501,6 @@ export class OpenAPI implements DocGenerator {
       Log.debug('handle body and/or files');
       this._pushRequestBody(parameters.body, parameters.files, consumes, res);
     } else {
-      const bodyHelper = new this.#helperClass(parameters);
       if (bodyHelper.isValid()) {
         const children = bodyHelper.getChildren();
         if (children.body || children.files) {
@@ -1518,7 +1535,7 @@ export class OpenAPI implements DocGenerator {
 
     if (body) {
       Log.debug('handle body');
-      const bodyHelper = body instanceof this.#helperClass ? body : new this.#helperClass(body);
+      const bodyHelper = body instanceof this.#helperClass ? body : new this.#helperClass({ value: body });
       if (bodyHelper.isValid()) {
         bodySchema = this._createSchema(bodyHelper);
         if (this._getLocalRef(bodyHelper)) {
@@ -1541,7 +1558,7 @@ export class OpenAPI implements DocGenerator {
         });
         Object.keys(body).forEach(
           name => {
-            const childHelper = new this.#helperClass(body[name]);
+            const childHelper = new this.#helperClass({ value: body[name] });
             if (!childHelper.isValid()) {
               return;
             }
@@ -1560,7 +1577,7 @@ export class OpenAPI implements DocGenerator {
 
     if (files && (!schemaObject || bodySchema?.isType('object'))) {
       Log.debug('handle files');
-      const filesHelper = files instanceof this.#helperClass ? files : new this.#helperClass(files);
+      const filesHelper = files instanceof this.#helperClass ? files : new this.#helperClass({ value: files });
 
       // mix with bodySchema or create new
       const prop = bodySchema || new SchemaCreator({
@@ -1605,7 +1622,7 @@ export class OpenAPI implements DocGenerator {
       } else if (!(files instanceof this.#helperClass)) {
         Object.keys(files).forEach(
           name => {
-            const childHelper = new this.#helperClass(files[name]);
+            const childHelper = new this.#helperClass({ value: files[name] });
             if (!childHelper.isValid()) {
               return;
             }

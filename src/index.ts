@@ -27,7 +27,8 @@ export {
 export {
   OpenAPI,
   OpenAPIResult,
-  GenerateComponentsRule
+  GenerateComponentsRule,
+  OpenAPIHelperClass
 } from './generators/openapi';
 export {
   OpenAPIHelperInterface
@@ -35,7 +36,8 @@ export {
 export {
   Postman,
   PostmanCollection,
-  GenerateFoldersRule
+  GenerateFoldersRule,
+  PostmanHelperClass
 } from './generators/postman';
 export {
   PostmanHelperInterface
