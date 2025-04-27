@@ -23,6 +23,9 @@ var options = {
     stopNodes: ["parse-me-as-string"]
 };
 ```
+IMPORTANT:
+    - contructor argument of helpers should be an object like {root: boolean, args: unknown} so when root=true it means that args is the whole parameters object
+
 openapi:
   - finish todo's in generators/OpenAPI @done
   - doc auth methods @done
