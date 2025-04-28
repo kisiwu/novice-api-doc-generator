@@ -93,6 +93,8 @@ export enum GenerateComponentsRule {
 
 export type OpenAPIHelperClass = { new(args: { isRoot?: boolean, value: unknown }): OpenAPIHelperInterface }
 
+export type OpenAPIOptions = { helperClass?: OpenAPIHelperClass, helperSchemaProperty?: string }
+
 /**
  * OpenAPI doc generator.
  * 
@@ -114,7 +116,7 @@ export class OpenAPI implements DocGenerator {
   #responsesProperty?: string;
   #generateComponentsRule = GenerateComponentsRule.always;
 
-  constructor(options?: { helperClass?: OpenAPIHelperClass, helperSchemaProperty?: string }) {
+  constructor(options?: OpenAPIOptions) {
     this.#consumes = [];
     this.#helperClass = options?.helperClass || OpenAPIJoiHelper;
     this.#helperSchemaProperty = options?.helperSchemaProperty;

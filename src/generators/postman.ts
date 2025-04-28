@@ -91,6 +91,8 @@ export enum GenerateFoldersRule {
 
 export type PostmanHelperClass = { new(args: { isRoot?: boolean, value: unknown }): PostmanHelperInterface }
 
+export type PostmanOptions = { helperClass?: PostmanHelperClass, helperSchemaProperty?: string }
+
 /**
  * 
  * Postman collection generator.
@@ -113,7 +115,7 @@ export class Postman implements DocGenerator {
   #host: string[];
   #folders: Folder[];
 
-  constructor(options?: { helperClass?: PostmanHelperClass, helperSchemaProperty?: string }) {
+  constructor(options?: PostmanOptions) {
     this.#consumes = [];
     this.#folders = [];
     this.#helperClass = options?.helperClass || PostmanJoiHelper;
