@@ -261,9 +261,9 @@ import {
   CustomPostmanHelperClass
 } from './custom';
 
-const openapi = new OpenAPI(CustomOpenAPIHelperClass);
+const openapi = new OpenAPI({ helperClass: CustomOpenAPIHelperClass });
 
-const postman = new Postman(CustomPostmanHelperClass);
+const postman = new Postman({ helperClass: CustomPostmanHelperClass });
 ```
 
 ## Utils
