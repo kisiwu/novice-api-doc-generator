@@ -12,12 +12,12 @@ import {
   GroupAuth
 } from '../testutils';
 
-describe('api doc', function () {
+describe('api doc (helper class property)', function () {
   const { logger } = this.ctx.kaukau;
 
   it('oas doc', () => {
     // generator
-    const openapi = new OpenAPI();
+    const openapi = new OpenAPI({ helperSchemaProperty: 'joiSchema' });
     openapi
       .setTitle('api doc')
       .setHost('http://test.kaukau.tst')
@@ -147,107 +147,110 @@ describe('api doc', function () {
         })
         .required(),
       },*/
-      parameters: Joi.object({
-        query: Joi.object().keys({
-          obj: Joi.object()
-            .keys({
-              ele: Joi.string().example('slow flow').required(),
-              customPlus: Joi.object().keys({
-                id: Joi.number().integer().required().example(6),
-                custom: Joi.object().keys({
-                  lava: Joi.string().description('thunder').required().example('ewf'),
-                  lamp: Joi.binary().description('cat')
-                }).description('shark'),
-                email: Joi.string().email().required(),
-                password: Joi.string().meta({format: 'password'}).example('pass'),
-                timestamp: Joi.date().meta({format: 'datetime'}).min(new Date(0)),
-              }).meta({
-                ref: '#/components/schemas/CustomPlus'
-              }),
-              tokenTwo: Joi.array()
+      parameters: {
+        joiSchema: Joi.object({
+        
+          query: Joi.object().keys({
+            obj: Joi.object()
+              .keys({
+                ele: Joi.string().example('slow flow').required(),
+                customPlus: Joi.object().keys({
+                  id: Joi.number().integer().required().example(6),
+                  custom: Joi.object().keys({
+                    lava: Joi.string().description('thunder').required().example('ewf'),
+                    lamp: Joi.binary().description('cat')
+                  }).description('shark'),
+                  email: Joi.string().email().required(),
+                  password: Joi.string().meta({format: 'password'}).example('pass'),
+                  timestamp: Joi.date().meta({format: 'datetime'}).min(new Date(0)),
+                }).meta({
+                  ref: '#/components/schemas/CustomPlus'
+                }),
+                tokenTwo: Joi.array()
+                .items(Joi.number())
+                .description('token to be passed as a header')
+                .example([128, 256])
+                .meta({
+                  ref: '#/components/schemas/RandomTokenCooks'
+                })
+              })
+              .description('obj')
+              .meta({
+                //ref: '#/components/schemas/Couwery'
+                ref: '#/components/parameters/Couwery'
+              })
+          }),
+          cookies: {
+            token: Joi.array()
               .items(Joi.number())
               .description('token to be passed as a header')
+              .required()
               .example([128, 256])
               .meta({
                 ref: '#/components/schemas/RandomTokenCooks'
               })
-            })
-            .description('obj')
-            .meta({
-              //ref: '#/components/schemas/Couwery'
-              ref: '#/components/parameters/Couwery'
-            })
-        }),
-        cookies: {
-          token: Joi.array()
-            .items(Joi.number())
-            .description('token to be passed as a header')
-            .required()
-            .example([128, 256])
-            .meta({
-              ref: '#/components/schemas/RandomTokenCooks'
-            })
-        },
-        body: Joi.object().keys({
-          id: Joi.number().integer().required().example(6),
-          custom: Joi.object().keys({
-            lava: Joi.string().description('thunder').required().example('ewf'),
-            lamp: Joi.binary().description('cat')
-          }).description('shark'),
-          email: Joi.string().email().required(),
-          password: Joi.string().meta({format: 'password'}).example('pass'),
-          timestamp: Joi.date().meta({format: 'datetime'}).min(new Date(0)),
-          versions: Joi.array().items(
-            Joi.number()
-            .description('version number').example(4).positive()
-          ).meta({
-            ref: '#/components/schemas/Versions',
-            allowReserved: false,
-            explode: true,
-            encoding: {
-              headers: {
-                'X-Rate-Limit-Limit': {
-                  description: 'The number of allowed requests in the current period',
-                  schema: {
-                    type: 'integer'
+          },
+          body: Joi.object().keys({
+            id: Joi.number().integer().required().example(6),
+            custom: Joi.object().keys({
+              lava: Joi.string().description('thunder').required().example('ewf'),
+              lamp: Joi.binary().description('cat')
+            }).description('shark'),
+            email: Joi.string().email().required(),
+            password: Joi.string().meta({format: 'password'}).example('pass'),
+            timestamp: Joi.date().meta({format: 'datetime'}).min(new Date(0)),
+            versions: Joi.array().items(
+              Joi.number()
+              .description('version number').example(4).positive()
+            ).meta({
+              ref: '#/components/schemas/Versions',
+              allowReserved: false,
+              explode: true,
+              encoding: {
+                headers: {
+                  'X-Rate-Limit-Limit': {
+                    description: 'The number of allowed requests in the current period',
+                    schema: {
+                      type: 'integer'
+                    }
                   }
                 }
-              }
+              },
+              deprecated: true,
+              style: 'form'
+            }).example([8,9])
+            //.example({$ref: '#/components/examples/Versions'})
+            .max(2)
+            .description('version numbers')
+            .single()
+            .unique()
+          }).description('anything description').meta({
+            additionalProperties: {
+              type: 'number'
             },
-            deprecated: true,
-            style: 'form'
-          }).example([8,9])
-          //.example({$ref: '#/components/examples/Versions'})
-          .max(2)
-          .description('version numbers')
-          .single()
-          .unique()
-        }).description('anything description').meta({
-          additionalProperties: {
-            type: 'number'
-          },
-          ref: '#/components/schemas/Mikamika'
+            ref: '#/components/schemas/Mikamika'
+          })
+          .max(10).unknown(true),
+          files: Joi.object()
+          .keys({
+            file: Joi.array()
+              .items(
+                Joi.object()
+                  .keys({
+                    mimetype: Joi.string()
+                      .required(),
+                  })
+                  .options({ stripUnknown: false, allowUnknown: true })
+              )
+              .length(1)
+              .description('File to upload')
+              .required(),
+          })
+          .required(),
+        }).description('Damn my G').meta({
+          ref: '#/components/requestBodies/AppBody'
         })
-        .max(10).unknown(true),
-        files: Joi.object()
-        .keys({
-          file: Joi.array()
-            .items(
-              Joi.object()
-                .keys({
-                  mimetype: Joi.string()
-                    .required(),
-                })
-                .options({ stripUnknown: false, allowUnknown: true })
-            )
-            .length(1)
-            .description('File to upload')
-            .required(),
-        })
-        .required(),
-      }).description('Damn my G').meta({
-        ref: '#/components/requestBodies/AppBody'
-      }),
+      },
       path: '/app',
       responses: GroupCtxtResponse
       /*
@@ -305,47 +308,49 @@ test.run();
 2. Run test
 3. **Go go go!**
 `,        
-        query: Joi.object({
-          lang: Joi.string().example('en').meta({
-            examples: {
-              'simple-lang': {
-                $ref: '#/components/examples/simple-lang-example'
-              },
-              'lang-country': {
-                $ref: '#/components/examples/lang-country-example'
+        joiSchema: {
+          query: Joi.object({
+            lang: Joi.string().example('en').meta({
+              examples: {
+                'simple-lang': {
+                  $ref: '#/components/examples/simple-lang-example'
+                },
+                'lang-country': {
+                  $ref: '#/components/examples/lang-country-example'
+                }
+              }
+            })
+          }),
+          body: Joi.alternatives().try(
+            Joi.object().keys({
+              type: Joi.string()//.valid('sheep').required()
+              .description('type of animal'),
+              size: Joi.number().positive().unit('cm')
+            }).description('Sheep')
+            .meta({
+              ref: '#/components/schemas/Sheep'
+            }),
+            Joi.object().keys({
+              type: Joi.string()//.valid('dog').required()
+              .description('type of animal'),
+              size: Joi.number().positive().unit('cm')
+            }).description('Dog')
+            .meta({
+              ref: '#/components/schemas/Dog'
+            })
+          ).required()
+          .description('Animal')
+          .meta({
+            ref: '#/components/schemas/Wanimal',
+            discriminator: {
+              propertyName: 'type',
+              mapping: {
+                dog: '#/components/schemas/Dog',
+                sheep: '#/components/schemas/Sheep'
               }
             }
           })
-        }),
-        body: Joi.alternatives().try(
-          Joi.object().keys({
-            type: Joi.string()//.valid('sheep').required()
-            .description('type of animal'),
-            size: Joi.number().positive().unit('cm')
-          }).description('Sheep')
-          .meta({
-            ref: '#/components/schemas/Sheep'
-          }),
-          Joi.object().keys({
-            type: Joi.string()//.valid('dog').required()
-            .description('type of animal'),
-            size: Joi.number().positive().unit('cm')
-          }).description('Dog')
-          .meta({
-            ref: '#/components/schemas/Dog'
-          })
-        ).required()
-        .description('Animal')
-        .meta({
-          ref: '#/components/schemas/Wanimal',
-          discriminator: {
-            propertyName: 'type',
-            mapping: {
-              dog: '#/components/schemas/Dog',
-              sheep: '#/components/schemas/Sheep'
-            }
-          }
-        }),
+        },
         consumes: 'application/json',
       },
       path: '/app/alternatives',
@@ -357,7 +362,8 @@ test.run();
       description: 'testing purpose... again',
       tags: ['Test'],
       parameters: {
-        body: Joi.object()
+        joiSchema: {
+          body: Joi.object()
           .keys({
             id: Joi.number()
             .meta({
@@ -398,7 +404,8 @@ test.run();
                 }
               }
             }
-          }),
+          })
+        },
         consumes: 'application/xml',
         security: GroupCtxtAuth,
       },
@@ -421,7 +428,7 @@ test.run();
 
     // uncomment to test locally
     /*
-    const wStream = fs.createWriteStream('private/openapi4.json', { flags: 'w+' });
+    const wStream = fs.createWriteStream('private/openapi4-prop.json', { flags: 'w+' });
     wStream.write(JSON.stringify(result, null, ' '), (err: unknown) => {
       if (err) {
         logger.error(err);

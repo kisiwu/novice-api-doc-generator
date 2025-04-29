@@ -7,11 +7,12 @@ export class OpenAPIJoiHelper extends JoiHelper implements OpenAPIHelperInterfac
     if (!this.isJoi()) {
       return;
     }
+
     let r: OpenAPIJoiHelper | undefined;
     if (this._joi.$_terms
       && this._joi.$_terms.items
       && this._joi.$_terms.items[0]) {
-      r = new OpenAPIJoiHelper(this._joi.$_terms.items[0]);
+      r = new OpenAPIJoiHelper({ value: this._joi.$_terms.items[0] });
     }
     return r;
   }
@@ -24,7 +25,7 @@ export class OpenAPIJoiHelper extends JoiHelper implements OpenAPIHelperInterfac
     if (this._joi.$_terms
       && this._joi.$_terms.keys && this._joi.$_terms.keys.length) {
       this._joi.$_terms.keys.forEach(
-        (c: { key: string, schema?: Record<string, JoiSchema> }) => r[c.key] = new OpenAPIJoiHelper(c.schema));
+        (c: { key: string, schema?: Record<string, JoiSchema> }) => r[c.key] = new OpenAPIJoiHelper({ value: c.schema }));
     }
     return r;
   }
@@ -37,9 +38,9 @@ export class OpenAPIJoiHelper extends JoiHelper implements OpenAPIHelperInterfac
     if (this._joi.$_terms
       && this._joi.$_terms.matches && this._joi.$_terms.matches.length) {
       this._joi.$_terms.matches.forEach(
-        (c: {schema?: JoiSchema;}) => {
-          if(c.schema) {
-            r.push(new OpenAPIJoiHelper(c.schema))
+        (c: { schema?: JoiSchema; }) => {
+          if (c.schema) {
+            r.push(new OpenAPIJoiHelper({ value: c.schema }))
           }
         }
       );
@@ -75,8 +76,8 @@ export class OpenAPIJoiHelper extends JoiHelper implements OpenAPIHelperInterfac
     return this._joi['$_terms']
       && this._joi['$_terms'].metas
       && this._joi['$_terms'].metas[0]
-      && (typeof this._joi['$_terms'].metas[0].additionalProperties === 'boolean' 
-        || (this._joi['$_terms'].metas[0].additionalProperties 
+      && (typeof this._joi['$_terms'].metas[0].additionalProperties === 'boolean'
+        || (this._joi['$_terms'].metas[0].additionalProperties
           && typeof this._joi['$_terms'].metas[0].additionalProperties === 'object'))
       ? true : false;
   }

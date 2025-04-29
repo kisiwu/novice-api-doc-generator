@@ -42,9 +42,11 @@ export type JoiSchema = Partial<Schema> & {
 
 export class JoiHelper implements BaseHelperInterface {
   protected _joi: JoiSchema;
+  protected isRoot: boolean;
 
-  constructor(joiObject: JoiSchema | unknown = {}) {
-    this._joi = joiObject && typeof joiObject === 'object' ? joiObject : {};
+  constructor({ isRoot, value = {} }: { isRoot?: boolean, value?: JoiSchema | unknown }) {
+    this.isRoot = isRoot || false
+    this._joi = value && typeof value === 'object' ? value : {};
   }
 
   protected isJoi(): boolean {
@@ -58,7 +60,7 @@ export class JoiHelper implements BaseHelperInterface {
     if (!this.isJoi()) {
       return false;
     }
-    return typeof this._joi?.['$_terms']?.metas?.[0]?.[v] !== 'undefined' ? 
+    return typeof this._joi?.['$_terms']?.metas?.[0]?.[v] !== 'undefined' ?
       true : false;
   }
 
@@ -93,7 +95,7 @@ export class JoiHelper implements BaseHelperInterface {
       }
     }
 
-    if(res === 'dataUri') {
+    if (res === 'dataUri') {
       res = 'uri';
     }
 
