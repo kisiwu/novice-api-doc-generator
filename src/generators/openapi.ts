@@ -1155,7 +1155,17 @@ export class OpenAPI implements DocGenerator {
     const responses = this._getResponsesSchema(route.responses);
     let schemasParameters: SchemasParameters = {};
     if (this.#helperSchemaProperty) {
-      const tmp = parameters[this.#helperSchemaProperty]
+      // retrieve nested object property
+      const tmp = this.#helperSchemaProperty.replace(/\[([^[\]]*)\]/g, '.$1.')
+        .split('.')
+        .filter((t) => t !== '')
+        .reduce((prev: unknown, curr) => {
+          if (prev && typeof prev === 'object' && curr in prev) {
+            const tmp: unknown = prev[curr as keyof typeof prev]
+            return tmp
+          }
+          return
+        }, parameters);
       if (tmp && typeof tmp === 'object') {
         schemasParameters = tmp as Record<string, unknown>
       }

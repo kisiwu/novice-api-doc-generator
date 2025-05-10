@@ -1,7 +1,7 @@
 {
   "name": "@novice1/api-doc-generator",
   "private": false,
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Quickly generate API Documentation.",
   "main": "lib/index.js",
   "homepage": "https://kisiwu.github.io/novice-api-doc-generator/latest/",
@@ -15,11 +15,11 @@
   "scripts": {
     "doc": "typedoc",
     "build": "tsc",
-    "lint": "eslint src/**/*.ts",
-    "test": "env TS_NODE_COMPILER_OPTIONS='{\"module\": \"commonjs\"}' kaukau --require ts-node/register --file test --ext .test.ts",
+    "lint": "eslint .",
+    "test": "kaukau --require ts-node/register --file test --ext .test.ts",
     "testany": "env TS_NODE_COMPILER_OPTIONS='{\"module\": \"commonjs\", \"noImplicitAny\": false}' kaukau --require ts-node/register --file test --ext .test.ts",
-    "testpostman": "env TS_NODE_COMPILER_OPTIONS='{\"module\": \"commonjs\"}' kaukau --require ts-node/register --file test/postman --ext .test.ts",
-    "testopenapi": "env TS_NODE_COMPILER_OPTIONS='{\"module\": \"commonjs\"}' kaukau --require ts-node/register --file test/openapi --ext .test.ts"
+    "testpostman": "kaukau --require ts-node/register --file test/postman --ext .test.ts",
+    "testopenapi": "kaukau --require ts-node/register --file test/openapi --ext .test.ts"
   },
   "keywords": [
     "openapi",
@@ -32,19 +32,24 @@
   ],
   "license": "MIT",
   "devDependencies": {
-    "@novice1/routing": "^2.0.0",
-    "@types/chai": "^5.2.1",
+    "@eslint/eslintrc": "^3.3.1",
+    "@eslint/js": "^9.26.0",
+    "@novice1/routing": "^2.0.2",
+    "@stylistic/eslint-plugin-js": "^4.2.0",
+    "@types/chai": "^5.2.2",
     "@types/extend": "^3.0.4",
     "@types/jsontoxml": "^1.0.6",
     "@types/mocha": "^10.0.10",
-    "@types/node": "^22.14.1",
-    "@typescript-eslint/eslint-plugin": "^8.31.0",
-    "@typescript-eslint/parser": "^8.31.0",
+    "@types/node": "^22.15.17",
+    "@typescript-eslint/eslint-plugin": "^8.32.0",
+    "@typescript-eslint/parser": "^8.32.0",
     "chai": "^4.5.0",
-    "eslint": "^8.57.0",
-    "kaukau": "^4.1.5",
+    "eslint": "^9.26.0",
+    "eslint-plugin-mocha": "^11.0.0",
+    "globals": "^16.1.0",
+    "kaukau": "^4.1.6",
     "ts-node": "^10.9.2",
-    "typedoc": "^0.28.3",
+    "typedoc": "^0.28.4",
     "typescript": "^5.8.3"
   },
   "dependencies": {

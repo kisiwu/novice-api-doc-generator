@@ -2,7 +2,7 @@ import { BaseHelperInterface } from './baseHelper';
 import { VALID_TYPES } from '../utils/genericUtils';
 import { Schema } from 'joi'
 
-interface JoiRule {
+export interface JoiRule {
   name: string;
   method: string;
   args: {
