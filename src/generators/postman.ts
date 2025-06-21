@@ -603,9 +603,20 @@ export class Postman implements DocGenerator {
     }
     const parametersHelper = new this.#helperClass({ isRoot: true, value: schemasParameters });
 
+    let formatPathParams: Record<string, unknown> | undefined = schemasParameters.params
+    
+    if (parametersHelper.isValid()) {
+      formatPathParams = parametersHelper.getChildren().params?.getChildren()
+    } else {
+      const paramsHelper = new this.#helperClass({ value: schemasParameters.params });
+      if (paramsHelper.isValid()) {
+        formatPathParams = paramsHelper.getChildren()
+      }
+    }
+
     const path = formatPath(
-      route.path, 
-      schemasParameters.params || (parametersHelper.isValid() ? parametersHelper.getChildren().params?.getChildren() : undefined)
+      route.path,
+      formatPathParams
     );
     const method = route.method;
     const name = route.name || '';
