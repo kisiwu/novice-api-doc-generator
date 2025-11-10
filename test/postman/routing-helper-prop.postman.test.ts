@@ -322,7 +322,7 @@ describe('api doc testpostman (helper class property)', function () {
 
     // uncomment to test locally
     /*
-    const wStream = fs.createWriteStream('private/postman4-prop.json', { flags: 'w+' });
+    const wStream = fs.createWriteStream('private/postman5-prop.json', { flags: 'w+' });
     wStream.write(JSON.stringify(result, null, ' '), (err: unknown) => {
       if (err) {
         logger.error(err);

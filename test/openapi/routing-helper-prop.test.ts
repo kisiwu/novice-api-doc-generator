@@ -428,7 +428,7 @@ test.run();
 
     // uncomment to test locally
     /*
-    const wStream = fs.createWriteStream('private/openapi4-prop.json', { flags: 'w+' });
+    const wStream = fs.createWriteStream('private/openapi5-prop.json', { flags: 'w+' });
     wStream.write(JSON.stringify(result, null, ' '), (err: unknown) => {
       if (err) {
         logger.error(err);
