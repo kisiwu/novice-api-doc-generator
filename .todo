@@ -1,0 +1,8 @@
+- postman generator
+    - when body has same field as files, files should override, as it does in openapi generator
+
+- openapi generator
+    - requestBody.content[mime-type] is not set when there is no  content for it. 
+        - If there are "parameters.consumes" and it is a post/put method, maybe it should be set as empty object by default (better than guessing), as in postman generator
+
+- global search "@todo" (case insensitive)

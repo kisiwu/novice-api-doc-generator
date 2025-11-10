@@ -584,7 +584,8 @@ export class OAuth2Util extends FullAuthUtil {
 
     return r;
   }
-
+  
+  // @TODO: if defined, set host in URLs
   toOpenAPI(): Record<string, SecuritySchemeObject> {
     const flows: OAuthFlowsObject = {};
     const flow: OAuthFlowObject = {
