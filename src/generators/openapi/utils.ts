@@ -1,9 +1,10 @@
 import { VALID_TYPES } from '../../utils/genericUtils';
 import Logger from '@novice1/logger';
+import { OpenAPISupportedVersion } from './definitions';
 
 export const Log = Logger.debugger('@novice1/api-doc-generator').extend('openapi');
 
-export function formatType(type: string): { type?: string, format?: string } {
+export function _formatType(type: string): { type?: string, format?: string } {
   let t: { type?: string, format?: string } = {
     type,
   };
@@ -43,6 +44,49 @@ export function formatType(type: string): { type?: string, format?: string } {
   }
 
   return t;
+}
+
+export function formatType3_0(type: string): { type?: string, format?: string } {
+  let t: { type?: string, format?: string } = {
+    type,
+  };
+  if (type === 'binary') {
+    t.type = 'string';
+    t.format = type;
+    Log.silly('type %s to %o', type, t);
+  } else {
+    t = _formatType(type)
+  }
+
+  return t;
+}
+
+// @TODO: better handling for contentMediaType and contentEncoding. For now, format=binary still works in some editors (editor-next.swagger.io)
+export function formatType3_1(type: string): { type?: string, format?: string, contentMediaType?: string, contentEncoding?: string } {
+  let t: { type?: string, format?: string, contentMediaType?: string, contentEncoding?: string } = {
+    type,
+  };
+  if (type === 'binary') {
+    t.type = 'string';
+    t.format = 'binary';
+    t.contentMediaType = 'application/octet-stream';
+  } else if (type.includes('/')) {
+    t.type = 'string';
+    t.contentMediaType = type;
+    Log.silly('type %s to %o', type, t);
+  } else {
+    t = _formatType(type)
+  }
+
+  return t;
+}
+
+export function formatType(type: string, v?: OpenAPISupportedVersion): { type?: string, format?: string, contentMediaType?: string, contentEncoding?: string } {
+  if (v === '3.0.4') {
+    return formatType3_0(type)
+  } else {
+    return formatType3_1(type)
+  }
 }
 
 export function formatPath(path: string, params?: Record<string, unknown>): string {

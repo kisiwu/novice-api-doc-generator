@@ -1,13 +1,19 @@
 import extend from 'extend';
-import { 
-  AdditionalProperties, 
-  DiscriminatorObject, 
-  ReferenceObject, 
-  SchemaObject, 
-  XMLObject 
+import {
+  AdditionalProperties,
+  DiscriminatorObject,
+  OpenAPISupportedVersion,
+  ReferenceObject,
+  SchemaObject,
+  SchemaObject3_0,
+  SchemaObject3_1,
+  XMLObject
 } from '../definitions';
 
 export class SchemaCreator {
+
+  #openapi: OpenAPISupportedVersion = '3.1.1'
+
   #schema: SchemaObject;
 
   #min?: number;
@@ -15,7 +21,12 @@ export class SchemaCreator {
 
   #oneOf: Array<SchemaObject | ReferenceObject>;
 
-  constructor(schema: SchemaObject = {}) {
+  #example?: unknown;
+
+  constructor(schema: SchemaObject = {}, v?: OpenAPISupportedVersion) {
+    if (v) {
+      this.#openapi = v
+    }
     this.#schema = schema;
     this.#oneOf = [];
   }
@@ -50,7 +61,7 @@ export class SchemaCreator {
     return props[propertyName];
   }
 
-  getType(): string | undefined {
+  getType(): string | string[] | undefined {
     return this.#schema.type;
   }
 
@@ -135,7 +146,7 @@ export class SchemaCreator {
   }
 
   setExample(value: unknown): SchemaCreator {
-    this.#schema.example = value;
+    this.#example = value;
     return this;
   }
 
@@ -199,6 +210,15 @@ export class SchemaCreator {
         copy.maxLength = this.#max;
       } else {
         copy.maximum = this.#max;
+      }
+    }
+
+    // example
+    if (typeof this.#example !== 'undefined') {
+      if (this.#openapi === '3.0.4') {
+        (copy as SchemaObject3_0).example = this.#example
+      } else {
+        (copy as SchemaObject3_1).examples = /*Array.isArray(this.#example) ? this.#example :*/ [this.#example]
       }
     }
 

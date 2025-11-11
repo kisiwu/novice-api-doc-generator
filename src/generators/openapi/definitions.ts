@@ -1,3 +1,5 @@
+export type OpenAPISupportedVersion = '3.0.4' | '3.1.1'
+
 export type AdditionalProperties = boolean | SchemaObject | ReferenceObject;
 
 export enum ParameterLocation {
@@ -34,12 +36,14 @@ export interface InfoObject {
   [key: string]: unknown;
 }
 
+export type SchemaObject = SchemaObject3_0 | SchemaObject3_1
+
 /**
  * @links
  *  - https://swagger.io/specification/#schema-object
  *  - https://tools.ietf.org/html/draft-wright-json-schema-validation-00
  */
-export interface SchemaObject {
+export interface SchemaObject3_0 {
   title?: string;
   /**
    * CommonMark syntax MAY be used for rich text representation.
@@ -83,7 +87,15 @@ export interface SchemaObject {
   externalDocs?: ExternalDocObject;
   example?: unknown;
   deprecated?: boolean;
-  [key: string]: unknown;
+
+  allowEmptyValue?: boolean;
+  $ref?: string;
+}
+
+export type SchemaObject3_1 = Omit<SchemaObject3_0, 'type' | 'nullable' | 'example'> & {
+  type?: string | string[];
+  examples?: unknown[];
+  $schema?: string;
 }
 
 export interface XMLObject {
@@ -108,6 +120,21 @@ export interface TagObject {
   name: string;
   description?: string;
   externalDocs?: ExternalDocObject;
+}
+
+export type TagObject3_2 = TagObject & { 
+  /**
+   * @support OpenAPI 3.2
+   */
+  summary?: string;
+  /**
+   * @support OpenAPI 3.2
+   */
+  parent?: string;
+  /**
+   * @support OpenAPI 3.2
+   */
+  kind?: 'nav' | 'badge';
 }
 
 export interface OAuthFlowObject {

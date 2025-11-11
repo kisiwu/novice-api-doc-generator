@@ -32,17 +32,6 @@ export class ParameterCreator {
     return this;
   }
 
-  getSchemaProp(prop: string): unknown {
-    const schema = this.#param.schema || {};
-    return schema[prop];
-  }
-
-  setSchemaProp(prop: string, value: unknown): ParameterCreator {
-    this.#param.schema = this.#param.schema || {};
-    this.#param.schema[prop] = value;
-    return this;
-  }
-
   setSchema(value: SchemaObject | ReferenceObject): ParameterCreator {
     this.#param.schema = value;
     return this;

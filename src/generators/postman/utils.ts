@@ -23,9 +23,11 @@ export function formatType(type: string): { type?: string, format?: string } {
     || type === 'url'
     || type === 'date'
     || type === 'byte'
-    || type === 'binary') {
+    || type === 'binary'
+    || type.includes('/')
+  ) {
     t.type = 'string';
-    t.format = type;
+    t.format = type.includes('/') ? 'binary' : type;
     Log.silly('type %s to %o', type, t);
   }
   else if (type === 'float' || type === 'double' || type === 'integer') {

@@ -62,7 +62,7 @@ export const simpleResponse = new ResponseUtil('SimpleResponse').setHeaders({
   .addMediaType('text/plain', {
     schema: {
       type: 'string',
-      example: 'whoa!'
+      examples: ['whoa!']
     }
   });
 

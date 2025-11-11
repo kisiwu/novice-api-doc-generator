@@ -24,7 +24,8 @@ import {
   ContactObject,
   ExternalDocObject,
   ServerObject,
-  SecurityRequirementObject
+  SecurityRequirementObject,
+  OpenAPISupportedVersion
 } from './openapi/definitions';
 import { OpenAPIHelperInterface } from './openapi/helpers/interfaces';
 import { OpenAPIJoiHelper } from './openapi/helpers/joiHelper';
@@ -74,7 +75,7 @@ interface RouteSchema {
 }
 
 export interface OpenAPIResult {
-  openapi: string;
+  openapi: OpenAPISupportedVersion;
   info: InfoObject;
   servers: ServerObject[];
   components: ComponentsObject;
@@ -93,7 +94,7 @@ export enum GenerateComponentsRule {
 
 export type OpenAPIHelperClass = { new(args: { isRoot?: boolean, value: unknown }): OpenAPIHelperInterface }
 
-export type OpenAPIOptions = { helperClass?: OpenAPIHelperClass, helperSchemaProperty?: string }
+export type OpenAPIOptions = { version?: OpenAPISupportedVersion, helperClass?: OpenAPIHelperClass, helperSchemaProperty?: string }
 
 /**
  * OpenAPI doc generator.
@@ -121,7 +122,7 @@ export class OpenAPI implements DocGenerator {
     this.#helperClass = options?.helperClass || OpenAPIJoiHelper;
     this.#helperSchemaProperty = options?.helperSchemaProperty;
     this.#result = {
-      openapi: '3.0.0',
+      openapi: options?.version || '3.1.1',
       info: {
         version: '1.0.0',
         title: '@novice1 API',
@@ -1367,7 +1368,7 @@ export class OpenAPI implements DocGenerator {
 
     let children: Record<string, OpenAPIHelperInterface>;
     if (valueHelper.isValid()) {
-      valueHelperType = formatType(valueHelper.getType()).type;
+      valueHelperType = formatType(valueHelper.getType(), this.#result.openapi).type;
       children = valueHelper.getChildren();
     }
 
@@ -1451,7 +1452,7 @@ export class OpenAPI implements DocGenerator {
     defaultParameterObject: ParameterObject): ParameterObject {
     const parameter = new ParameterCreator(defaultParameterObject)
       .setRequired(helper.isRequired())
-      .setSchema(formatType(helper.getType()));
+      .setSchema(formatType(helper.getType(), this.#result.openapi));
 
 
     const schema = this._createBasicSchema(helper);
@@ -1473,7 +1474,15 @@ export class OpenAPI implements DocGenerator {
     if (schema.isType('object')) {
       // style ?
       if (!parameter.hasStyle()) {
-        parameter.setStyle('deepObject');
+        if (this.#result.openapi === '3.0.4') {
+          parameter.setStyle('deepObject');
+        } else {
+          if (location === 'query' || location === 'cookie') {
+            parameter.setStyle('form');
+          } else if (location === 'path' || location === 'header') {
+            parameter.setStyle('simple');
+          }
+        }
       }
     }
 
@@ -1578,7 +1587,7 @@ export class OpenAPI implements DocGenerator {
           type: 'object',
           required: [],
           properties: {},
-        });
+        }, this.#result.openapi);
         Object.keys(body).forEach(
           name => {
             const childHelper = new this.#helperClass({ value: body[name] });
@@ -1607,7 +1616,7 @@ export class OpenAPI implements DocGenerator {
         type: 'object',
         required: [],
         properties: {},
-      });
+      }, this.#result.openapi);
 
       if (filesHelper.isValid()) {
         if (!bodySchema && filesHelper.getType() !== 'object') {
@@ -1710,7 +1719,7 @@ export class OpenAPI implements DocGenerator {
     name?: string,
     format?: string
   ): SchemaCreator {
-    const prop = new SchemaCreator(formatType(helper.getType()));
+    const prop = new SchemaCreator(formatType(helper.getType(), this.#result.openapi), this.#result.openapi);
 
     let description = '';
     // description
@@ -1848,7 +1857,7 @@ export class OpenAPI implements DocGenerator {
     parentProp?: SchemaCreator,
     name?: string
   ): SchemaCreator {
-    return new SchemaCreator(this._createAlternativeSchemaObject(altHelper, parentProp, name));
+    return new SchemaCreator(this._createAlternativeSchemaObject(altHelper, parentProp, name), this.#result.openapi);
   }
 
   private _createAlternativeSchemaObject(
@@ -1856,7 +1865,7 @@ export class OpenAPI implements DocGenerator {
     parentProp?: SchemaCreator,
     name?: string
   ): SchemaObject {
-    const prop = new SchemaCreator({ oneOf: [] });
+    const prop = new SchemaCreator({ oneOf: [] }, this.#result.openapi);
 
     let description = '';
     // description
@@ -1930,10 +1939,8 @@ export class OpenAPI implements DocGenerator {
     // only for "array"
     if (propSchema.isType('array')) {
       if (format === 'binary') {
-        propSchema.setItems({
-          type: 'string',
-          format: format
-        });
+        // @TODO: better media type handling 
+        propSchema.setItems(formatType(format, this.#result.openapi));
       } else {
         if (format) {
           propSchema.setFormat(format);
@@ -1948,7 +1955,7 @@ export class OpenAPI implements DocGenerator {
           const schemaObject = this._createSchemaObject(firstItem, propSchema, 'items');
           propSchema.setItems(schemaObject);
         } else {
-          propSchema.setItems(formatType('any'));
+          propSchema.setItems(formatType('any', this.#result.openapi));
         }
       }
     }
