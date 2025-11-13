@@ -603,6 +603,7 @@ export class Postman implements DocGenerator {
     }
     const parametersHelper = new this.#helperClass({ isRoot: true, value: schemasParameters });
 
+    /*
     let formatPathParams: Record<string, unknown> | undefined = schemasParameters.params
     
     if (parametersHelper.isValid()) {
@@ -613,10 +614,11 @@ export class Postman implements DocGenerator {
         formatPathParams = paramsHelper.getChildren()
       }
     }
+    */
 
     const path = formatPath(
       route.path,
-      formatPathParams
+      //formatPathParams
     );
     const method = route.method;
     const name = route.name || '';

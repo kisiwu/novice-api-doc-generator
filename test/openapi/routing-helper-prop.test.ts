@@ -251,7 +251,7 @@ describe('api doc (helper class property)', function () {
           ref: '#/components/requestBodies/AppBody'
         })
       },
-      path: '/app',
+      path: '/app/:type/done',
       responses: GroupCtxtResponse
       /*
       responses: {
@@ -428,7 +428,7 @@ test.run();
 
     // uncomment to test locally
     /*
-    const wStream = fs.createWriteStream('private/openapi3-1-1.json', { flags: 'w+' });
+    const wStream = fs.createWriteStream('private/openapi3-1-1-1.json', { flags: 'w+' });
     wStream.write(JSON.stringify(result, null, ' '), (err: unknown) => {
       if (err) {
         logger.error(err);

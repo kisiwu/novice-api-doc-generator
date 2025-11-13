@@ -89,7 +89,8 @@ export function formatType(type: string, v?: OpenAPISupportedVersion): { type?: 
   }
 }
 
-export function formatPath(path: string, params?: Record<string, unknown>): string {
+export function formatPath(path: string/*, params?: Record<string, unknown>*/): string {
+  /*
   if (params) {
     let pos: number = path.indexOf('/:');
 
@@ -132,5 +133,6 @@ export function formatPath(path: string, params?: Record<string, unknown>): stri
       path += pathEnd;
     }
   }
-  return path;
+  */
+  return path.replace(/(^|\/):([^/]+)/g, '$1{$2}').replace(/\*/g, '');
 }

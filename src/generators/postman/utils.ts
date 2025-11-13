@@ -49,7 +49,8 @@ export function formatType(type: string): { type?: string, format?: string } {
   return t;
 }
 
-export function formatPath(path: string, params?: Record<string, unknown>): string {
+export function formatPath(path: string/*, params?: Record<string, unknown>*/): string {
+  /*
   if (params) {
     let pos: number = path.indexOf('/:');
 
@@ -90,5 +91,6 @@ export function formatPath(path: string, params?: Record<string, unknown>): stri
       path += pathEnd;
     }
   }
-  return path;
+  */
+  return path.replace(/{([^}]+)}/g, ':$1').replace(/\*/g, '');
 }

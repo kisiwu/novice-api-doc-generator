@@ -163,7 +163,7 @@ describe('api doc testpostman (helper class property)', function () {
           ref: '#/components/requestBodies/AppBody'
         })
       },
-      path: '/app',
+      path: '/app/:type/done',
       responses: GroupCtxtResponse
       /*
       responses: {
@@ -322,7 +322,7 @@ describe('api doc testpostman (helper class property)', function () {
 
     // uncomment to test locally
     /*
-    const wStream = fs.createWriteStream('private/postman5-prop.json', { flags: 'w+' });
+    const wStream = fs.createWriteStream('private/postman-6.json', { flags: 'w+' });
     wStream.write(JSON.stringify(result, null, ' '), (err: unknown) => {
       if (err) {
         logger.error(err);
