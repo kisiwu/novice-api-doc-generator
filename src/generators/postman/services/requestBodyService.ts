@@ -243,7 +243,15 @@ export class RequestBodyCreator {
     }
     if (this.hasFileFields()) {
       Object.keys(this.fileFields).forEach(name => {
-        res.push(this._createFormDataEntity(name, this.fileFields[name], true));
+        const newItem = this._createFormDataEntity(name, this.fileFields[name], true)
+        const index = res.findIndex(item => item.key === newItem.key);
+        if (index !== -1) {
+          // Replace at the same position
+          res[index] = newItem;
+        } else {
+          // Push at the end
+          res.push(newItem);
+        }
       });
     }
     return res;

@@ -1787,6 +1787,7 @@ export class OpenAPI implements DocGenerator {
     if (prop.isType('array')) {
       this._fillArraySchemaObject(helper, prop, format);
     } else if (format) {
+      // @TODO: better media type handling
       prop.setFormat(format);
       if (format === 'binary') {
         prop.setType('string');

@@ -95,6 +95,8 @@ export interface SchemaObject3_0 {
 export type SchemaObject3_1 = Omit<SchemaObject3_0, 'type' | 'nullable' | 'example'> & {
   type?: string | string[];
   examples?: unknown[];
+  contentEncoding?: string;
+  contentMediaType?: string;
   $schema?: string;
 }
 

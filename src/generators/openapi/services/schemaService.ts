@@ -10,6 +10,7 @@ import {
   XMLObject
 } from '../definitions';
 
+// @todo: add contentMediaType and contentEncoding
 export class SchemaCreator {
 
   #openapi: OpenAPISupportedVersion = '3.1.1'
@@ -22,6 +23,8 @@ export class SchemaCreator {
   #oneOf: Array<SchemaObject | ReferenceObject>;
 
   #example?: unknown;
+
+  #format?: string
 
   constructor(schema: SchemaObject = {}, v?: OpenAPISupportedVersion) {
     if (v) {
@@ -122,7 +125,7 @@ export class SchemaCreator {
   }
 
   setFormat(format: string): SchemaCreator {
-    this.#schema.format = format;
+    this.#format = format;
     return this;
   }
 
@@ -187,6 +190,19 @@ export class SchemaCreator {
 
   toObject(): SchemaObject {
     const copy: SchemaObject = extend(true, {}, this.#schema);
+
+    // format
+    if (this.#format) {
+      if (this.#format === 'binary' || this.#format.includes('/')) {
+        if (this.#openapi === '3.0.4') {
+          (copy as SchemaObject3_0).format = 'binary'
+        } else {
+          (copy as SchemaObject3_1).contentMediaType = this.#format === 'binary' ? 'application/octet-stream' : this.#format
+        }
+      } else {
+        copy.format = this.#format
+      }
+    }
 
     // min
     if (typeof this.#min !== 'undefined') {

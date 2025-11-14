@@ -68,8 +68,8 @@ export function formatType3_1(type: string): { type?: string, format?: string, c
   };
   if (type === 'binary') {
     t.type = 'string';
-    t.format = 'binary';
     t.contentMediaType = 'application/octet-stream';
+    Log.silly('type %s to %o', type, t);
   } else if (type.includes('/')) {
     t.type = 'string';
     t.contentMediaType = type;
