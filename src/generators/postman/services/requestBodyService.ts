@@ -176,6 +176,9 @@ export class RequestBodyCreator {
         }
       }
     }
+    if (res.disabled && res.formdata?.length && res.mode === 'formdata') {
+      res.disabled = !res.formdata.some(d => !d.disabled)
+    }
     return res;
   }
 
