@@ -44,3 +44,13 @@ export {
 export {
   PostmanHelperInterface
 } from './generators/postman/helpers/interfaces';
+
+// some definitions
+export {
+  ReferenceObject,
+  SchemaObject,
+  SchemaObject3_0,
+  SchemaObject3_1,
+  SecurityRequirementObject,
+  SecuritySchemeObject
+} from './generators/openapi/definitions'
