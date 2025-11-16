@@ -25,7 +25,8 @@ import {
   ExternalDocObject,
   ServerObject,
   SecurityRequirementObject,
-  OpenAPISupportedVersion
+  OpenAPISupportedVersion,
+  SchemaObject3_1
 } from './openapi/definitions';
 import { OpenAPIHelperInterface } from './openapi/helpers/interfaces';
 import { OpenAPIJoiHelper } from './openapi/helpers/joiHelper';
@@ -1923,7 +1924,10 @@ export class OpenAPI implements DocGenerator {
       }
     }
 
-    const altSchemaObject = prop.toObject();
+    // alternative 
+    // It could be 3.0 or 3.1. 
+    // As this is internal anyway, set it to 3.1 for a quick working fix
+    const altSchemaObject: SchemaObject3_1 = prop.toObject();
     altHelper.getAlternatives().forEach(
       helper => {
         if (helper.isValid()) {

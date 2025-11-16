@@ -1,7 +1,7 @@
 {
   "name": "@novice1/api-doc-generator",
   "private": false,
-  "version": "1.1.3",
+  "version": "1.2.0",
   "description": "Quickly generate API Documentation.",
   "main": "lib/index.js",
   "homepage": "https://kisiwu.github.io/novice-api-doc-generator/latest/",
@@ -15,7 +15,7 @@
   "scripts": {
     "doc": "typedoc",
     "build": "tsc",
-    "lint": "eslint .",
+    "lint": "eslint . && tsc --noEmit",
     "test": "kaukau --require ts-node/register --file test --ext .test.ts",
     "testany": "env TS_NODE_COMPILER_OPTIONS='{\"module\": \"commonjs\", \"noImplicitAny\": false}' kaukau --require ts-node/register --file test --ext .test.ts",
     "testpostman": "kaukau --require ts-node/register --file test/postman --ext .test.ts",
@@ -40,7 +40,7 @@
     "@types/extend": "^3.0.4",
     "@types/jsontoxml": "^1.0.6",
     "@types/mocha": "^10.0.10",
-    "@types/node": "^24.10.0",
+    "@types/node": "^24.10.1",
     "@typescript-eslint/eslint-plugin": "^8.46.4",
     "@typescript-eslint/parser": "^8.46.4",
     "chai": "^4.5.0",

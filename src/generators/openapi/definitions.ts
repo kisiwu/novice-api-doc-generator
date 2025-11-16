@@ -1,6 +1,6 @@
 export type OpenAPISupportedVersion = '3.0.4' | '3.1.1'
 
-export type AdditionalProperties = boolean | SchemaObject | ReferenceObject;
+export type AdditionalProperties<T = SchemaObject3_1 | SchemaObject3_0> = boolean | T | ReferenceObject;
 
 export enum ParameterLocation {
   cookie = 'cookie',
@@ -38,34 +38,29 @@ export interface InfoObject {
 
 export type SchemaObject = SchemaObject3_0 | SchemaObject3_1
 
-/**
- * @links
- *  - https://swagger.io/specification/#schema-object
- *  - https://tools.ietf.org/html/draft-wright-json-schema-validation-00
- */
-export interface SchemaObject3_0 {
+export interface CommonPropsSchemaObject<T> {
+  allOf?: Array<T | ReferenceObject>;
+  anyOf?: Array<T | ReferenceObject>;
+  oneOf?: Array<T | ReferenceObject>;
+  not?: T | ReferenceObject;
+  items?: T | ReferenceObject;
+  properties?: Record<string, T | ReferenceObject>;
+  additionalProperties?: AdditionalProperties<T>;
+
   title?: string;
   /**
    * CommonMark syntax MAY be used for rich text representation.
    */
   description?: string;
 
-  type?: string;
   format?: string;
   pattern?: RegExp | string;
   default?: unknown;
 
   enum?: unknown[];
   multipleOf?: number;
-  allOf?: Array<SchemaObject | ReferenceObject>;
-  anyOf?: Array<SchemaObject | ReferenceObject>;
-  oneOf?: Array<SchemaObject | ReferenceObject>;
-  not?: SchemaObject | ReferenceObject;
 
-  items?: SchemaObject | ReferenceObject;
   uniqueItems?: boolean;
-  properties?: Record<string, SchemaObject | ReferenceObject>;
-  additionalProperties?: AdditionalProperties;
   required?: string[];
 
   maxLength?: number;
@@ -79,20 +74,29 @@ export interface SchemaObject3_0 {
   exclusiveMaximum?: boolean;
   exclusiveMinimum?: boolean;
 
-  nullable?: boolean;
   discriminator?: DiscriminatorObject;
   readOnly?: boolean;
   writeOnly?: boolean;
   xml?: unknown;
   externalDocs?: ExternalDocObject;
-  example?: unknown;
   deprecated?: boolean;
 
   allowEmptyValue?: boolean;
   $ref?: string;
+} 
+
+/**
+ * @links
+ *  - https://swagger.io/specification/#schema-object
+ *  - https://tools.ietf.org/html/draft-wright-json-schema-validation-00
+ */
+export interface SchemaObject3_0 extends CommonPropsSchemaObject<SchemaObject3_0> {
+  type?: string;
+  nullable?: boolean;
+  example?: unknown;
 }
 
-export type SchemaObject3_1 = Omit<SchemaObject3_0, 'type' | 'nullable' | 'example'> & {
+export interface SchemaObject3_1 extends CommonPropsSchemaObject<SchemaObject3_1> {
   type?: string | string[];
   examples?: unknown[];
   contentEncoding?: string;
@@ -166,7 +170,7 @@ export interface SecuritySchemeObject {
 
 export interface ReferenceObject {
   $ref: string;
-  [key: string]: unknown;
+  //[key: string]: unknown;
 }
 
 export interface ServerVariableObject {
