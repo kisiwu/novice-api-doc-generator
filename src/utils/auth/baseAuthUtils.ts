@@ -59,7 +59,7 @@ export abstract class FullAuthUtil extends BaseAuthUtil implements IAuthUtil {
    * @param description A short description for security scheme.
    * CommonMark syntax MAY be used for rich text representation.
    */
-  abstract setDescription(description: string): FullAuthUtil;
+  abstract setDescription(description: string): this;
 
   constructor(securitySchemeName: string) {
     super();

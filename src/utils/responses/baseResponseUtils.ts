@@ -75,7 +75,7 @@ export abstract class FullResponseUtil extends BaseResponseUtil {
    * @param description A short description of the response.
    * CommonMark syntax MAY be used for rich text representation.
    */
-  abstract setDescription(description: string): FullResponseUtil;
+  abstract setDescription(description: string): this;
 
   constructor(name?: string) {
     super();

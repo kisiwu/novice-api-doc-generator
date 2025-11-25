@@ -23,7 +23,7 @@ export class ContextResponseUtil extends BaseResponseUtil {
     this.responseUtil = responseUtil;
   }
 
-  setDefault(isDefault: boolean): ContextResponseUtil {
+  setDefault(isDefault: boolean): this {
     this.default = isDefault;
     return this;
   }
@@ -32,7 +32,7 @@ export class ContextResponseUtil extends BaseResponseUtil {
     return this.default ? this.default : false;
   }
 
-  setCode(code: number): ContextResponseUtil {
+  setCode(code: number): this {
     this.code = code;
     return this;
   }
@@ -47,7 +47,7 @@ export class ContextResponseUtil extends BaseResponseUtil {
     return r;
   }
 
-  setRef(ref: string): ContextResponseUtil {
+  setRef(ref: string): this {
     this.ref = ref;
     return this;
   }
@@ -62,14 +62,14 @@ export class ContextResponseUtil extends BaseResponseUtil {
     return r;
   }
 
-  setLinks(links: Record<string, LinkObject | ReferenceObject>): ContextResponseUtil {
+  setLinks(links: Record<string, LinkObject | ReferenceObject>): this {
     this.links = links;
     return this;
   }
-  addLink(key: string, link: LinkObject): ContextResponseUtil;
-  addLink(key: string, link: ReferenceObject): ContextResponseUtil;
-  addLink(key: string): ContextResponseUtil;
-  addLink(key: string, link: LinkObject | ReferenceObject = {}): ContextResponseUtil {
+  addLink(key: string, link: LinkObject): this;
+  addLink(key: string, link: ReferenceObject): this;
+  addLink(key: string): this;
+  addLink(key: string, link: LinkObject | ReferenceObject = {}): this {
     this.links = this.links || {};
     this.links[key] = link;
     return this;

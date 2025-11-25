@@ -14,22 +14,22 @@ export class MediaTypeCreator {
     this.#mediaType = mediaType;
   }
 
-  setExample(value: unknown): MediaTypeCreator {
+  setExample(value: unknown): this {
     this.#mediaType.example = value;
     return this;
   }
 
-  setExamples(examples: Record<string, ExampleObject | ReferenceObject>): MediaTypeCreator {
+  setExamples(examples: Record<string, ExampleObject | ReferenceObject>): this {
     this.#mediaType.examples = examples;
     return this;
   }
 
-  setEncoding(encoding: Record<string, EncodingObject>): MediaTypeCreator {
+  setEncoding(encoding: Record<string, EncodingObject>): this {
     this.#mediaType.encoding = encoding;
     return this;
   }
 
-  setSchema(schema: SchemaObject | ReferenceObject): MediaTypeCreator {
+  setSchema(schema: SchemaObject | ReferenceObject): this {
     this.#mediaType.schema = schema;
     return this;
   }

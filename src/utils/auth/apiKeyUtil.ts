@@ -21,12 +21,12 @@ export class ApiKeyUtil extends FullAuthUtil {
   protected value?: string;
   protected apiKeyLocation?: string; // in
 
-  setDescription(description: string): ApiKeyUtil {
+  setDescription(description: string): this {
     this.description = description;
     return this;
   }
 
-  setKey(key: string): ApiKeyUtil {
+  setKey(key: string): this {
     this.key = key;
     return this;
   }
@@ -41,7 +41,7 @@ export class ApiKeyUtil extends FullAuthUtil {
     return r;
   }
 
-  setName(key: string): ApiKeyUtil {
+  setName(key: string): this {
     this.key = key;
     return this;
   }
@@ -56,7 +56,7 @@ export class ApiKeyUtil extends FullAuthUtil {
     return r;
   }
 
-  setValue(value: string): ApiKeyUtil {
+  setValue(value: string): this {
     this.value = value;
     return this;
   }
@@ -71,9 +71,9 @@ export class ApiKeyUtil extends FullAuthUtil {
     return r;
   }
 
-  setApiKeyLocation(apiKeyLocation: ApiKeyLocation): ApiKeyUtil;
-  setApiKeyLocation(apiKeyLocation: string): ApiKeyUtil;
-  setApiKeyLocation(apiKeyLocation: string): ApiKeyUtil {
+  setApiKeyLocation(apiKeyLocation: ApiKeyLocation): this;
+  setApiKeyLocation(apiKeyLocation: string): this;
+  setApiKeyLocation(apiKeyLocation: string): this {
     this.apiKeyLocation = apiKeyLocation;
     return this;
   }

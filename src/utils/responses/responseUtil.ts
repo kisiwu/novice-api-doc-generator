@@ -17,17 +17,17 @@ import extend from 'extend';
  */
 export class ResponseUtil extends FullResponseUtil {
 
-  setName(name: string): ResponseUtil {
+  setName(name: string): this {
     this.name = name;
     return this;
   }
 
-  setDescription(description: string): ResponseUtil {
+  setDescription(description: string): this {
     this.description = description;
     return this;
   }
 
-  setCode(code: number): ResponseUtil {
+  setCode(code: number): this {
     this.code = code;
     return this;
   }
@@ -36,7 +36,7 @@ export class ResponseUtil extends FullResponseUtil {
     return this.code;
   }
 
-  setDefault(isDefault: boolean): ResponseUtil {
+  setDefault(isDefault: boolean): this {
     this.default = isDefault;
     return this;
   }
@@ -45,7 +45,7 @@ export class ResponseUtil extends FullResponseUtil {
     return this.default ? this.default : false;
   }
 
-  setRef(ref: string): ResponseUtil {
+  setRef(ref: string): this {
     this.ref = ref;
     return this;
   }
@@ -60,14 +60,14 @@ export class ResponseUtil extends FullResponseUtil {
     return r;
   }
 
-  setHeaders(headers: Record<string, HeaderObject | ReferenceObject>): ResponseUtil {
+  setHeaders(headers: Record<string, HeaderObject | ReferenceObject>): this {
     this.headers = headers;
     return this;
   }
-  addHeader(key: string, header: HeaderObject): ResponseUtil;
-  addHeader(key: string, header: ReferenceObject): ResponseUtil;
-  addHeader(key: string): ResponseUtil;
-  addHeader(key: string, header: HeaderObject | ReferenceObject = {}): ResponseUtil {
+  addHeader(key: string, header: HeaderObject): this;
+  addHeader(key: string, header: ReferenceObject): this;
+  addHeader(key: string): this;
+  addHeader(key: string, header: HeaderObject | ReferenceObject = {}): this {
     this.headers = this.headers || {};
     this.headers[key] = header;
     return this;
@@ -86,14 +86,14 @@ export class ResponseUtil extends FullResponseUtil {
     return r;
   }
 
-  setMediaTypes(mediaTypes: Record<string, MediaTypeObject>): ResponseUtil {
+  setMediaTypes(mediaTypes: Record<string, MediaTypeObject>): this {
     this.content = mediaTypes;
     return this;
   }
-  addMediaType(contentType: string, mediaType: MediaTypeObject): ResponseUtil;
-  addMediaType(contentType: string, mediaType: MediaTypeUtil): ResponseUtil;
-  addMediaType(contentType: string): ResponseUtil;
-  addMediaType(contentType: string, mediaType: MediaTypeObject | MediaTypeUtil = {}): ResponseUtil {
+  addMediaType(contentType: string, mediaType: MediaTypeObject): this;
+  addMediaType(contentType: string, mediaType: MediaTypeUtil): this;
+  addMediaType(contentType: string): this;
+  addMediaType(contentType: string, mediaType: MediaTypeObject | MediaTypeUtil = {}): this {
     this.content = this.content || {};
     if (mediaType instanceof MediaTypeUtil) {
       this.content[contentType] = mediaType.toObject();
@@ -116,14 +116,14 @@ export class ResponseUtil extends FullResponseUtil {
     return r;
   }
 
-  setLinks(links: Record<string, LinkObject | ReferenceObject>): ResponseUtil {
+  setLinks(links: Record<string, LinkObject | ReferenceObject>): this {
     this.links = links;
     return this;
   }
-  addLink(key: string, link: LinkObject): ResponseUtil;
-  addLink(key: string, link: ReferenceObject): ResponseUtil;
-  addLink(key: string): ResponseUtil;
-  addLink(key: string, link: LinkObject | ReferenceObject = {}): ResponseUtil {
+  addLink(key: string, link: LinkObject): this;
+  addLink(key: string, link: ReferenceObject): this;
+  addLink(key: string): this;
+  addLink(key: string, link: LinkObject | ReferenceObject = {}): this {
     this.links = this.links || {};
     this.links[key] = link;
     return this;

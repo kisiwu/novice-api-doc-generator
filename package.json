@@ -1,7 +1,7 @@
 {
   "name": "@novice1/api-doc-generator",
   "private": false,
-  "version": "1.2.0",
+  "version": "1.2.1",
   "description": "Quickly generate API Documentation.",
   "main": "lib/index.js",
   "homepage": "https://kisiwu.github.io/novice-api-doc-generator/latest/",

@@ -13,12 +13,12 @@ export class BasicAuthUtil extends FullAuthUtil {
   protected password?: string;
   protected username?: string;
 
-  setDescription(description: string): BasicAuthUtil {
+  setDescription(description: string): this {
     this.description = description;
     return this;
   }
 
-  setPassword(password: string): BasicAuthUtil {
+  setPassword(password: string): this {
     this.password = password;
     return this;
   }
@@ -33,7 +33,7 @@ export class BasicAuthUtil extends FullAuthUtil {
     return r;
   }
 
-  setUsername(username: string): BasicAuthUtil {
+  setUsername(username: string): this {
     this.username = username;
     return this;
   }
