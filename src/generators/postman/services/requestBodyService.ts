@@ -14,19 +14,19 @@ interface JsontoxmlObject {
   children?: JsontoxmlObject[];
 }
 
-    /**
-     * mode?: string; // raw urlencoded formdata file graphql
-  raw?: string;
-  graphql?: Record<string, unknown>;
-  urlencoded?: UrlEncodedParameter[];
-  formdata?: FormParameter[];
-  file?: {
-    src?: string | null;
-    content?: string;
-  },
-  options?: Record<string, unknown>;
-  disabled?: boolean;
-     */
+/**
+ * mode?: string; // raw urlencoded formdata file graphql
+raw?: string;
+graphql?: Record<string, unknown>;
+urlencoded?: UrlEncodedParameter[];
+formdata?: FormParameter[];
+file?: {
+src?: string | null;
+content?: string;
+},
+options?: Record<string, unknown>;
+disabled?: boolean;
+ */
 
 export class RequestBodyCreator {
   protected mode: string | undefined;
@@ -63,7 +63,7 @@ export class RequestBodyCreator {
   }
 
   setFormat(format: string): RequestBodyCreator {
-    switch(format) {
+    switch (format) {
       case 'json':
       case 'application/json':
         this.format = 'json';
@@ -83,7 +83,7 @@ export class RequestBodyCreator {
   }
 
   setFile(file: PostmanHelperInterface): RequestBodyCreator {
-    this.file= file;
+    this.file = file;
     return this;
   }
 
@@ -92,7 +92,7 @@ export class RequestBodyCreator {
   }
 
   setBody(body: PostmanHelperInterface): RequestBodyCreator {
-    this.body= body;
+    this.body = body;
     return this;
   }
 
@@ -123,7 +123,7 @@ export class RequestBodyCreator {
   }
 
   setFieldsBody(fieldsBody: PostmanHelperInterface): RequestBodyCreator {
-    this.fieldsBody= fieldsBody;
+    this.fieldsBody = fieldsBody;
     return this;
   }
 
@@ -162,14 +162,14 @@ export class RequestBodyCreator {
       if (this.body) {
         res.raw = this.createRawBody();
       } // or check file
-      else if(this.file) {
+      else if (this.file) {
         res.mode = 'file';
       } // or check fields and filefields
       else {
-        if(this.hasFileFields()) {
+        if (this.hasFileFields()) {
           res.mode = 'formdata';
           res.formdata = this.createFormData();
-        } else if(this.hasFields()) {
+        } else if (this.hasFields()) {
           res.mode = 'raw';
           res.raw = this.createRawFields();
           res.formdata = this.createFormData();
@@ -184,7 +184,7 @@ export class RequestBodyCreator {
 
   protected createRawBody(): string | undefined {
     let res: string | undefined;
-    if(this.body) {
+    if (this.body) {
       const raw = this._createRaw(this.body);
       if (typeof raw != 'undefined' && raw != null) {
         if (this.format === 'json' || typeof raw !== 'string') {
@@ -199,7 +199,7 @@ export class RequestBodyCreator {
 
   protected createRawFields(): string | undefined {
     let res: string | undefined;
-    if(this.hasFields()) {
+    if (this.hasFields()) {
       if (this.format === 'xml') {
         const json: JsontoxmlObject = this._createElementJsontoxmlObject(
           'element',
@@ -239,7 +239,7 @@ export class RequestBodyCreator {
 
   protected createFormData(): FormParameter[] {
     const res: FormParameter[] = [];
-    if(this.hasFields()) {
+    if (this.hasFields()) {
       Object.keys(this.fields).forEach(name => {
         res.push(this._createFormDataEntity(name, this.fields[name]));
       });
@@ -298,13 +298,13 @@ export class RequestBodyCreator {
       helper
     );
     const helperType = formatType(helper.getType());
-    
+
     if (helper.getType() === 'array') {
       let text: string | undefined;
       const item = helper.getFirstItem();
       if (item) {
         const itemType = formatType(item.getType());
-        if(item.hasDefaultValue()) {
+        if (item.hasDefaultValue()) {
           text = `${item.getDefaultValue()}`;
         } else if (item.hasExampleValue()) {
           text = `${item.getExampleValue()}`;
@@ -325,8 +325,8 @@ export class RequestBodyCreator {
       const children = helper.getChildren();
       Object.keys(children).forEach(childName => {
         const child = children[childName];
-        const jsonChild = this._createJsontoxmlObject(childName, child); 
-        if(child.hasXml?.() && child.getXml) {
+        const jsonChild = this._createJsontoxmlObject(childName, child);
+        if (child.hasXml?.() && child.getXml) {
           const xmlObject = child.getXml();
           if (xmlObject?.attribute) {
             res.attrs = res.attrs || {};
@@ -339,7 +339,7 @@ export class RequestBodyCreator {
       });
     } else {
       let text: string | undefined;
-      if(helper.hasDefaultValue()) {
+      if (helper.hasDefaultValue()) {
         text = `${helper.getDefaultValue()}`;
       } else if (helper.hasExampleValue()) {
         text = `${helper.getExampleValue()}`;
@@ -360,20 +360,23 @@ export class RequestBodyCreator {
     deepLevel = 0
   ): unknown {
     let res: unknown;
-    const helperType = formatType(helper.getType());
-    if(deepLevel > 9) {
+    if (deepLevel > 9) {
       return;
     }
-    if(helper.hasDefaultValue()) {
+    const helperType = formatType(helper.getType());
+    const helperEnum = helper.getEnum();
+    if (helper.hasDefaultValue()) {
       res = helper.getDefaultValue();
     } else if (helper.hasExampleValue()) {
       res = helper.getExampleValue();
+    } else if (helperEnum.length) {
+      res = helperEnum[0]
     } else if (helper.getType() === 'alternatives') {
       const altHelper = helper.getAlternatives()[0];
       if (altHelper) {
         res = this._createRaw(altHelper, deepLevel + 1);
       }
-    } else if (helper.getType() === 'object'){
+    } else if (helperType.type === 'object') {
       const children = helper.getChildren();
       const obj: Record<string, unknown> = {};
       Object.keys(children).forEach(
@@ -382,20 +385,24 @@ export class RequestBodyCreator {
         }
       );
       res = obj;
-    } else if (helper.getType() === 'array') {
+    } else if (helperType.type === 'array') {
       const item = helper.getFirstItem();
       const arr: unknown[] = [];
-      if(item) {
+      if (item) {
         const rawItem = this._createRaw(item, deepLevel + 1);
-        if(rawItem) {
+        if (rawItem) {
           arr.push(rawItem);
         }
       }
       res = arr;
+    } else if (helperType.type === 'number') {
+      res = helper.hasMin() ? helper.getMin() : 0;
+    } else if (helperType.type === 'boolean') {
+      res = true;
     } else if (helperType.format) {
       res = `<${helperType.format}>`;
     } else {
-      res = `<${helperType.type}>`;
+      res = `<${helperType.type || helper.getType()}>`;
     }
     return res;
   }
@@ -445,12 +452,12 @@ export class RequestBodyCreator {
         return this._createSrcFormData(name, altHelper);
       }
     }
-    
-    if(helper.getType() === 'array') {
+
+    if (helper.getType() === 'array') {
       res.src = [];
     } else {
       res.src = null;
-    } 
+    }
 
     return res;
   }
@@ -469,7 +476,7 @@ export class RequestBodyCreator {
     if (typeof raw != 'undefined' && raw != null) {
       if (typeof raw !== 'string') {
         res.value = JSON.stringify(raw);
-      } else if(typeof raw === 'string') {
+      } else if (typeof raw === 'string') {
         res.value = raw;
       }
     }

@@ -1126,7 +1126,18 @@ export class Postman implements DocGenerator {
           value = `${exampleValue}`;
         }
       } else {
-        value = `<${helper.getType()}>`;
+        const helperType = helper.getType();
+        const formattedHelperType = formatType(helperType);
+        const helperEnum = helper.getEnum();
+        if (helperEnum.length) {
+          value = `${helperEnum[0]}`;
+        } else if (formattedHelperType.type === 'number') {
+          value = `${helper.hasMin() ? helper.getMin() : 0}`;
+        } else if (formattedHelperType.type === 'boolean') {
+          value = `${true}`;
+        } else {
+          value = `<${formattedHelperType.format || formattedHelperType.type || helper.getType()}>`;
+        }
       }
 
       const header: HeaderObject = {
@@ -1335,7 +1346,18 @@ export class Postman implements DocGenerator {
           queryParam.value = `${exampleValue}`;
         }
       } else {
-        queryParam.value = `<${helper.getType()}>`;
+        const helperType = helper.getType();
+        const formattedHelperType = formatType(helperType);
+        const helperEnum = helper.getEnum();
+        if (helperEnum.length) {
+          queryParam.value = `${helperEnum[0]}`;
+        } else if (formattedHelperType.type === 'number') {
+          queryParam.value = `${helper.hasMin() ? helper.getMin() : 0}`;
+        } else if (formattedHelperType.type === 'boolean') {
+          queryParam.value = `${true}`;
+        } else {
+          queryParam.value = `<${formattedHelperType.format || formattedHelperType.type || helper.getType()}>`;
+        }
       }
 
       Log.debug('QueryParam: %O', queryParam);
