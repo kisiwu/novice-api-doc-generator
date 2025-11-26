@@ -25,7 +25,7 @@ import {
 import { PostmanHelperInterface } from './postman/helpers/interfaces';
 import { PostmanJoiHelper } from './postman/helpers/joiHelper';
 
-import { formatPath, /*formatType,*/ Log } from './postman/utils';
+import { formatPath, formatType, Log } from './postman/utils';
 import { RequestBodyCreator } from './postman/services/requestBodyService';
 import { BasePostmanAuthUtil } from '../utils/auth/baseAuthUtils';
 import { BasePostmanResponseUtil, BaseResponseUtil } from '../utils/responses/baseResponseUtils';
@@ -1204,12 +1204,20 @@ export class Postman implements DocGenerator {
       if (!helper.isValid()) return;
 
       const variable: Variable = {
+        key: name,
         name,
         type: helper.getType()
       };
 
       if (!variable.type || !VALID_VARIABLE_TYPES.includes(variable.type)) {
-        variable.type = 'any';
+        let tmpType = 'any'
+        if (variable.type) {
+          const tmpType2 = formatType(variable.type).type
+          if (tmpType2 && VALID_VARIABLE_TYPES.includes(tmpType2)) {
+            tmpType = tmpType2
+          }
+        }
+        variable.type = tmpType;
       }
 
       const description: string = helper.getDescription();
