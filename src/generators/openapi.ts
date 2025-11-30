@@ -1761,14 +1761,15 @@ export class OpenAPI implements DocGenerator {
     }
 
     // enum
-    if (helper.getEnum().length) {
-      prop.setEnum(helper.getEnum());
-    }
-
-    // anyOf
-    const anyOf = helper.getAnyOf?.()
-    if (Array.isArray(anyOf) && anyOf.length) {
-      prop.setAnyOf(anyOf);
+    const enumValues = helper.getEnum()
+    if (enumValues.length) {
+      prop.setEnum(enumValues);
+    } else {
+      // anyOf
+      const anyOf = helper.getAnyOf?.()
+      if (Array.isArray(anyOf) && anyOf.length) {
+        prop.setAnyOf(anyOf);
+      }
     }
 
     // required
