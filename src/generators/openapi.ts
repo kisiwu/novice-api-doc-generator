@@ -1765,6 +1765,12 @@ export class OpenAPI implements DocGenerator {
       prop.setEnum(helper.getEnum());
     }
 
+    // anyOf
+    const anyOf = helper.getAnyOf?.()
+    if (Array.isArray(anyOf) && anyOf.length) {
+      prop.setAnyOf(anyOf);
+    }
+
     // required
     if (helper.isRequired()) {
       if (parentProp?.isType('object') && name) {

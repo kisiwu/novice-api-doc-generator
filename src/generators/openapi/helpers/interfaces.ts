@@ -5,6 +5,7 @@ import {
   EncodingObject,
   ExampleObject,
   ReferenceObject,
+  SchemaObject,
   XMLObject,
 } from '../definitions';
 
@@ -29,4 +30,6 @@ export interface OpenAPIHelperInterface extends BaseHelperInterface {
   getExamples?(): Record<string, ExampleObject | ReferenceObject> | undefined;
   hasEncoding?(): boolean;
   getEncoding?(): Record<string, EncodingObject> | undefined;
+  hasAnyOf?(): boolean;
+  getAnyOf?(): SchemaObject[];
 }

@@ -158,6 +158,11 @@ export class SchemaCreator {
     return this;
   }
 
+  setAnyOf(value: Array<SchemaObject | ReferenceObject>): SchemaCreator {
+    this.#schema.anyOf = value;
+    return this;
+  }
+
   setMin(value: number | undefined): SchemaCreator {
     this.#min = value;
     return this;
