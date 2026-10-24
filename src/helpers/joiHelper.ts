@@ -1,6 +1,6 @@
-import { BaseHelperInterface } from './baseHelper';
 import { VALID_TYPES } from '../utils/genericUtils';
-import { Schema } from 'joi'
+import { BaseHelperInterface } from './baseHelper';
+import type { Schema } from 'joi';
 
 export interface JoiRule {
   name: string;
@@ -18,10 +18,10 @@ export type JoiSchema = Partial<Schema> & {
   _valids?: {
     _values?: Set<unknown>;
     [key: string]: unknown;
-  },
+  };
   _singleRules?: Map<string, JoiRule>;
   _rules?: JoiRule[];
-}
+};
 
 /**
  * Types:
@@ -44,24 +44,20 @@ export class JoiHelper implements BaseHelperInterface {
   protected _joi: JoiSchema;
   protected isRoot: boolean;
 
-  constructor({ isRoot, value = {} }: { isRoot?: boolean, value?: JoiSchema | unknown }) {
-    this.isRoot = isRoot || false
+  constructor({ isRoot, value = {} }: { isRoot?: boolean; value?: JoiSchema | unknown }) {
+    this.isRoot = isRoot || false;
     this._joi = value && typeof value === 'object' ? value : {};
   }
 
   protected isJoi(): boolean {
-    return (this._joi
-      && typeof this._joi.type === 'string'
-      && this._joi.$_terms
-      && this._joi.$) ? true : false;
+    return this._joi && typeof this._joi.type === 'string' && this._joi.$_terms && this._joi.$ ? true : false;
   }
 
   protected hasMeta(v: string): boolean {
     if (!this.isJoi()) {
       return false;
     }
-    return typeof this._joi?.['$_terms']?.metas?.[0]?.[v] !== 'undefined' ?
-      true : false;
+    return typeof this._joi?.['$_terms']?.metas?.[0]?.[v] !== 'undefined' ? true : false;
   }
 
   protected getMeta(v: string): unknown {
@@ -89,7 +85,7 @@ export class JoiHelper implements BaseHelperInterface {
     if (metaFormat && typeof metaFormat === 'string' && VALID_TYPES.includes(metaFormat)) {
       res = metaFormat;
     } else if (this._joi._rules) {
-      const rule = this._joi._rules.find(v => VALID_TYPES.includes(v.name));
+      const rule = this._joi._rules.find((v) => VALID_TYPES.includes(v.name));
       if (rule) {
         res = rule.name;
       }
@@ -107,8 +103,7 @@ export class JoiHelper implements BaseHelperInterface {
     if (!this.isJoi()) {
       return res;
     }
-    if (this._joi._flags
-      && typeof this._joi._flags.description === 'string') {
+    if (this._joi._flags && typeof this._joi._flags.description === 'string') {
       res = this._joi._flags.description;
     }
     return res;
@@ -119,8 +114,7 @@ export class JoiHelper implements BaseHelperInterface {
     if (!this.isJoi()) {
       return res;
     }
-    if (this._joi._flags
-      && this._joi._flags.presence === 'required') {
+    if (this._joi._flags && this._joi._flags.presence === 'required') {
       res = true;
     }
     return res;
@@ -131,8 +125,7 @@ export class JoiHelper implements BaseHelperInterface {
     if (!this.isJoi()) {
       return res;
     }
-    if (this._joi._rules
-      && this._joi._rules.some(v => v.name == 'unique')) {
+    if (this._joi._rules && this._joi._rules.some((v) => v.name == 'unique')) {
       res = true;
     }
     return res;
@@ -142,8 +135,7 @@ export class JoiHelper implements BaseHelperInterface {
     if (!this.isJoi()) {
       return false;
     }
-    return this._joi._flags
-      && typeof this._joi._flags.default !== 'undefined' ? true : false;
+    return this._joi._flags && typeof this._joi._flags.default !== 'undefined' ? true : false;
   }
 
   getDefaultValue(): unknown {
@@ -161,9 +153,11 @@ export class JoiHelper implements BaseHelperInterface {
     if (!this.isJoi()) {
       return false;
     }
-    return this._joi['$_terms']
-      && this._joi['$_terms'].examples
-      && typeof this._joi['$_terms'].examples[0] !== 'undefined' ? true : false;
+    return this._joi['$_terms'] &&
+      this._joi['$_terms'].examples &&
+      typeof this._joi['$_terms'].examples[0] !== 'undefined'
+      ? true
+      : false;
   }
 
   getExampleValue(): unknown {
@@ -181,10 +175,12 @@ export class JoiHelper implements BaseHelperInterface {
     if (!this.isJoi()) {
       return false;
     }
-    return this._joi['$_terms']
-      && this._joi['$_terms'].metas
-      && this._joi['$_terms'].metas[0]
-      && this._joi['$_terms'].metas[0].deprecated ? true : false;
+    return this._joi['$_terms'] &&
+      this._joi['$_terms'].metas &&
+      this._joi['$_terms'].metas[0] &&
+      this._joi['$_terms'].metas[0].deprecated
+      ? true
+      : false;
   }
 
   allowsEmptyValue(): boolean {
@@ -192,10 +188,9 @@ export class JoiHelper implements BaseHelperInterface {
     if (!this.isJoi()) {
       return r;
     }
-    if (this._joi._valids
-      && this._joi._valids._values) {
+    if (this._joi._valids && this._joi._valids._values) {
       const _values = this._joi._valids._values;
-      r = ['', null].some(v => _values.has(v))
+      r = ['', null].some((v) => _values.has(v));
     }
     return r;
   }
@@ -205,13 +200,8 @@ export class JoiHelper implements BaseHelperInterface {
     if (!this.isJoi()) {
       return r;
     }
-    if (this._joi._flags
-      && this._joi._flags.only
-      && this._joi._valids
-      && this._joi._valids._values) {
-      this._joi._valids._values.forEach(
-        v => r.push(v)
-      );
+    if (this._joi._flags && this._joi._flags.only && this._joi._valids && this._joi._valids._values) {
+      this._joi._valids._values.forEach((v) => r.push(v));
     }
     return r;
   }

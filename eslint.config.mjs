@@ -1,12 +1,15 @@
-import { defineConfig } from 'eslint/config';
+import { FlatCompat } from '@eslint/eslintrc';
+import js from '@eslint/js';
+import stylisticJs from '@stylistic/eslint-plugin';
 import typescriptEslint from '@typescript-eslint/eslint-plugin';
-import globals from 'globals';
 import tsParser from '@typescript-eslint/parser';
+import eslintConfigPrettier from 'eslint-config-prettier/flat';
+import { importX } from 'eslint-plugin-import-x';
+import { createTypeScriptImportResolver } from 'eslint-import-resolver-typescript'
+import { defineConfig } from 'eslint/config';
+import globals from 'globals';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
-import js from '@eslint/js';
-import { FlatCompat } from '@eslint/eslintrc';
-import stylisticJs from '@stylistic/eslint-plugin'
 import mochaPlugin from 'eslint-plugin-mocha';
 
 const __filename = fileURLToPath(import.meta.url);
@@ -18,14 +21,16 @@ const compat = new FlatCompat({
 });
 
 export default defineConfig([
-    { ignores: ['lib/', 'docs/'] },
+    { ignores: ['lib/', 'dist/', 'build/', 'coverage/', '.husky/', 'assets/', 'docs/', 'private/'] },
+    mochaPlugin.configs.recommended,
     {
         extends: compat.extends('eslint:recommended', 'plugin:@typescript-eslint/recommended'),
         files: ['{src,test}/**/*.ts', '*.{ts,mjs}'],
 
         plugins: {
             '@typescript-eslint': typescriptEslint,
-            '@stylistic/js': stylisticJs
+            '@stylistic/js': stylisticJs,
+            'import-x': importX,
         },
 
         languageOptions: {
@@ -41,14 +46,32 @@ export default defineConfig([
         rules: {
             '@stylistic/js/quotes': ['warn', 'single'],
             '@stylistic/js/quote-props': ['error', 'as-needed'],
+            'import-x/no-cycle': ['error', { maxDepth: Infinity }],
         },
-    }, {
-        extends: [...compat.extends('eslint:recommended'), mochaPlugin.configs.recommended],
-        files: ['test/**/*.mjs'],
+
+        settings: {
+            'import-x/resolver-next': [
+                createTypeScriptImportResolver({
+                    project: './tsconfig.json',
+                })
+            ],
+        },
+    },
+    {
+        files: ['test/**/*.ts', 'test/**/*.js'],
+        rules: {
+            'mocha/no-setup-in-describe': ['off'],
+            'mocha/no-mocha-arrows': ['off'],
+            '@typescript-eslint/no-unused-expressions': ['off']
+        }
+    },
+    {
+        extends: compat.extends('eslint:recommended', 'plugin:@typescript-eslint/recommended'),
+        files: ['**/*.mjs'],
 
         plugins: {
             '@typescript-eslint': typescriptEslint,
-            '@stylistic/js': stylisticJs
+            '@stylistic': stylisticJs,
         },
 
         languageOptions: {
@@ -62,17 +85,24 @@ export default defineConfig([
         },
 
         rules: {
-            'mocha/no-setup-in-describe': ['off'],
-            '@stylistic/js/quotes': ['warn', 'single'],
-            '@stylistic/js/quote-props': ['error', 'as-needed'],
+            '@stylistic/quotes': ['error', 'single'],
+            '@stylistic/quote-props': ['error', 'as-needed'],
+            '@typescript-eslint/no-unused-vars': [
+                'warn',
+                {
+                    argsIgnorePattern: '^_',
+                    caughtErrorsIgnorePattern: '^_',
+                    varsIgnorePattern: '^_'
+                }
+            ]
         },
-    }, {
-        extends: [...compat.extends('eslint:recommended'), mochaPlugin.configs.recommended],
-        files: ['test/**/*.js', '*.js'],
-
+    },
+    {
+        extends: [...compat.extends('eslint:recommended')],
+        files: ['**/*.js'],
 
         plugins: {
-            '@stylistic/js': stylisticJs
+            '@stylistic': stylisticJs,
         },
 
         languageOptions: {
@@ -85,8 +115,17 @@ export default defineConfig([
         },
 
         rules: {
-            'mocha/no-setup-in-describe': ['off'],
-            '@stylistic/js/quotes': ['warn', 'single'],
-            '@stylistic/js/quote-props': ['error', 'as-needed'],
+            '@stylistic/quotes': ['error', 'single'],
+            '@stylistic/quote-props': ['error', 'as-needed'],
+            'no-unused-vars': [
+                'warn',
+                {
+                    argsIgnorePattern: '^_',
+                    caughtErrorsIgnorePattern: '^_',
+                    varsIgnorePattern: '^_'
+                }
+            ]
         },
-    }]);
+    },
+    eslintConfigPrettier,
+]);

@@ -11,46 +11,39 @@ export {
   GroupContextAuthUtil,
   NoAuthUtil,
   OAuth2Util,
-  TokenLocation
+  TokenLocation,
 } from './utils/auth/all';
 export {
   ContextResponseUtil,
   GroupResponseUtil,
-  IOpenAPIResponseContext,
+  type IOpenAPIResponseContext,
   MediaTypeUtil,
-  ResponseUtil
+  ResponseUtil,
 } from './utils/responses/all';
-export {
-  DocGenerator,
-  ProcessedRoute
-} from './commons';
+export type { DocGenerator, ProcessedRoute } from './commons';
 export {
   OpenAPI,
-  OpenAPIResult,
+  type OpenAPIResult,
   GenerateComponentsRule,
-  OpenAPIHelperClass,
-  OpenAPIOptions
+  type OpenAPIHelperClass,
+  type OpenAPIOptions,
 } from './generators/openapi';
-export {
-  OpenAPIHelperInterface
-} from './generators/openapi/helpers/interfaces';
+export { type OpenAPIHelperInterface } from './generators/openapi/helpers/interfaces';
 export {
   Postman,
-  PostmanCollection,
+  type PostmanCollection,
   GenerateFoldersRule,
-  PostmanHelperClass,
-  PostmanOptions
+  type PostmanHelperClass,
+  type PostmanOptions,
 } from './generators/postman';
-export {
-  PostmanHelperInterface
-} from './generators/postman/helpers/interfaces';
+export { type PostmanHelperInterface } from './generators/postman/helpers/interfaces';
 
 // some definitions
-export {
+export type {
   ReferenceObject,
   SchemaObject,
   SchemaObject3_0,
   SchemaObject3_1,
   SecurityRequirementObject,
-  SecuritySchemeObject
-} from './generators/openapi/definitions'
+  SecuritySchemeObject,
+} from './generators/openapi/definitions';

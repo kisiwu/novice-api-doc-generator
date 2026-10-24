@@ -1,11 +1,5 @@
+import { EncodingObject, ExampleObject, MediaTypeObject, ReferenceObject, SchemaObject } from '../definitions';
 import extend from 'extend';
-import { 
-  EncodingObject,
-  ExampleObject,
-  MediaTypeObject,
-  ReferenceObject,
-  SchemaObject
-} from '../definitions';
 
 export class MediaTypeCreator {
   #mediaType: MediaTypeObject;
@@ -34,8 +28,8 @@ export class MediaTypeCreator {
     return this;
   }
 
-  toObject(): MediaTypeObject{
+  toObject(): MediaTypeObject {
     const copy: MediaTypeObject = extend(true, {}, this.#mediaType);
     return copy;
   }
-} 
+}

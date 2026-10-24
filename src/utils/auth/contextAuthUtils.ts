@@ -1,12 +1,12 @@
-import extend from 'extend';
-import { BaseAuthUtil, BaseContextAuthUtil, IContextAuthUtil } from './baseAuthUtils';
-import { Auth } from '../../generators/postman/definitions';
 import { SecurityRequirementObject } from '../../generators/openapi/definitions';
+import { Auth } from '../../generators/postman/definitions';
+import { BaseAuthUtil, BaseContextAuthUtil, IContextAuthUtil } from './baseAuthUtils';
+import extend from 'extend';
 
 /**
  * Helps defining scopes for security requirements
  * of a route.
- * 
+ *
  * {@include ../../../typedocIncludes/auth/oAuth2Util.md}
  */
 export class ContextAuthUtil extends BaseContextAuthUtil {
@@ -42,7 +42,7 @@ export class GroupContextAuthUtil extends BaseContextAuthUtil {
 
   toPostman(): Auth {
     let r: Auth = {
-      type: 'noauth'
+      type: 'noauth',
     };
     this.authUtils.forEach((builder, i) => {
       const auth = builder.toPostman();
@@ -56,7 +56,7 @@ export class GroupContextAuthUtil extends BaseContextAuthUtil {
 
   toOpenAPISecurity(): SecurityRequirementObject[] {
     let r: SecurityRequirementObject[] = [];
-    this.authUtils.forEach(builder => {
+    this.authUtils.forEach((builder) => {
       r = r.concat(builder.toOpenAPISecurity());
     });
     return r;

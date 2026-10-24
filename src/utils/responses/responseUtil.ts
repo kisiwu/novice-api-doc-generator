@@ -1,14 +1,17 @@
-import { BaseResponseUtil, FullResponseUtil, IOpenAPIResponseContext, IPostmanResponseContext } from './baseResponseUtils';
-import {
-  ResponseObject as PostmanResponseObject
-} from '../../generators/postman/definitions';
 import {
   ResponseObject as OpenAPIResponseObject,
   ReferenceObject,
   LinkObject,
   MediaTypeObject,
-  HeaderObject
+  HeaderObject,
 } from '../../generators/openapi/definitions';
+import { ResponseObject as PostmanResponseObject } from '../../generators/postman/definitions';
+import {
+  BaseResponseUtil,
+  FullResponseUtil,
+  IOpenAPIResponseContext,
+  IPostmanResponseContext,
+} from './baseResponseUtils';
 import { MediaTypeUtil } from './mediaTypeUtil';
 import extend from 'extend';
 
@@ -16,7 +19,6 @@ import extend from 'extend';
  * {@include ../../../typedocIncludes/responses/responseUtil.md}
  */
 export class ResponseUtil extends FullResponseUtil {
-
   setName(name: string): this {
     this.name = name;
     return this;
@@ -79,7 +81,7 @@ export class ResponseUtil extends FullResponseUtil {
   }
   removeHeader(key: string): HeaderObject | ReferenceObject | undefined {
     let r;
-    if(this.headers) {
+    if (this.headers) {
       r = this.headers[key];
       delete this.headers[key];
     }
@@ -109,7 +111,7 @@ export class ResponseUtil extends FullResponseUtil {
   }
   removeMediaType(contentType: string): MediaTypeObject | undefined {
     let r;
-    if(this.content) {
+    if (this.content) {
       r = this.content[contentType];
       delete this.content[contentType];
     }
@@ -135,7 +137,7 @@ export class ResponseUtil extends FullResponseUtil {
   }
   removeLink(key: string): LinkObject | ReferenceObject | undefined {
     let r;
-    if(this.links) {
+    if (this.links) {
       r = this.links[key];
       delete this.links[key];
     }
@@ -152,8 +154,8 @@ export class ResponseUtil extends FullResponseUtil {
   toOpenAPI(ctxt: IOpenAPIResponseContext): Record<string, OpenAPIResponseObject | ReferenceObject>;
   toOpenAPI(ctxt: IOpenAPIResponseContext = {}): Record<string, OpenAPIResponseObject | ReferenceObject> {
     let name = this.name;
-    if(this.code) {
-      name = `${this.code}`; 
+    if (this.code) {
+      name = `${this.code}`;
     }
     if (ctxt.code) {
       name = `${ctxt.code}`;
@@ -167,19 +169,19 @@ export class ResponseUtil extends FullResponseUtil {
     if (ctxt.ref) {
       return {
         [name]: {
-          $ref: ctxt.ref
-        }
+          $ref: ctxt.ref,
+        },
       };
     }
     if (this.ref) {
       return {
         [name]: {
-          $ref: this.ref
-        }
+          $ref: this.ref,
+        },
       };
     }
     const res: OpenAPIResponseObject | ReferenceObject = {
-      description: this.description || ''
+      description: this.description || '',
     };
     if (this.headers) {
       res.headers = this.headers;
@@ -194,7 +196,7 @@ export class ResponseUtil extends FullResponseUtil {
       res.links = ctxt.links;
     }
     return {
-      [name]: res
+      [name]: res,
     };
   }
 }
@@ -212,7 +214,7 @@ export class GroupResponseUtil extends BaseResponseUtil {
 
   toPostman(): PostmanResponseObject[] {
     let r: PostmanResponseObject[] = [];
-    this.responseUtils.forEach(builder => {
+    this.responseUtils.forEach((builder) => {
       r = r.concat(builder.toPostman());
     });
     return r;
@@ -220,7 +222,7 @@ export class GroupResponseUtil extends BaseResponseUtil {
 
   toOpenAPI(): Record<string, OpenAPIResponseObject | ReferenceObject> {
     let r: Record<string, OpenAPIResponseObject | ReferenceObject> = {};
-    this.responseUtils.forEach(builder => {
+    this.responseUtils.forEach((builder) => {
       r = extend(r, builder.toOpenAPI());
     });
     return r;

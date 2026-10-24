@@ -1,4 +1,4 @@
-import { RouteMeta } from '@novice1/routing'
+import { RouteMeta } from '@novice1/routing';
 
 export interface ProcessedRoute {
   path: string;

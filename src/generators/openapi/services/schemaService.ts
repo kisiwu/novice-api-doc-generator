@@ -1,4 +1,3 @@
-import extend from 'extend';
 import {
   AdditionalProperties,
   DiscriminatorObject,
@@ -7,13 +6,13 @@ import {
   SchemaObject,
   SchemaObject3_0,
   SchemaObject3_1,
-  XMLObject
+  XMLObject,
 } from '../definitions';
+import extend from 'extend';
 
 // @todo: add contentMediaType and contentEncoding
 export class SchemaCreator {
-
-  #openapi: OpenAPISupportedVersion = '3.1.1'
+  #openapi: OpenAPISupportedVersion = '3.1.1';
 
   #schema: SchemaObject;
 
@@ -24,11 +23,11 @@ export class SchemaCreator {
 
   #example?: unknown;
 
-  #format?: string
+  #format?: string;
 
   constructor(schema: SchemaObject = {}, v?: OpenAPISupportedVersion) {
     if (v) {
-      this.#openapi = v
+      this.#openapi = v;
     }
     this.#schema = schema;
     this.#oneOf = [];
@@ -200,12 +199,13 @@ export class SchemaCreator {
     if (this.#format) {
       if (this.#format === 'binary' || this.#format.includes('/')) {
         if (this.#openapi === '3.0.4') {
-          (copy as SchemaObject3_0).format = 'binary'
+          (copy as SchemaObject3_0).format = 'binary';
         } else {
-          (copy as SchemaObject3_1).contentMediaType = this.#format === 'binary' ? 'application/octet-stream' : this.#format
+          (copy as SchemaObject3_1).contentMediaType =
+            this.#format === 'binary' ? 'application/octet-stream' : this.#format;
         }
       } else {
-        copy.format = this.#format
+        copy.format = this.#format;
       }
     }
 
@@ -237,9 +237,9 @@ export class SchemaCreator {
     // example
     if (typeof this.#example !== 'undefined') {
       if (this.#openapi === '3.0.4') {
-        (copy as SchemaObject3_0).example = this.#example
+        (copy as SchemaObject3_0).example = this.#example;
       } else {
-        (copy as SchemaObject3_1).examples = /*Array.isArray(this.#example) ? this.#example :*/ [this.#example]
+        (copy as SchemaObject3_1).examples = /*Array.isArray(this.#example) ? this.#example :*/ [this.#example];
       }
     }
 

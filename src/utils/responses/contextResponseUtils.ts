@@ -1,11 +1,9 @@
 import {
-  LinkObject, 
-  ReferenceObject, 
-  ResponseObject as OpenAPIResponseObject
+  LinkObject,
+  ReferenceObject,
+  ResponseObject as OpenAPIResponseObject,
 } from '../../generators/openapi/definitions';
-import {
-  ResponseObject as PostmanResponseObject
-} from '../../generators/postman/definitions';
+import { ResponseObject as PostmanResponseObject } from '../../generators/postman/definitions';
 import { BaseResponseUtil, IOpenAPIResponseContext, IPostmanResponseContext } from './baseResponseUtils';
 
 /**
@@ -81,7 +79,7 @@ export class ContextResponseUtil extends BaseResponseUtil {
   }
   removeLink(key: string): LinkObject | ReferenceObject | undefined {
     let r;
-    if(this.links) {
+    if (this.links) {
       r = this.links[key];
       delete this.links[key];
     }
@@ -104,12 +102,12 @@ export class ContextResponseUtil extends BaseResponseUtil {
     if (this.ref) {
       ctxt.ref = this.ref;
     }
-    if (this.links){
+    if (this.links) {
       ctxt.links = this.links;
     }
     if (this.default) {
       ctxt.default = this.default;
     }
-    return this.responseUtil.toOpenAPI(ctxt); 
+    return this.responseUtil.toOpenAPI(ctxt);
   }
 }

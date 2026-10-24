@@ -13,7 +13,7 @@ export enum AuthType {
   noauth = 'noauth',
   oauth1 = 'oauth1',
   oauth2 = 'oauth2',
-  ntlm = 'ntlm'
+  ntlm = 'ntlm',
 }
 
 export interface DescriptionObject {
@@ -106,7 +106,6 @@ export interface Auth {
   [key: string]: unknown;
 }
 
-
 // --- item
 
 export interface ProxyConfig {
@@ -170,7 +169,7 @@ export interface RequestBodyObject {
   file?: {
     src?: string | null;
     content?: string;
-  },
+  };
   options?: Record<string, unknown>;
   disabled?: boolean;
   [x: string]: unknown;
@@ -223,7 +222,7 @@ export interface Item {
   description?: Description;
   variable?: Variable[];
   event?: EventObject[];
-  request: RequestObject/* | string*/;
+  request: RequestObject /* | string*/;
   response?: ResponseObject[];
   protocolProfileBehavior?: unknown;
 }

@@ -1,6 +1,6 @@
-import { FullAuthUtil } from './baseAuthUtils';
-import { Auth } from '../../generators/postman/definitions';
 import { SecuritySchemeObject } from '../../generators/openapi/definitions';
+import { Auth } from '../../generators/postman/definitions';
+import { FullAuthUtil } from './baseAuthUtils';
 
 function isDefined(v: unknown) {
   return typeof v !== 'undefined';
@@ -9,14 +9,13 @@ function isDefined(v: unknown) {
 export enum ApiKeyLocation {
   query = 'query',
   header = 'header',
-  cookie = 'cookie'
+  cookie = 'cookie',
 }
 
 /**
  * {@include ../../../typedocIncludes/auth/apiKeyUtil.md}
  */
 export class ApiKeyUtil extends FullAuthUtil {
-
   protected key?: string;
   protected value?: string;
   protected apiKeyLocation?: string; // in
@@ -91,29 +90,28 @@ export class ApiKeyUtil extends FullAuthUtil {
   toPostman(): Auth {
     const r: Auth = {
       type: 'apikey',
-      apikey: []
+      apikey: [],
     };
 
     if (isDefined(this.key)) {
       r.apikey?.push({
         key: 'key',
         value: this.key,
-        type: 'string'
+        type: 'string',
       });
     }
     if (isDefined(this.value)) {
       r.apikey?.push({
         key: 'value',
         value: this.value,
-        type: 'string'
+        type: 'string',
       });
     }
-    if (isDefined(this.apiKeyLocation) 
-      && this.apiKeyLocation !== ApiKeyLocation.cookie) {
+    if (isDefined(this.apiKeyLocation) && this.apiKeyLocation !== ApiKeyLocation.cookie) {
       r.apikey?.push({
         key: 'in',
         value: this.apiKeyLocation,
-        type: 'string'
+        type: 'string',
       });
     }
 
@@ -123,7 +121,7 @@ export class ApiKeyUtil extends FullAuthUtil {
   toOpenAPI(): Record<string, SecuritySchemeObject> {
     const r: SecuritySchemeObject = {
       type: 'apiKey',
-      description: this.description
+      description: this.description,
     };
     if (isDefined(this.apiKeyLocation)) {
       r.in = this.apiKeyLocation;
@@ -132,7 +130,7 @@ export class ApiKeyUtil extends FullAuthUtil {
       r.name = this.key;
     }
     return {
-      [this.securitySchemeName]: r
+      [this.securitySchemeName]: r,
     };
   }
 }

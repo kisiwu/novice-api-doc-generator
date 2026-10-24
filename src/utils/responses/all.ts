@@ -3,15 +3,8 @@ export {
   BasePostmanResponseUtil,
   BaseResponseUtil,
   FullResponseUtil,
-  IOpenAPIResponseContext
+  type IOpenAPIResponseContext,
 } from './baseResponseUtils';
-export {
-  ContextResponseUtil
-} from './contextResponseUtils';
-export {
-  MediaTypeUtil
-} from './mediaTypeUtil';
-export {
-  ResponseUtil,
-  GroupResponseUtil
-} from './responseUtil';
+export { ContextResponseUtil } from './contextResponseUtils';
+export { MediaTypeUtil } from './mediaTypeUtil';
+export { ResponseUtil, GroupResponseUtil } from './responseUtil';

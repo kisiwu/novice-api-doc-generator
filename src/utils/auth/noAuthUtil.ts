@@ -1,5 +1,5 @@
-import { Auth } from '../../generators/postman/definitions';
 import { SecurityRequirementObject } from '../../generators/openapi/definitions';
+import { Auth } from '../../generators/postman/definitions';
 import { BaseContextAuthUtil } from './baseAuthUtils';
 
 /**
@@ -9,10 +9,9 @@ import { BaseContextAuthUtil } from './baseAuthUtils';
  * {@include ../../../typedocIncludes/auth/noAuthUtil.md}
  */
 export class NoAuthUtil extends BaseContextAuthUtil {
-
   toPostman(): Auth {
     const r: Auth = {
-      type: 'noauth'
+      type: 'noauth',
     };
     return r;
   }

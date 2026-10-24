@@ -1,7 +1,7 @@
-import extend from 'extend';
 import { SecurityRequirementObject, SecuritySchemeObject } from '../../generators/openapi/definitions';
 import { Auth } from '../../generators/postman/definitions';
 import { BaseAuthUtil } from './baseAuthUtils';
+import extend from 'extend';
 
 /**
  * {@include ../../../typedocIncludes/auth/openapi/groupAuthUtil.md}
@@ -17,7 +17,7 @@ export class GroupAuthUtil extends BaseAuthUtil {
 
   toPostman(): Auth {
     let r: Auth = {
-      type: 'noauth'
+      type: 'noauth',
     };
     this.authUtils.forEach((builder, i) => {
       const auth = builder.toPostman();
@@ -31,7 +31,7 @@ export class GroupAuthUtil extends BaseAuthUtil {
 
   toOpenAPISecurity(): SecurityRequirementObject[] {
     let r: SecurityRequirementObject[] = [];
-    this.authUtils.forEach(builder => {
+    this.authUtils.forEach((builder) => {
       r = r.concat(builder.toOpenAPISecurity());
     });
     return r;
@@ -39,7 +39,7 @@ export class GroupAuthUtil extends BaseAuthUtil {
 
   toOpenAPI(): Record<string, SecuritySchemeObject> {
     let r: Record<string, SecuritySchemeObject> = {};
-    this.authUtils.forEach(builder => {
+    this.authUtils.forEach((builder) => {
       r = extend(r, builder.toOpenAPI());
     });
     return r;

@@ -13,13 +13,9 @@ interface ISchemeOpenAPIAuthUtil {
   toOpenAPI(): Record<string, SecuritySchemeObject>;
 }
 
-interface IFullOpenAPIAuthUtil 
-  extends IContextOpenAPIAuthUtil, ISchemeOpenAPIAuthUtil {
-}
+interface IFullOpenAPIAuthUtil extends IContextOpenAPIAuthUtil, ISchemeOpenAPIAuthUtil {}
 
-export interface IContextAuthUtil 
-  extends IPostmanAuthUtil, IContextOpenAPIAuthUtil {
-}
+export interface IContextAuthUtil extends IPostmanAuthUtil, IContextOpenAPIAuthUtil {}
 
 interface IAuthUtil extends IFullOpenAPIAuthUtil, IPostmanAuthUtil {
   setDescription(description: string): unknown;
@@ -35,18 +31,14 @@ export abstract class BasePostmanAuthUtil implements IPostmanAuthUtil {
   abstract toPostman(scopes?: string[]): Auth;
 }
 
-export abstract class BaseContextAuthUtil 
-  extends BasePostmanAuthUtil
-  implements IContextAuthUtil {
+export abstract class BaseContextAuthUtil extends BasePostmanAuthUtil implements IContextAuthUtil {
   abstract toOpenAPISecurity(scopes?: string[]): SecurityRequirementObject[];
 }
 
 /**
  * {@include ../../../typedocIncludes/auth/baseAuthUtil.md}
  */
-export abstract class BaseAuthUtil 
-  extends BaseContextAuthUtil
-  implements IPostmanAuthUtil, IFullOpenAPIAuthUtil {
+export abstract class BaseAuthUtil extends BaseContextAuthUtil implements IPostmanAuthUtil, IFullOpenAPIAuthUtil {
   abstract toOpenAPI(): Record<string, SecuritySchemeObject>;
 }
 
@@ -55,7 +47,7 @@ export abstract class FullAuthUtil extends BaseAuthUtil implements IAuthUtil {
   protected securitySchemeName: string;
 
   /**
-   * 
+   *
    * @param description A short description for security scheme.
    * CommonMark syntax MAY be used for rich text representation.
    */
@@ -81,8 +73,10 @@ export abstract class FullAuthUtil extends BaseAuthUtil implements IAuthUtil {
   }
 
   toOpenAPISecurity(scopes: string[] = []): SecurityRequirementObject[] {
-    return [{
-      [this.securitySchemeName]: scopes
-    }];
+    return [
+      {
+        [this.securitySchemeName]: scopes,
+      },
+    ];
   }
 }

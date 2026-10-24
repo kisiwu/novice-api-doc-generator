@@ -1,11 +1,11 @@
 /**
  * @todo: finish toObject method
  */
-import jsontoxml from 'jsontoxml';
 import { XMLObject } from '../../openapi/definitions';
 import { FormParameter, RequestBodyObject, SrcFormParameter, ValueFormParameter } from '../definitions';
 import { PostmanHelperInterface } from '../helpers/interfaces';
 import { formatType } from '../utils';
+import jsontoxml from 'jsontoxml';
 
 interface JsontoxmlObject {
   name: string;
@@ -138,7 +138,7 @@ export class RequestBodyCreator {
   toObject(): RequestBodyObject {
     const mode = this.mode;
     const res: RequestBodyObject = {
-      disabled: !this.required
+      disabled: !this.required,
     };
     if (mode === 'raw') {
       res.mode = mode;
@@ -177,7 +177,7 @@ export class RequestBodyCreator {
       }
     }
     if (res.disabled && res.formdata?.length && res.mode === 'formdata') {
-      res.disabled = !res.formdata.some(d => !d.disabled)
+      res.disabled = !res.formdata.some((d) => !d.disabled);
     }
     return res;
   }
@@ -201,11 +201,8 @@ export class RequestBodyCreator {
     let res: string | undefined;
     if (this.hasFields()) {
       if (this.format === 'xml') {
-        const json: JsontoxmlObject = this._createElementJsontoxmlObject(
-          'element',
-          this.fieldsBody
-        );
-        Object.keys(this.fields).forEach(name => {
+        const json: JsontoxmlObject = this._createElementJsontoxmlObject('element', this.fieldsBody);
+        Object.keys(this.fields).forEach((name) => {
           const child = this.fields[name];
           const jsonChild = this._createJsontoxmlObject(name, child);
           if (child.hasXml?.() && child.getXml) {
@@ -224,11 +221,11 @@ export class RequestBodyCreator {
         });
         res = jsontoxml([json], {
           xmlHeader: true,
-          indent: ' '
+          indent: ' ',
         });
       } else {
         const raw: Record<string, unknown> = {};
-        Object.keys(this.fields).forEach(name => {
+        Object.keys(this.fields).forEach((name) => {
           raw[name] = this._createRaw(this.fields[name]);
         });
         res = JSON.stringify(raw, null, '\t');
@@ -240,14 +237,14 @@ export class RequestBodyCreator {
   protected createFormData(): FormParameter[] {
     const res: FormParameter[] = [];
     if (this.hasFields()) {
-      Object.keys(this.fields).forEach(name => {
+      Object.keys(this.fields).forEach((name) => {
         res.push(this._createFormDataEntity(name, this.fields[name]));
       });
     }
     if (this.hasFileFields()) {
-      Object.keys(this.fileFields).forEach(name => {
-        const newItem = this._createFormDataEntity(name, this.fileFields[name], true)
-        const index = res.findIndex(item => item.key === newItem.key);
+      Object.keys(this.fileFields).forEach((name) => {
+        const newItem = this._createFormDataEntity(name, this.fileFields[name], true);
+        const index = res.findIndex((item) => item.key === newItem.key);
         if (index !== -1) {
           // Replace at the same position
           res[index] = newItem;
@@ -260,12 +257,9 @@ export class RequestBodyCreator {
     return res;
   }
 
-  private _createElementJsontoxmlObject(
-    name: string,
-    helper?: PostmanHelperInterface
-  ): JsontoxmlObject {
+  private _createElementJsontoxmlObject(name: string, helper?: PostmanHelperInterface): JsontoxmlObject {
     const res: JsontoxmlObject = {
-      name
+      name,
     };
     if (helper?.hasXml?.() && helper.getXml) {
       let prefix = '';
@@ -279,7 +273,7 @@ export class RequestBodyCreator {
       if (xml?.namespace) {
         const xmlns = prefix ? `xmlns:${prefix}` : `xmlns:${res.name}`;
         res.attrs = {
-          [xmlns]: xml.namespace
+          [xmlns]: xml.namespace,
         };
       }
       if (prefix) {
@@ -289,14 +283,8 @@ export class RequestBodyCreator {
     return res;
   }
 
-  private _createJsontoxmlObject(
-    name: string,
-    helper: PostmanHelperInterface
-  ): JsontoxmlObject {
-    const res: JsontoxmlObject = this._createElementJsontoxmlObject(
-      name,
-      helper
-    );
+  private _createJsontoxmlObject(name: string, helper: PostmanHelperInterface): JsontoxmlObject {
+    const res: JsontoxmlObject = this._createElementJsontoxmlObject(name, helper);
     const helperType = formatType(helper.getType());
 
     if (helper.getType() === 'array') {
@@ -323,7 +311,7 @@ export class RequestBodyCreator {
       }
     } else if (helper.getType() === 'object') {
       const children = helper.getChildren();
-      Object.keys(children).forEach(childName => {
+      Object.keys(children).forEach((childName) => {
         const child = children[childName];
         const jsonChild = this._createJsontoxmlObject(childName, child);
         if (child.hasXml?.() && child.getXml) {
@@ -355,10 +343,7 @@ export class RequestBodyCreator {
     return res;
   }
 
-  private _createRaw(
-    helper: PostmanHelperInterface,
-    deepLevel = 0
-  ): unknown {
+  private _createRaw(helper: PostmanHelperInterface, deepLevel = 0): unknown {
     let res: unknown;
     if (deepLevel > 9) {
       return;
@@ -370,7 +355,7 @@ export class RequestBodyCreator {
     } else if (helper.hasExampleValue()) {
       res = helper.getExampleValue();
     } else if (helperEnum.length) {
-      res = helperEnum[0]
+      res = helperEnum[0];
     } else if (helper.getType() === 'alternatives') {
       const altHelper = helper.getAlternatives()[0];
       if (altHelper) {
@@ -379,11 +364,9 @@ export class RequestBodyCreator {
     } else if (helperType.type === 'object') {
       const children = helper.getChildren();
       const obj: Record<string, unknown> = {};
-      Object.keys(children).forEach(
-        name => {
-          obj[name] = this._createRaw(children[name], deepLevel + 1);
-        }
-      );
+      Object.keys(children).forEach((name) => {
+        obj[name] = this._createRaw(children[name], deepLevel + 1);
+      });
       res = obj;
     } else if (helperType.type === 'array') {
       const item = helper.getFirstItem();
@@ -407,11 +390,7 @@ export class RequestBodyCreator {
     return res;
   }
 
-  private _createFormDataEntity(
-    name: string,
-    helper: PostmanHelperInterface,
-    isFile = false
-  ): FormParameter {
+  private _createFormDataEntity(name: string, helper: PostmanHelperInterface, isFile = false): FormParameter {
     let res: FormParameter;
     const helperType = formatType(helper.getType());
     if (helperType.format === 'binary' || isFile) {
@@ -424,7 +403,7 @@ export class RequestBodyCreator {
     if (helper.hasDescriptionType?.() && helper.getDescriptionType) {
       res.description = {
         type: helper.getDescriptionType(),
-        content: description
+        content: description,
       };
     } else {
       res.description = description;
@@ -436,14 +415,11 @@ export class RequestBodyCreator {
     return res;
   }
 
-  private _createSrcFormData(
-    name: string,
-    helper: PostmanHelperInterface
-  ): SrcFormParameter {
+  private _createSrcFormData(name: string, helper: PostmanHelperInterface): SrcFormParameter {
     const res: SrcFormParameter = {
       key: name,
       type: 'file',
-      disabled: !helper.isRequired()
+      disabled: !helper.isRequired(),
     };
 
     if (helper.getType() === 'alternatives') {
@@ -462,14 +438,11 @@ export class RequestBodyCreator {
     return res;
   }
 
-  private _createValueFormData(
-    name: string,
-    helper: PostmanHelperInterface
-  ): ValueFormParameter {
+  private _createValueFormData(name: string, helper: PostmanHelperInterface): ValueFormParameter {
     const res: ValueFormParameter = {
       key: name,
       type: 'text',
-      disabled: !helper.isRequired()
+      disabled: !helper.isRequired(),
     };
 
     const raw = this._createRaw(helper);
@@ -483,5 +456,4 @@ export class RequestBodyCreator {
 
     return res;
   }
-
 }

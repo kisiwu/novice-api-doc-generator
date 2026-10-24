@@ -1,6 +1,6 @@
-import { FullAuthUtil } from './baseAuthUtils';
-import { Auth } from '../../generators/postman/definitions';
 import { SecuritySchemeObject } from '../../generators/openapi/definitions';
+import { Auth } from '../../generators/postman/definitions';
+import { FullAuthUtil } from './baseAuthUtils';
 
 function isDefined(v: unknown) {
   return typeof v !== 'undefined';
@@ -51,20 +51,20 @@ export class BasicAuthUtil extends FullAuthUtil {
   toPostman(): Auth {
     const r: Auth = {
       type: 'basic',
-      basic: []
+      basic: [],
     };
     if (isDefined(this.password)) {
       r.basic?.push({
         key: 'password',
         value: this.password,
-        type: 'string'
+        type: 'string',
       });
     }
     if (isDefined(this.username)) {
       r.basic?.push({
         key: 'username',
         value: this.username,
-        type: 'string'
+        type: 'string',
       });
     }
     return r;
@@ -75,8 +75,8 @@ export class BasicAuthUtil extends FullAuthUtil {
       [this.securitySchemeName]: {
         type: 'http',
         scheme: 'basic',
-        description: this.description
-      }
+        description: this.description,
+      },
     };
   }
 }

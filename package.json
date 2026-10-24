@@ -13,11 +13,13 @@
     "node": ">=16"
   },
   "scripts": {
+    "build": "npm exec tsc",
     "doc": "typedoc",
-    "build": "tsc",
+    "format": "cross-env NODE_OPTIONS=--experimental-strip-types prettier --write ./src",
+    "format:check": "cross-env NODE_OPTIONS=--experimental-strip-types prettier --check ./src",
     "lint": "eslint . && tsc --noEmit",
     "test": "kaukau --require ts-node/register --file test --ext .test.ts",
-    "testany": "env TS_NODE_COMPILER_OPTIONS='{\"module\": \"commonjs\", \"noImplicitAny\": false}' kaukau --require ts-node/register --file test --ext .test.ts",
+    "testany": "kaukau --require ts-node/register --file test --ext .test.ts",
     "testpostman": "kaukau --require ts-node/register --file test/postman --ext .test.ts",
     "testopenapi": "kaukau --require ts-node/register --file test/openapi --ext .test.ts"
   },
@@ -32,31 +34,48 @@
   ],
   "license": "MIT",
   "devDependencies": {
-    "@eslint/eslintrc": "^3.3.3",
-    "@eslint/js": "^9.39.2",
-    "@novice1/routing": "^2.1.0",
-    "@stylistic/eslint-plugin": "^5.7.1",
+    "@eslint/eslintrc": "^3.3.7",
+    "@eslint/js": "^10.0.1",
+    "@novice1/routing": "^2.1.2",
+    "@stylistic/eslint-plugin": "^5.10.0",
+    "@trivago/prettier-plugin-sort-imports": "^6.0.2",
     "@types/chai": "^5.2.3",
     "@types/extend": "^3.0.4",
     "@types/jsontoxml": "^1.0.6",
     "@types/mocha": "^10.0.10",
-    "@types/node": "^25.1.0",
-    "@typescript-eslint/eslint-plugin": "^8.54.0",
-    "@typescript-eslint/parser": "^8.54.0",
+    "@types/node": "^26.6.5",
+    "@typescript-eslint/eslint-plugin": "^8.72.0",
+    "@typescript-eslint/parser": "^8.72.0",
+    "@typescript/native": "npm:typescript@^7.0.2",
     "chai": "^4.5.0",
-    "eslint": "^9.39.2",
-    "eslint-plugin-mocha": "^11.2.0",
-    "globals": "^17.2.0",
-    "kaukau": "^4.2.1",
+    "cross-env": "^10.1.0",
+    "eslint": "^10.13.0",
+    "eslint-config-prettier": "^10.1.8",
+    "eslint-import-resolver-typescript": "^4.4.5",
+    "eslint-plugin-import-x": "^4.17.1",
+    "eslint-plugin-mocha": "^11.3.0",
+    "globals": "^17.13.0",
+    "joi": "^18.3.0",
+    "kaukau": "^5.0.1",
+    "prettier": "^3.9.10",
     "ts-node": "^10.9.2",
-    "typedoc": "^0.28.16",
-    "typescript": "^5.9.3"
+    "typedoc": "^0.28.20",
+    "typescript": "npm:@typescript/typescript6@^6.0.0",
+    "typescript-eslint": "^8.71.2"
   },
   "dependencies": {
     "@novice1/logger": "^1.6.1",
     "extend": "^3.0.2",
-    "joi": "^18.0.1",
     "jsontoxml": "^1.0.1",
-    "tslib": "^2.8.1"
+    "tslib": "^2.8.1",
+    "joi": "^18.0.1"
+  },
+  "peerDependencies": {
+    "joi": "^18.0.1"
+  },
+  "peerDependenciesMeta": {
+    "joi": {
+      "optional": true
+    }
   }
 }

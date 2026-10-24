@@ -26,5 +26,5 @@ export const VALID_TYPES: string[] = [
   'guid',
   'uuid',
   'uri',
-  'dataUri'
+  'dataUri',
 ];

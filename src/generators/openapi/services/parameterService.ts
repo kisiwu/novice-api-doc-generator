@@ -1,11 +1,5 @@
+import { ExampleObject, MediaTypeObject, ParameterObject, ReferenceObject, SchemaObject } from '../definitions';
 import extend from 'extend';
-import { 
-  ExampleObject, 
-  MediaTypeObject, 
-  ParameterObject, 
-  ReferenceObject, 
-  SchemaObject 
-} from '../definitions';
 
 export class ParameterCreator {
   #param: ParameterObject;
@@ -16,13 +10,13 @@ export class ParameterCreator {
 
   isRequired(): boolean {
     let res = false;
-    if(this.#param.required) {
+    if (this.#param.required) {
       res = true;
     }
     return res;
   }
 
-  setRequired(bool: boolean): ParameterCreator{
+  setRequired(bool: boolean): ParameterCreator {
     this.#param.required = bool;
     return this;
   }
@@ -85,8 +79,8 @@ export class ParameterCreator {
     return typeof this.#param.style === 'undefined' ? false : true;
   }
 
-  toObject(): ParameterObject{
+  toObject(): ParameterObject {
     const copy: ParameterObject = extend(true, {}, this.#param);
     return copy;
   }
-} 
+}

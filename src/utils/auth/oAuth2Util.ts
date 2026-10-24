@@ -1,12 +1,12 @@
-import extend from 'extend';
-import { FullAuthUtil } from './baseAuthUtils';
-import { Auth } from '../../generators/postman/definitions';
-import { 
-  OAuthFlowObject, 
-  OAuthFlowsObject, 
-  SecurityRequirementObject, 
-  SecuritySchemeObject 
+import {
+  OAuthFlowObject,
+  OAuthFlowsObject,
+  SecurityRequirementObject,
+  SecuritySchemeObject,
 } from '../../generators/openapi/definitions';
+import { Auth } from '../../generators/postman/definitions';
+import { FullAuthUtil } from './baseAuthUtils';
+import extend from 'extend';
 
 function isDefined(v: unknown) {
   return typeof v !== 'undefined';
@@ -14,7 +14,7 @@ function isDefined(v: unknown) {
 
 export enum ClientAuthentication {
   body = 'body',
-  header = 'header'
+  header = 'header',
 }
 
 export enum GrantType {
@@ -22,24 +22,23 @@ export enum GrantType {
   authorizationCodeWithPkce = 'authorization_code_with_pkce',
   implicit = 'implicit',
   passwordCredentials = 'password_credentials',
-  clientCredentials = 'client_credentials'
+  clientCredentials = 'client_credentials',
 }
 
 export enum TokenLocation {
   queryParams = 'queryParams',
-  header = 'header'
+  header = 'header',
 }
 
 export enum ChallengeAlgorithm {
   plain = 'plain',
-  S256 = 'S256'
+  S256 = 'S256',
 }
 
 /**
  * {@include ../../../typedocIncludes/auth/oAuth2Util.md}
  */
 export class OAuth2Util extends FullAuthUtil {
-
   protected clientAuthentication?: string; // client_authentication
   protected state?: string;
   protected scopes: Record<string, string> = {};
@@ -56,7 +55,7 @@ export class OAuth2Util extends FullAuthUtil {
   protected codeVerifier?: string; // code_verifier
   protected challengeAlgorithm?: string;
   protected password?: string;
-  protected username?: string; 
+  protected username?: string;
   protected refreshUrl?: string;
 
   /**
@@ -87,17 +86,14 @@ export class OAuth2Util extends FullAuthUtil {
   }
 
   /**
-   * 
+   *
    * @param clientAuthentication Send client credentials to body
    * or as Basic Auth header
-   * @returns 
+   * @returns
    */
-  setClientAuthentication(
-    clientAuthentication: ClientAuthentication): this;
-  setClientAuthentication(
-    clientAuthentication: string): this;
-  setClientAuthentication(
-    clientAuthentication: ClientAuthentication): this {
+  setClientAuthentication(clientAuthentication: ClientAuthentication): this;
+  setClientAuthentication(clientAuthentication: string): this;
+  setClientAuthentication(clientAuthentication: ClientAuthentication): this {
     this.clientAuthentication = clientAuthentication;
     return this;
   }
@@ -113,10 +109,10 @@ export class OAuth2Util extends FullAuthUtil {
   }
 
   /**
-   * 
+   *
    * @param state An opaque value that is used for
    * preventing cross-site request forgery.
-   * @returns 
+   * @returns
    */
   setState(state: string): this {
     this.state = state;
@@ -134,10 +130,10 @@ export class OAuth2Util extends FullAuthUtil {
   }
 
   /**
-   * 
+   *
    * @param scopes The scopes of the access request.
    * A map between the scope name and a short description for it. The map MAY be empty.
-   * @returns 
+   * @returns
    */
   setScopes(scopes: Record<string, string>): this {
     this.scopes = scopes;
@@ -209,10 +205,10 @@ export class OAuth2Util extends FullAuthUtil {
   }
 
   /**
-   * 
+   *
    * @param accessTokenUrl The endpoint for authentication server.
    * This is used to exchange the authorization code for an access token.
-   * @returns 
+   * @returns
    */
   setAccessTokenUrl(accessTokenUrl: string): this {
     this.accessTokenUrl = accessTokenUrl;
@@ -230,10 +226,10 @@ export class OAuth2Util extends FullAuthUtil {
   }
 
   /**
-   * 
+   *
    * @param authUrl The endpoint for the authorization server.
    * This is used to get the authorization code.
-   * @returns 
+   * @returns
    */
   setAuthUrl(authUrl: string): this {
     this.authUrl = authUrl;
@@ -251,9 +247,9 @@ export class OAuth2Util extends FullAuthUtil {
   }
 
   /**
-   * 
+   *
    * @param useBrowser If true, authorize using browser.
-   * @returns 
+   * @returns
    */
   setUseBrowser(useBrowser: boolean): this {
     this.useBrowser = useBrowser;
@@ -271,10 +267,10 @@ export class OAuth2Util extends FullAuthUtil {
   }
 
   /**
-   * 
+   *
    * @param redirectUri This is the callback URL that you will be
    * redirected to, after your application is authorized.
-   * @returns 
+   * @returns
    */
   setRedirectUri(redirectUri: string): this {
     this.redirectUri = redirectUri;
@@ -341,9 +337,9 @@ export class OAuth2Util extends FullAuthUtil {
   }
 
   /**
-   * 
+   *
    * @param headerPrefix Added to the Authorization header before the access token.
-   * @returns 
+   * @returns
    */
   setHeaderPrefix(headerPrefix: string): this {
     this.headerPrefix = headerPrefix;
@@ -361,10 +357,10 @@ export class OAuth2Util extends FullAuthUtil {
   }
 
   /**
-   * 
-   * @param codeVerifier A random, 43-128 character string used to 
+   *
+   * @param codeVerifier A random, 43-128 character string used to
    * connect the authorization request to the token request.
-   * @returns 
+   * @returns
    */
   setCodeVerifier(codeVerifier: string): this {
     this.codeVerifier = codeVerifier;
@@ -382,10 +378,10 @@ export class OAuth2Util extends FullAuthUtil {
   }
 
   /**
-   * 
+   *
    * @param challengeAlgorithm Algoritm used for generating the Code Challenge.
    */
-  setChallengeAlgorithm(challengeAlgorithm: ChallengeAlgorithm): this
+  setChallengeAlgorithm(challengeAlgorithm: ChallengeAlgorithm): this;
   setChallengeAlgorithm(challengeAlgorithm: string): this;
   setChallengeAlgorithm(challengeAlgorithm: string): this {
     this.challengeAlgorithm = challengeAlgorithm;
@@ -450,141 +446,140 @@ export class OAuth2Util extends FullAuthUtil {
   toPostman(scopes?: string[]): Auth {
     const r: Auth = {
       type: 'oauth2',
-      oauth2: []
+      oauth2: [],
     };
 
     if (isDefined(this.clientAuthentication)) {
       r.oauth2?.push({
         key: 'client_authentication',
         value: this.clientAuthentication,
-        type: 'string'
+        type: 'string',
       });
     }
     if (isDefined(this.state)) {
       r.oauth2?.push({
         key: 'state',
         value: this.state,
-        type: 'string'
+        type: 'string',
       });
     }
-    const scope = (scopes ? scopes : Object.keys(this.scopes))
-      .join(' ').trim();
+    const scope = (scopes ? scopes : Object.keys(this.scopes)).join(' ').trim();
     if (scope) {
       r.oauth2?.push({
         key: 'scope',
         value: scope,
-        type: 'string'
+        type: 'string',
       });
     }
     if (isDefined(this.clientSecret)) {
       r.oauth2?.push({
         key: 'clientSecret',
         value: this.clientSecret,
-        type: 'string'
+        type: 'string',
       });
     }
     if (isDefined(this.clientId)) {
       r.oauth2?.push({
         key: 'clientId',
         value: this.clientId,
-        type: 'string'
+        type: 'string',
       });
     }
     if (isDefined(this.accessTokenUrl)) {
       r.oauth2?.push({
         key: 'accessTokenUrl',
         value: isDefined(this.host) ? `${this.host}${this.accessTokenUrl}` : this.accessTokenUrl,
-        type: 'string'
+        type: 'string',
       });
     }
     if (isDefined(this.refreshUrl)) {
       r.oauth2?.push({
         key: 'refreshTokenUrl',
         value: isDefined(this.host) ? `${this.host}${this.refreshUrl}` : this.refreshUrl,
-        type: 'string'
+        type: 'string',
       });
     }
     if (isDefined(this.authUrl)) {
       r.oauth2?.push({
         key: 'authUrl',
         value: isDefined(this.host) ? `${this.host}${this.authUrl}` : this.authUrl,
-        type: 'string'
+        type: 'string',
       });
     }
     if (isDefined(this.useBrowser)) {
       r.oauth2?.push({
         key: 'useBrowser',
         value: this.useBrowser,
-        type: 'boolean'
+        type: 'boolean',
       });
     }
     if (isDefined(this.redirectUri)) {
       r.oauth2?.push({
         key: 'redirect_uri',
         value: this.redirectUri,
-        type: 'string'
+        type: 'string',
       });
     }
     if (isDefined(this.grantType)) {
       r.oauth2?.push({
         key: 'grant_type',
         value: this.grantType,
-        type: 'string'
+        type: 'string',
       });
     }
     if (isDefined(this.tokenLocation)) {
       r.oauth2?.push({
         key: 'addTokenTo',
         value: this.tokenLocation,
-        type: 'string'
+        type: 'string',
       });
     }
     if (isDefined(this.tokenName)) {
       r.oauth2?.push({
         key: 'tokenName',
         value: this.tokenName,
-        type: 'string'
+        type: 'string',
       });
     }
     if (isDefined(this.headerPrefix)) {
       r.oauth2?.push({
         key: 'headerPrefix',
         value: this.headerPrefix,
-        type: 'string'
+        type: 'string',
       });
     }
     if (isDefined(this.codeVerifier)) {
       r.oauth2?.push({
         key: 'code_verifier',
         value: this.codeVerifier,
-        type: 'string'
+        type: 'string',
       });
     }
     if (isDefined(this.challengeAlgorithm)) {
       r.oauth2?.push({
         key: 'challengeAlgorithm',
         value: this.challengeAlgorithm,
-        type: 'string'
+        type: 'string',
       });
     }
     if (isDefined(this.password)) {
       r.oauth2?.push({
         key: 'password',
         value: this.password,
-        type: 'string'
+        type: 'string',
       });
     }
     if (isDefined(this.username)) {
       r.oauth2?.push({
         key: 'username',
         value: this.username,
-        type: 'string'
+        type: 'string',
       });
     }
 
     return r;
   }
-  
+
   // @TODO: if defined, set host in URLs
   toOpenAPI(): Record<string, SecuritySchemeObject> {
     const flows: OAuthFlowsObject = {};
@@ -592,15 +587,14 @@ export class OAuth2Util extends FullAuthUtil {
       authorizationUrl: this.authUrl,
       scopes: extend({}, this.scopes),
       tokenUrl: this.accessTokenUrl,
-      refreshUrl: this.refreshUrl
+      refreshUrl: this.refreshUrl,
     };
     const r: SecuritySchemeObject = {
       type: 'oauth2',
       flows,
-      description: this.description
+      description: this.description,
     };
-    if (this.grantType === GrantType.authorizationCode
-      || this.grantType === GrantType.authorizationCodeWithPkce) {
+    if (this.grantType === GrantType.authorizationCode || this.grantType === GrantType.authorizationCodeWithPkce) {
       flows.authorizationCode = flow;
     }
     if (this.grantType === GrantType.clientCredentials) {
@@ -614,13 +608,15 @@ export class OAuth2Util extends FullAuthUtil {
     }
 
     return {
-      [this.securitySchemeName]: r
+      [this.securitySchemeName]: r,
     };
   }
 
   toOpenAPISecurity(scopes?: string[]): SecurityRequirementObject[] {
-    return [{
-      [this.securitySchemeName]: scopes || Object.keys(this.scopes)
-    }];
+    return [
+      {
+        [this.securitySchemeName]: scopes || Object.keys(this.scopes),
+      },
+    ];
   }
 }
