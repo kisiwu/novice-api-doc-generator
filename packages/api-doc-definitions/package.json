@@ -32,11 +32,7 @@
     "doc": "typedoc",
     "format": "cross-env NODE_OPTIONS=--experimental-strip-types prettier --write ./src",
     "format:check": "cross-env NODE_OPTIONS=--experimental-strip-types prettier --check ./src",
-    "lint": "eslint . && tsc --noEmit",
-    "test": "kaukau --require ts-node/register --file test --ext .test.ts",
-    "testany": "kaukau --require ts-node/register --file test --ext .test.ts",
-    "testpostman": "kaukau --require ts-node/register --file test/postman --ext .test.ts",
-    "testopenapi": "kaukau --require ts-node/register --file test/openapi --ext .test.ts"
+    "lint": "eslint . && pnpm exec tsc --noEmit"
   },
   "keywords": [
     "openapi",

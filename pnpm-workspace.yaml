@@ -4,4 +4,4 @@ packages:
 allowBuilds:
   unrs-resolver: true
 minimumReleaseAgeExclude:
-    - '@novice1/routing@2.1.2'
+    - '@novice1/routing@2.1.3'

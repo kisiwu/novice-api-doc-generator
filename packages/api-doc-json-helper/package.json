@@ -5,7 +5,7 @@
   "main": "lib/index.js",
   "scripts": {
     "build": "pnpm exec tsc",
-    "lint": "eslint .",
+    "lint": "eslint . && pnpm exec tsc --noEmit",
     "test": "ts-node ./test/usage.test.ts"
   },
   "repository": {
@@ -26,5 +26,9 @@
   ],
   "dependencies": {
     "@novice1/api-doc-definitions": "workspace:^"
+  },
+  "devDependencies": {
+    "@novice1/api-doc-generator": "workspace:^",
+    "@novice1/routing": "^2.1.3"
   }
 }
