@@ -278,6 +278,12 @@ importers:
         specifier: ^18.0.1
         version: 18.3.0
 
+  packages/api-doc-json-helper:
+    dependencies:
+      '@novice1/api-doc-definitions':
+        specifier: workspace:^
+        version: link:../api-doc-definitions
+
 packages:
 
   '@babel/code-frame@7.29.7':

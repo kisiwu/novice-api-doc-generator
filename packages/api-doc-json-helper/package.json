@@ -1,0 +1,30 @@
+{
+  "name": "@novice1/api-doc-json-helper",
+  "version": "1.0.9",
+  "description": "",
+  "main": "lib/index.js",
+  "scripts": {
+    "build": "pnpm exec tsc",
+    "lint": "eslint .",
+    "test": "ts-node ./test/usage.test.ts"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/kisiwu/novice-api-doc-generator.git"
+  },
+  "author": "demingongo",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/kisiwu/novice-api-doc-generator/issues"
+  },
+  "homepage": "https://github.com/kisiwu/novice-api-doc-generator/packages/api-doc-json-helper#readme",
+  "keywords": [
+    "openapi",
+    "postman",
+    "swagger",
+    "json"
+  ],
+  "dependencies": {
+    "@novice1/api-doc-definitions": "workspace:^"
+  }
+}

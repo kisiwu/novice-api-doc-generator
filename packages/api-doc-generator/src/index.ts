@@ -35,7 +35,7 @@ export {
   type PostmanOptions,
 } from './generators/postman';
 
-// some definitions from @novice1/api-doc-definitions
+//// Exporting some definitions from @novice1/api-doc-definitions
 
 export type { DocGenerator, ProcessedRoute, RouteMeta } from '@novice1/api-doc-definitions';
 export type {
@@ -43,11 +43,15 @@ export type {
   OpenAPIHelperInterface,
   PostmanHelperInterface,
 } from '@novice1/api-doc-definitions/helpers';
-export type {
-  ReferenceObject,
-  SchemaObject,
-  SchemaObject3_0,
-  SchemaObject3_1,
-  SecurityRequirementObject,
-  SecuritySchemeObject,
+export {
+  type AdditionalProperties,
+  ParameterLocation,
+  type MediaTypeObject,
+  type ReferenceObject,
+  type SchemaObject,
+  type SchemaObject3_0,
+  type SchemaObject3_1,
+  type SecurityRequirementObject,
+  type SecuritySchemeObject,
 } from '@novice1/api-doc-definitions/openapi';
+export { AuthType } from '@novice1/api-doc-definitions/postman';
