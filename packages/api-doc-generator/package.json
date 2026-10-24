@@ -1,0 +1,57 @@
+{
+  "name": "@novice1/api-doc-generator",
+  "private": false,
+  "version": "1.2.6",
+  "description": "Quickly generate API Documentation.",
+  "main": "lib/index.js",
+  "homepage": "https://kisiwu.github.io/novice-api-doc-generator/latest/",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/kisiwu/novice-api-doc-generator.git"
+  },
+  "engines": {
+    "node": ">=20"
+  },
+  "scripts": {
+    "build": "pnpm exec tsc",
+    "doc": "typedoc",
+    "format": "cross-env NODE_OPTIONS=--experimental-strip-types prettier --write ./src",
+    "format:check": "cross-env NODE_OPTIONS=--experimental-strip-types prettier --check ./src",
+    "lint": "eslint . && tsc --noEmit",
+    "test": "kaukau --require ts-node/register --file test --ext .test.ts",
+    "testany": "kaukau --require ts-node/register --file test --ext .test.ts",
+    "testpostman": "kaukau --require ts-node/register --file test/postman --ext .test.ts",
+    "testopenapi": "kaukau --require ts-node/register --file test/openapi --ext .test.ts"
+  },
+  "keywords": [
+    "openapi",
+    "postman",
+    "swagger"
+  ],
+  "author": "demingongo",
+  "contributors": [
+    "sbolingo"
+  ],
+  "license": "MIT",
+  "devDependencies": {
+    "@novice1/routing": "^2.1.2",
+    "@types/extend": "^3.0.4",
+    "@types/jsontoxml": "^1.0.6",
+    "@types/mocha": "^10.0.10",
+    "joi": "^18.0.1"
+  },
+  "dependencies": {
+    "@novice1/logger": "^1.6.1",
+    "extend": "^3.0.2",
+    "jsontoxml": "^1.0.1",
+    "tslib": "^2.8.1"
+  },
+  "peerDependencies": {
+    "joi": "^18.0.1"
+  },
+  "peerDependenciesMeta": {
+    "joi": {
+      "optional": true
+    }
+  }
+}

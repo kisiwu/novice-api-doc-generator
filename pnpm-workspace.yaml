@@ -1,0 +1,7 @@
+packages:
+    - examples/*
+    - packages/*
+allowBuilds:
+  unrs-resolver: true
+minimumReleaseAgeExclude:
+    - '@novice1/routing@2.1.2'

@@ -1,53 +1,62 @@
 {
-  "name": "@novice1/api-doc-generator",
-  "private": false,
+  "name": "novice-api-doc-generator",
+  "private": true,
   "version": "1.2.6",
-  "description": "Quickly generate API Documentation.",
+  "description": "Monorepo for API documentation generator for @novice1",
   "main": "lib/index.js",
   "homepage": "https://kisiwu.github.io/novice-api-doc-generator/latest/",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/kisiwu/novice-api-doc-generator.git"
   },
-  "engines": {
-    "node": ">=16"
-  },
   "scripts": {
-    "build": "npm exec tsc",
-    "doc": "typedoc",
-    "format": "cross-env NODE_OPTIONS=--experimental-strip-types prettier --write ./src",
-    "format:check": "cross-env NODE_OPTIONS=--experimental-strip-types prettier --check ./src",
-    "lint": "eslint . && tsc --noEmit",
-    "test": "kaukau --require ts-node/register --file test --ext .test.ts",
-    "testany": "kaukau --require ts-node/register --file test --ext .test.ts",
-    "testpostman": "kaukau --require ts-node/register --file test/postman --ext .test.ts",
-    "testopenapi": "kaukau --require ts-node/register --file test/openapi --ext .test.ts"
+    "build": "pnpm -r build",
+    "clean": "pnpm -r exec rimraf node_modules lib docs coverage && rimraf node_modules",
+    "clean:build": "pnpm -r exec rimraf lib",
+    "clean:deps": "pnpm -r exec rimraf node_modules && rimraf node_modules",
+    "clean:coverage": "pnpm -r exec rimraf coverage",
+    "doc": "pnpm --filter \"./packages/*\" -r doc",
+    "format": "pnpm --filter \"./packages/*\" -r format",
+    "format:check": "pnpm --filter \"./packages/*\" -r format:check",
+    "lint": "pnpm -r lint",
+    "test": "pnpm -r test",
+    "test:integration": "pnpm -r test",
+    "release:build": "pnpm --filter \"./packages/*\" -r build",
+    "release:test": "pnpm --filter \"./packages/*\" -r test",
+    "release:version": "pnpm --filter \"./packages/*\" -r exec npm version",
+    "release:publish": "pnpm --filter \"./packages/*\" -r publish --access public",
+    "version:patch": "pnpm --filter \"./packages/*\" -r exec npm version patch",
+    "version:minor": "pnpm --filter \"./packages/*\" -r exec npm version minor",
+    "version:major": "pnpm --filter \"./packages/*\" -r exec npm version major"
   },
   "keywords": [
     "openapi",
     "postman",
-    "swagger"
+    "swagger",
+    "json",
+    "joi",
+    "zod",
+    "valibot",
+    "arktype"
   ],
   "author": "demingongo",
   "contributors": [
     "sbolingo"
   ],
   "license": "MIT",
+  "packageManager": "pnpm@12.11.2",
   "devDependencies": {
     "@eslint/eslintrc": "^3.3.7",
     "@eslint/js": "^10.0.1",
-    "@novice1/routing": "^2.1.2",
     "@stylistic/eslint-plugin": "^5.10.0",
     "@trivago/prettier-plugin-sort-imports": "^6.0.2",
     "@types/chai": "^5.2.3",
-    "@types/extend": "^3.0.4",
-    "@types/jsontoxml": "^1.0.6",
     "@types/mocha": "^10.0.10",
     "@types/node": "^26.6.5",
     "@typescript-eslint/eslint-plugin": "^8.72.0",
     "@typescript-eslint/parser": "^8.72.0",
     "@typescript/native": "npm:typescript@^7.0.2",
-    "chai": "^4.5.0",
+    "chai": "^6.2.2",
     "cross-env": "^10.1.0",
     "eslint": "^10.13.0",
     "eslint-config-prettier": "^10.1.8",
@@ -55,27 +64,11 @@
     "eslint-plugin-import-x": "^4.17.1",
     "eslint-plugin-mocha": "^11.3.0",
     "globals": "^17.13.0",
-    "joi": "^18.3.0",
     "kaukau": "^5.0.1",
     "prettier": "^3.9.10",
     "ts-node": "^10.9.2",
     "typedoc": "^0.28.20",
     "typescript": "npm:@typescript/typescript6@^6.0.0",
     "typescript-eslint": "^8.71.2"
-  },
-  "dependencies": {
-    "@novice1/logger": "^1.6.1",
-    "extend": "^3.0.2",
-    "jsontoxml": "^1.0.1",
-    "tslib": "^2.8.1",
-    "joi": "^18.0.1"
-  },
-  "peerDependencies": {
-    "joi": "^18.0.1"
-  },
-  "peerDependenciesMeta": {
-    "joi": {
-      "optional": true
-    }
   }
 }
