@@ -1,13 +1,18 @@
 .github
-src
+.todo
+typedocIncludes
 docs
-/test
-/types/files.d.ts
-typedoc.json
 private
-kaukau-*.mjs
+src
+test
+types
+todo
+typedoc.json
+.prettierignore
+*.config.js
+*.config.mjs
+*.config.mts
 tsconfig.json
-eslint.config.mjs
 
 # Logs
 logs
@@ -46,3 +51,8 @@ jspm_packages
 
 # Optional REPL history
 .node_repl_history
+
+# dotenv environment variables file
+.env
+.env.test
+.env.production
