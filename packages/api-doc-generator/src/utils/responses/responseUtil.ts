@@ -1,18 +1,18 @@
 import {
-  ResponseObject as OpenAPIResponseObject,
-  ReferenceObject,
-  LinkObject,
-  MediaTypeObject,
-  HeaderObject,
-} from '../../generators/openapi/definitions';
-import { ResponseObject as PostmanResponseObject } from '../../generators/postman/definitions';
-import {
   BaseResponseUtil,
   FullResponseUtil,
   IOpenAPIResponseContext,
   IPostmanResponseContext,
 } from './baseResponseUtils';
 import { MediaTypeUtil } from './mediaTypeUtil';
+import type {
+  ResponseObject as OpenAPIResponseObject,
+  ReferenceObject,
+  LinkObject,
+  MediaTypeObject,
+  HeaderObject,
+} from '@novice1/api-doc-definitions/openapi';
+import type { ResponseObject as PostmanResponseObject } from '@novice1/api-doc-definitions/postman';
 import extend from 'extend';
 
 /**

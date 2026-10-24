@@ -20,7 +20,6 @@ export {
   MediaTypeUtil,
   ResponseUtil,
 } from './utils/responses/all';
-export type { DocGenerator, ProcessedRoute } from './commons';
 export {
   OpenAPI,
   type OpenAPIResult,
@@ -28,7 +27,6 @@ export {
   type OpenAPIHelperClass,
   type OpenAPIOptions,
 } from './generators/openapi';
-export { type OpenAPIHelperInterface } from './generators/openapi/helpers/interfaces';
 export {
   Postman,
   type PostmanCollection,
@@ -36,9 +34,15 @@ export {
   type PostmanHelperClass,
   type PostmanOptions,
 } from './generators/postman';
-export { type PostmanHelperInterface } from './generators/postman/helpers/interfaces';
 
-// some definitions
+// some definitions from @novice1/api-doc-definitions
+
+export type { DocGenerator, ProcessedRoute, RouteMeta } from '@novice1/api-doc-definitions';
+export type {
+  BaseHelperInterface,
+  OpenAPIHelperInterface,
+  PostmanHelperInterface,
+} from '@novice1/api-doc-definitions/helpers';
 export type {
   ReferenceObject,
   SchemaObject,
@@ -46,4 +50,4 @@ export type {
   SchemaObject3_1,
   SecurityRequirementObject,
   SecuritySchemeObject,
-} from './generators/openapi/definitions';
+} from '@novice1/api-doc-definitions/openapi';

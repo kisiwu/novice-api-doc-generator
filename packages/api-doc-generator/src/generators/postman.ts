@@ -1,28 +1,27 @@
-import { DocGenerator, ProcessedRoute } from '../commons';
 import { BasePostmanAuthUtil } from '../utils/auth/baseAuthUtils';
 import { BasePostmanResponseUtil, BaseResponseUtil } from '../utils/responses/baseResponseUtils';
-import {
-  Auth,
-  AuthAttribute,
-  AuthType,
-  CollectionVersion,
-  Description,
-  EventObject,
-  Folder,
-  HeaderObject,
-  InfoObject,
-  Item,
-  QueryParam,
-  RequestBodyObject,
-  ResponseObject,
-  UrlObject,
-  Variable,
-} from './postman/definitions';
-import { PostmanHelperInterface } from './postman/helpers/interfaces';
 import { PostmanJoiHelper } from './postman/helpers/joiHelper';
 import { RequestBodyCreator } from './postman/services/requestBodyService';
 import { formatPath, formatType, Log } from './postman/utils';
-import { RouteMeta } from '@novice1/routing';
+import type { DocGenerator, ProcessedRoute, RouteMeta } from '@novice1/api-doc-definitions';
+import type { PostmanHelperInterface } from '@novice1/api-doc-definitions/helpers';
+import {
+  type Auth,
+  type AuthAttribute,
+  AuthType,
+  type CollectionVersion,
+  type Description,
+  type EventObject,
+  type Folder,
+  type HeaderObject,
+  type InfoObject,
+  type Item,
+  type QueryParam,
+  type RequestBodyObject,
+  type ResponseObject,
+  type UrlObject,
+  type Variable,
+} from '@novice1/api-doc-definitions/postman';
 import extend from 'extend';
 
 interface ResponsesRecord {

@@ -1,0 +1,51 @@
+{
+  "name": "@novice1/api-doc-definitions",
+  "private": false,
+  "version": "1.2.6",
+  "description": "",
+  "main": "lib/index.js",
+  "exports": {
+    ".": {
+      "types": "./lib/index.d.ts",
+      "default": "./lib/index.js"
+    },
+    "./helpers": {
+      "types": "./lib/helpers.d.ts",
+      "default": "./lib/helpers.js"
+    },
+    "./openapi": {
+      "types": "./lib/generators/openapi/definitions.d.ts",
+      "default": "./lib/generators/openapi/definitions.js"
+    },
+    "./postman": {
+      "types": "./lib/generators/postman/definitions.d.ts",
+      "default": "./lib/generators/postman/definitions.js"
+    }
+  },
+  "homepage": "https://kisiwu.github.io/novice-api-doc-generator/latest/",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/kisiwu/novice-api-doc-generator.git"
+  },
+  "scripts": {
+    "build": "pnpm exec tsc",
+    "doc": "typedoc",
+    "format": "cross-env NODE_OPTIONS=--experimental-strip-types prettier --write ./src",
+    "format:check": "cross-env NODE_OPTIONS=--experimental-strip-types prettier --check ./src",
+    "lint": "eslint . && tsc --noEmit",
+    "test": "kaukau --require ts-node/register --file test --ext .test.ts",
+    "testany": "kaukau --require ts-node/register --file test --ext .test.ts",
+    "testpostman": "kaukau --require ts-node/register --file test/postman --ext .test.ts",
+    "testopenapi": "kaukau --require ts-node/register --file test/openapi --ext .test.ts"
+  },
+  "keywords": [
+    "openapi",
+    "postman",
+    "swagger"
+  ],
+  "author": "demingongo",
+  "contributors": [
+    "sbolingo"
+  ],
+  "license": "MIT"
+}

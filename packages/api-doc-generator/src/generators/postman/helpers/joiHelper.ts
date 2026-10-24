@@ -1,6 +1,6 @@
 import { JoiHelper, JoiSchema } from '../../../helpers/joiHelper';
-import { XMLObject } from '../../openapi/definitions';
-import { PostmanHelperInterface } from './interfaces';
+import type { PostmanHelperInterface } from '@novice1/api-doc-definitions/helpers';
+import type { XMLObject } from '@novice1/api-doc-definitions/openapi';
 
 export class PostmanJoiHelper extends JoiHelper implements PostmanHelperInterface {
   getFirstItem(): PostmanJoiHelper | undefined {

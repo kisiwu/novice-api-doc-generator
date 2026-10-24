@@ -1,5 +1,5 @@
 import { VALID_TYPES } from '../utils/genericUtils';
-import { BaseHelperInterface } from './baseHelper';
+import type { BaseHelperInterface } from '@novice1/api-doc-definitions/helpers';
 import type { Schema } from 'joi';
 
 export interface JoiRule {

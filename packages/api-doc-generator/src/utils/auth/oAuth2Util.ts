@@ -1,11 +1,11 @@
-import {
+import { FullAuthUtil } from './baseAuthUtils';
+import type {
   OAuthFlowObject,
   OAuthFlowsObject,
   SecurityRequirementObject,
   SecuritySchemeObject,
-} from '../../generators/openapi/definitions';
-import { Auth } from '../../generators/postman/definitions';
-import { FullAuthUtil } from './baseAuthUtils';
+} from '@novice1/api-doc-definitions/openapi';
+import type { Auth } from '@novice1/api-doc-definitions/postman';
 import extend from 'extend';
 
 function isDefined(v: unknown) {

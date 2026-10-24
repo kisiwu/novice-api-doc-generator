@@ -1,4 +1,10 @@
-import { EncodingObject, ExampleObject, MediaTypeObject, ReferenceObject, SchemaObject } from '../definitions';
+import type {
+  EncodingObject,
+  ExampleObject,
+  MediaTypeObject,
+  ReferenceObject,
+  SchemaObject,
+} from '@novice1/api-doc-definitions/openapi';
 import extend from 'extend';
 
 export class MediaTypeCreator {

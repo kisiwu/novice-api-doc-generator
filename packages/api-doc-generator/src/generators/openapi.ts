@@ -1,37 +1,36 @@
-import { DocGenerator, ProcessedRoute } from '../commons';
 import { BaseOpenAPIAuthUtil, BaseAuthUtil, BaseContextAuthUtil } from '../utils/auth/baseAuthUtils';
 import { BaseOpenAPIResponseUtil, BaseResponseUtil } from '../utils/responses/baseResponseUtils';
-import {
-  SchemaObject,
-  SecuritySchemeObject,
-  MediaTypeObject,
-  ReferenceObject,
-  RequestBodyObject,
-  ResponseObject,
-  TagObject,
-  EncodingObject,
-  ExampleObject,
-  ComponentsObject,
-  ParameterObject,
-  ParameterLocation,
-  LinkObject,
-  HeaderObject,
-  InfoObject,
-  LicenseObject,
-  ContactObject,
-  ExternalDocObject,
-  ServerObject,
-  SecurityRequirementObject,
-  OpenAPISupportedVersion,
-  SchemaObject3_1,
-} from './openapi/definitions';
-import { OpenAPIHelperInterface } from './openapi/helpers/interfaces';
 import { OpenAPIJoiHelper } from './openapi/helpers/joiHelper';
 import { MediaTypeCreator } from './openapi/services/mediaTypeService';
 import { ParameterCreator } from './openapi/services/parameterService';
 import { SchemaCreator } from './openapi/services/schemaService';
 import { formatPath, formatType, Log } from './openapi/utils';
-import { RouteMeta } from '@novice1/routing';
+import type { DocGenerator, ProcessedRoute, RouteMeta } from '@novice1/api-doc-definitions';
+import type { OpenAPIHelperInterface } from '@novice1/api-doc-definitions/helpers';
+import {
+  type SchemaObject,
+  type SecuritySchemeObject,
+  type MediaTypeObject,
+  type ReferenceObject,
+  type RequestBodyObject,
+  type ResponseObject,
+  type TagObject,
+  type EncodingObject,
+  type ExampleObject,
+  type ComponentsObject,
+  type ParameterObject,
+  ParameterLocation,
+  type LinkObject,
+  type HeaderObject,
+  type InfoObject,
+  type LicenseObject,
+  type ContactObject,
+  type ExternalDocObject,
+  type ServerObject,
+  type SecurityRequirementObject,
+  type OpenAPISupportedVersion,
+  type SchemaObject3_1,
+} from '@novice1/api-doc-definitions/openapi';
 import extend from 'extend';
 
 interface ResponsesRecord {

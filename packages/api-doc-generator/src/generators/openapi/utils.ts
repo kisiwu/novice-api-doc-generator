@@ -1,5 +1,5 @@
 import { VALID_TYPES } from '../../utils/genericUtils';
-import { OpenAPISupportedVersion } from './definitions';
+import type { OpenAPISupportedVersion } from '@novice1/api-doc-definitions/openapi';
 import Logger from '@novice1/logger';
 
 export const Log = Logger.debugger('@novice1/api-doc-generator').extend('openapi');

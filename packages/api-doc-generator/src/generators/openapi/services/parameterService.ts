@@ -1,4 +1,10 @@
-import { ExampleObject, MediaTypeObject, ParameterObject, ReferenceObject, SchemaObject } from '../definitions';
+import type {
+  ExampleObject,
+  MediaTypeObject,
+  ParameterObject,
+  ReferenceObject,
+  SchemaObject,
+} from '@novice1/api-doc-definitions/openapi';
 import extend from 'extend';
 
 export class ParameterCreator {

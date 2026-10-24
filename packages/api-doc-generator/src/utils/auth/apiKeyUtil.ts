@@ -1,6 +1,6 @@
-import { SecuritySchemeObject } from '../../generators/openapi/definitions';
-import { Auth } from '../../generators/postman/definitions';
 import { FullAuthUtil } from './baseAuthUtils';
+import type { SecuritySchemeObject } from '@novice1/api-doc-definitions/openapi';
+import type { Auth } from '@novice1/api-doc-definitions/postman';
 
 function isDefined(v: unknown) {
   return typeof v !== 'undefined';

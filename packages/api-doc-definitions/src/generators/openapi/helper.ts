@@ -1,5 +1,5 @@
-import { BaseHelperInterface } from '../../../helpers/baseHelper';
-import {
+import type { BaseHelperInterface } from '../../base-helper';
+import type {
   AdditionalProperties,
   DiscriminatorObject,
   EncodingObject,
@@ -7,7 +7,7 @@ import {
   ReferenceObject,
   SchemaObject,
   XMLObject,
-} from '../definitions';
+} from './definitions';
 
 export interface OpenAPIHelperInterface extends BaseHelperInterface {
   // required

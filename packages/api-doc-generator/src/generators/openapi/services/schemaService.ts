@@ -1,4 +1,4 @@
-import {
+import type {
   AdditionalProperties,
   DiscriminatorObject,
   OpenAPISupportedVersion,
@@ -7,7 +7,7 @@ import {
   SchemaObject3_0,
   SchemaObject3_1,
   XMLObject,
-} from '../definitions';
+} from '@novice1/api-doc-definitions/openapi';
 import extend from 'extend';
 
 // @todo: add contentMediaType and contentEncoding

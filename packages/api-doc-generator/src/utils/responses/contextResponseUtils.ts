@@ -1,10 +1,10 @@
-import {
+import { BaseResponseUtil, IOpenAPIResponseContext, IPostmanResponseContext } from './baseResponseUtils';
+import type {
   LinkObject,
   ReferenceObject,
   ResponseObject as OpenAPIResponseObject,
-} from '../../generators/openapi/definitions';
-import { ResponseObject as PostmanResponseObject } from '../../generators/postman/definitions';
-import { BaseResponseUtil, IOpenAPIResponseContext, IPostmanResponseContext } from './baseResponseUtils';
+} from '@novice1/api-doc-definitions/openapi';
+import type { ResponseObject as PostmanResponseObject } from '@novice1/api-doc-definitions/postman';
 
 /**
  * {@include ../../../typedocIncludes/responses/contextResponseUtil.md}

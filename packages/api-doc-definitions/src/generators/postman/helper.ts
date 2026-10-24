@@ -1,5 +1,5 @@
-import { BaseHelperInterface } from '../../../helpers/baseHelper';
-import { XMLObject } from '../../openapi/definitions';
+import type { BaseHelperInterface } from '../../base-helper';
+import type { XMLObject } from '../openapi/definitions';
 
 export interface PostmanHelperInterface extends BaseHelperInterface {
   // required

@@ -1,6 +1,6 @@
-import { SecurityRequirementObject } from '../../generators/openapi/definitions';
-import { Auth } from '../../generators/postman/definitions';
 import { BaseAuthUtil, BaseContextAuthUtil, IContextAuthUtil } from './baseAuthUtils';
+import type { SecurityRequirementObject } from '@novice1/api-doc-definitions/openapi';
+import type { Auth } from '@novice1/api-doc-definitions/postman';
 import extend from 'extend';
 
 /**

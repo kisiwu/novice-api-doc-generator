@@ -1,13 +1,13 @@
-import { JoiHelper, JoiSchema } from '../../../helpers/joiHelper';
-import {
+import { JoiHelper, type JoiSchema } from '../../../helpers/joiHelper';
+import type { OpenAPIHelperInterface } from '@novice1/api-doc-definitions/helpers';
+import type {
   AdditionalProperties,
   DiscriminatorObject,
   EncodingObject,
   ExampleObject,
   ReferenceObject,
   XMLObject,
-} from '../definitions';
-import { OpenAPIHelperInterface } from './interfaces';
+} from '@novice1/api-doc-definitions/openapi';
 
 export class OpenAPIJoiHelper extends JoiHelper implements OpenAPIHelperInterface {
   getFirstItem(): OpenAPIJoiHelper | undefined {

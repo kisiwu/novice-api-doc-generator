@@ -1,11 +1,11 @@
-import {
+import type {
   HeaderObject,
   LinkObject,
   MediaTypeObject,
   ReferenceObject,
   ResponseObject as OpenAPIResponseObject,
-} from '../../generators/openapi/definitions';
-import { ResponseObject as PostmanResponseObject } from '../../generators/postman/definitions';
+} from '@novice1/api-doc-definitions/openapi';
+import type { ResponseObject as PostmanResponseObject } from '@novice1/api-doc-definitions/postman';
 
 export interface IOpenAPIResponseContext {
   code?: number;

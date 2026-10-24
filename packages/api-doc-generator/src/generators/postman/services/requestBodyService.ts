@@ -1,10 +1,15 @@
 /**
  * @todo: finish toObject method
  */
-import { XMLObject } from '../../openapi/definitions';
-import { FormParameter, RequestBodyObject, SrcFormParameter, ValueFormParameter } from '../definitions';
-import { PostmanHelperInterface } from '../helpers/interfaces';
 import { formatType } from '../utils';
+import type { PostmanHelperInterface } from '@novice1/api-doc-definitions/helpers';
+import type { XMLObject } from '@novice1/api-doc-definitions/openapi';
+import type {
+  FormParameter,
+  RequestBodyObject,
+  SrcFormParameter,
+  ValueFormParameter,
+} from '@novice1/api-doc-definitions/postman';
 import jsontoxml from 'jsontoxml';
 
 interface JsontoxmlObject {

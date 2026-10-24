@@ -41,6 +41,7 @@
     "joi": "^18.0.1"
   },
   "dependencies": {
+    "@novice1/api-doc-definitions": "workspace:^",
     "@novice1/logger": "^1.6.1",
     "extend": "^3.0.2",
     "jsontoxml": "^1.0.1",
