@@ -8,7 +8,7 @@
     "format": "cross-env NODE_OPTIONS=--experimental-strip-types prettier --write ./src",
     "format:check": "cross-env NODE_OPTIONS=--experimental-strip-types prettier --check ./src",
     "lint": "eslint . && pnpm exec tsc --noEmit",
-    "test": "ts-node ./test/unit.test.ts"
+    "test": "ts-node ./test/openapi.test.ts && ts-node ./test/postman.test.ts"
   },
   "repository": {
     "type": "git",

@@ -15,7 +15,7 @@ export function arrayUnique<
   return schema.transform((x) => x.filter((value, index, array) => array.indexOf(value) === index));
 }
 
-describe('Unit tests', () => {
+describe('OpenAPIZodHelper', () => {
   it('should be an array', () => {
     const complicatedArraySchema = arrayUnique(
       arraySingle(z.array(z.enum(['solution', 'team', 'createdBy', 'lastUpdatedBy'])).max(5))
