@@ -1,4 +1,4 @@
-import { VALID_TYPES } from '../../utils/genericUtils';
+import { VALID_TYPES } from '@novice1/api-doc-definitions/values';
 import Logger from '@novice1/logger';
 
 export const Log = Logger.debugger('@novice1/api-doc-generator').extend('postman');

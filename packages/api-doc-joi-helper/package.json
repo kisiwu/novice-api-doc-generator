@@ -1,0 +1,43 @@
+{
+  "name": "@novice1/api-doc-joi-helper",
+  "version": "0.99.0",
+  "description": "",
+  "main": "lib/index.js",
+  "scripts": {
+    "build": "pnpm exec tsc",
+    "format": "cross-env NODE_OPTIONS=--experimental-strip-types prettier --write ./src",
+    "format:check": "cross-env NODE_OPTIONS=--experimental-strip-types prettier --check ./src",
+    "lint": "eslint . && pnpm exec tsc --noEmit",
+    "test": "kaukau --require ts-node/register --file test --ext .test.ts",
+    "testpostman": "kaukau --require ts-node/register --file test/postman --ext .test.ts",
+    "testopenapi": "kaukau --require ts-node/register --file test/openapi --ext .test.ts"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/kisiwu/novice-api-doc-generator.git"
+  },
+  "author": "demingongo",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/kisiwu/novice-api-doc-generator/issues"
+  },
+  "homepage": "https://github.com/kisiwu/novice-api-doc-generator/tree/main/packages/api-doc-joi-helper#readme",
+  "keywords": [
+    "openapi",
+    "postman",
+    "swagger",
+    "api-doc-generator",
+    "novice1",
+    "json"
+  ],
+  "devDependencies": {
+    "@novice1/api-doc-definitions": "workspace:^",
+    "@novice1/api-doc-generator": "workspace:^",
+    "@novice1/routing": "^2.1.3",
+    "joi": "^18.3.0"
+  },
+  "peerDependencies": {
+    "@novice1/api-doc-definitions": "^1.0.0",
+    "joi": "^18.0.1"
+  }
+}

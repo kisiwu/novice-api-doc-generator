@@ -1,4 +1,4 @@
-import { JoiHelper, type JoiSchema } from '../../../helpers/joiHelper';
+import { BaseJoiHelper, type JoiSchema } from './BaseJoiHelper';
 import type { OpenAPIHelperInterface } from '@novice1/api-doc-definitions/helpers';
 import type {
   AdditionalProperties,
@@ -9,7 +9,7 @@ import type {
   XMLObject,
 } from '@novice1/api-doc-definitions/openapi';
 
-export class OpenAPIJoiHelper extends JoiHelper implements OpenAPIHelperInterface {
+export class OpenAPIJoiHelper extends BaseJoiHelper implements OpenAPIHelperInterface {
   getFirstItem(): OpenAPIJoiHelper | undefined {
     if (!this.isJoi()) {
       return;

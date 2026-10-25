@@ -1,8 +1,8 @@
-import { JoiHelper, JoiSchema } from '../../../helpers/joiHelper';
+import { BaseJoiHelper, type JoiSchema } from './BaseJoiHelper';
 import type { PostmanHelperInterface } from '@novice1/api-doc-definitions/helpers';
 import type { XMLObject } from '@novice1/api-doc-definitions/openapi';
 
-export class PostmanJoiHelper extends JoiHelper implements PostmanHelperInterface {
+export class PostmanJoiHelper extends BaseJoiHelper implements PostmanHelperInterface {
   getFirstItem(): PostmanJoiHelper | undefined {
     if (!this.isJoi()) {
       return;

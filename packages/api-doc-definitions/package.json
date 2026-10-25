@@ -20,6 +20,10 @@
     "./postman": {
       "types": "./lib/generators/postman/definitions.d.ts",
       "default": "./lib/generators/postman/definitions.js"
+    },
+    "./values": {
+      "types": "./lib/values.d.ts",
+      "default": "./lib/values.js"
     }
   },
   "homepage": "https://kisiwu.github.io/novice-api-doc-generator/latest/",

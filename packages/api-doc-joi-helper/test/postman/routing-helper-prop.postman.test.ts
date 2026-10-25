@@ -1,72 +1,43 @@
 //import fs from 'fs';
-import { GenerateComponentsRule, OpenAPI } from '../../src';
-import {
-  /*apiKeyAuth,
-bearerAuth,*/
-  GroupCtxtAuth,
-  GroupCtxtResponse,
-  simpleResponse,
-  GroupAuth,
-} from '../testutils';
+import { GroupCtxtResponse, GroupCtxtAuth } from '../testutils';
+import { GenerateFoldersRule, Postman } from '@novice1/api-doc-generator';
 import routing from '@novice1/routing';
 import Joi from 'joi';
 
-describe('api doc (helper class property)', function () {
+describe('api doc testpostman (helper class property)', function () {
   const { logger } = this.ctx.kaukau;
 
-  it('oas doc', () => {
+  it('postman doc', () => {
     // generator
-    const openapi = new OpenAPI({ helperSchemaProperty: 'joiSchema' /*version: '3.1.1'*/ });
-    openapi
-      .setTitle('api doc')
+    const postman = new Postman({ helperSchemaProperty: 'joiSchema' });
+    postman
+      .setName('api doc testpostman')
       .setHost('http://test.kaukau.tst')
       .setConsumes(['multipart/form-data', 'application/json'])
       //.setProduces(['application/json', 'text/html', 'text/plain'])
-      .setTags([
+      .setFolders([
         {
           name: 'Test',
           description: 'Testing purpose',
-          externalDocs: { description: 'Find more info here', url: 'https://swagger.io/specification/' },
+          item: [],
         },
       ])
-      .setGenerateComponentsRule(GenerateComponentsRule.ifUndefined)
-      .setSecuritySchemes(GroupAuth);
-    //.setResponsesProperty('openapi');
+      .setGenerateFoldersRule(GenerateFoldersRule.siblings);
+    //.setResponsesProperty('postman');
 
-    openapi.addRequestBody('AppBody', {
-      required: true,
-      content: {
-        'multipart/form-data': {
-          schema: {
-            $ref: '#/components/schemas/Mikamika',
-          },
-        },
-        'application/json': {
-          schema: {
-            $ref: '#/components/schemas/Mikamika',
-          },
-        },
-      },
-      description: 'Jojo vs DIO',
+    /*
+    postman.addExample('simple-lang-example',{
+      summary: 'lang example',
+      value: 'fr'
+    }).addExample('lang-country-example', {
+      summary: 'lang country example',
+      value: 'fr_BE'
     });
-
-    //openapi.addExample('Versions', {value: [8, 9]})
-    openapi
-      .addExample('simple-lang-example', {
-        summary: 'lang example',
-        value: 'fr',
-      })
-      .addExample('lang-country-example', {
-        summary: 'lang country example',
-        value: 'fr_BE',
-      });
-
-    // add components/response
-    openapi.addResponse(simpleResponse);
+    */
 
     /*
     // add components/schema
-    openapi.addSchema('Coule', {
+    postman.addSchema('Coule', {
       type: 'array',
       example: [
         'well',
@@ -85,74 +56,11 @@ describe('api doc (helper class property)', function () {
           name: 'Test app',
           description: 'testing purpose',
           tags: ['Test'],
-          // set parameters
-          /*
-      parameters: {
-        headers: {
-          token: Joi.array()
-            .items(Joi.number())
-            .description('token to be passed as a header')
-            .required()
-            .example([128, 256])
-        },
-        body: Joi.object().keys({
-          id: Joi.number().integer().required().example(6),
-          custom: Joi.object().keys({
-            lava: Joi.string().description('thunder').required().example('ewf'),
-            lamp: Joi.binary().description('cat')
-          }).description('shark'),
-          email: Joi.string().email().required(),
-          password: Joi.string().meta({format: 'password'}).example('pass'),
-          timestamp: Joi.date().meta({format: 'datetime'}).min(new Date(0)),
-          versions: Joi.array().items(
-            Joi.number()
-            .description('version number').example(4).positive()
-          ).meta({
-            allowReserved: false,
-            explode: true,
-            encoding: {
-              headers: {
-                'X-Rate-Limit-Limit': {
-                  description: 'The number of allowed requests in the current period',
-                  schema: {
-                    type: 'integer'
-                  }
-                }
-              }
-            },
-            deprecated: true,
-            style: 'form'
-          }).example([7])
-          .max(2)
-          .description('version numbers')
-          .single()
-          .unique()
-        }).description('anything description').meta({
-          additionalProperties: {
-            type: 'number'
-          },
-          ref: '#/components/schemas/Mikamika'
-        })
-        .max(6).unknown(true),
-        files: Joi.object()
-        .keys({
-          file: Joi.array()
-            .items(
-              Joi.object()
-                .keys({
-                  mimetype: Joi.string()
-                    .required(),
-                })
-                .options({ stripUnknown: false, allowUnknown: true })
-            )
-            .length(1)
-            .description('File to upload')
-            .required(),
-        })
-        .required(),
-      },*/
           parameters: {
             joiSchema: Joi.object({
+              headers: {
+                'X-postman': Joi.string().description('custom header b'),
+              },
               query: Joi.object().keys({
                 obj: Joi.object()
                   .keys({
@@ -269,39 +177,30 @@ describe('api doc (helper class property)', function () {
           responses: GroupCtxtResponse,
           /*
       responses: {
-        openapi: {
-          default: {
-            description: 'A simple string response',
-            content: {
-              'text/plain': {
-                schema: {
-                  type: 'string',
-                  example: 'whoa!'
-                }
-              }
-            },
-            headers: {
-              'X-Rate-Limit-Limit': {
-                description: 'The number of allowed requests in the current period',
-                schema: {
-                  type: 'integer'
-                }
+        postman: 
+        [
+          {
+            header: [
+              {
+                key: 'Content-Type',
+                value: 'text/plain'
               },
-              'X-Rate-Limit-Remaining': {
-                description: 'The number of remaining requests in the current period',
-                schema: {
-                  type: 'integer'
-                }
+              {
+                key: 'X-Rate-Limit-Limit'
               },
-              'X-Rate-Limit-Reset': {
-                description: 'The number of seconds left in the current period',
-                schema: {
-                  type: 'integer'
-                }
-              }
-            }
-          }
-        }
+              {
+                key: 'X-Rate-Limit-Remaining'
+              },
+              {
+                key: 'X-Rate-Limit-Reset'
+              } 
+            ],
+            body: 'whoa!',
+            code: 200,
+            status: 'OK',
+            name: 'Black Rob'
+          },
+        ]
       }
       */
         },
@@ -315,16 +214,6 @@ describe('api doc (helper class property)', function () {
           description: 'testing purpose... again',
           tags: ['Test'],
           parameters: {
-            story: `## Test alt
-We are just testing stuff like
-\`\`\`js
-const test = new Test();
-test.run();
-\`\`\`
-1. Instanciate test
-2. Run test
-3. **Go go go!**
-`,
             joiSchema: {
               query: Joi.object({
                 lang: Joi.string()
@@ -395,9 +284,9 @@ test.run();
                 .keys({
                   id: Joi.number().meta({
                     format: 'int32',
-                    /*xml: {
-                attribute: true
-              }*/
+                    xml: {
+                      attribute: true,
+                    },
                   }),
                   name: Joi.string().meta({
                     xml: {
@@ -415,10 +304,10 @@ test.run();
                 })
                 .required()
                 .meta({
-                  ref: '#/components/schemas/Person',
                   xml: {
-                    name: 'element',
+                    name: 'Person',
                   },
+                  ref: '#/components/schemas/Person',
                   encoding: {
                     profileImage: {
                       contentType: 'application/xml',
@@ -446,19 +335,19 @@ test.run();
       );
 
     // add router
-    openapi.add(router.getMeta());
+    postman.add(router.getMeta());
 
     // remove unused definitions
-    logger.log(openapi.cleanupComponents());
+    //logger.log(postman.cleanupComponents());
 
     // generate result
-    const result = openapi.result();
+    const result = postman.result();
 
-    logger.silly('openapi:', result.openapi);
+    logger.silly('postman:', result.info.name);
 
     // uncomment to test locally
     /*
-    const wStream = fs.createWriteStream('private/openapi3-1-1-1.json', { flags: 'w+' });
+    const wStream = fs.createWriteStream('private/postman-6.json', { flags: 'w+' });
     wStream.write(JSON.stringify(result, null, ' '), (err: unknown) => {
       if (err) {
         logger.error(err);
@@ -467,6 +356,6 @@ test.run();
     });
     */
 
-    //logger.silly(openapi.remove('/app', 'post'));
+    //logger.silly(postman.remove('/app', 'post'));
   });
 });

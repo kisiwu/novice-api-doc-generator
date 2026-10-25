@@ -1,3 +1,7 @@
+/**
+ * List of valid types for API documentation.
+ * It includes basic types like 'string' and 'number', date types, and other specialized types.
+ */
 export const VALID_TYPES: string[] = [
   // https://tools.ietf.org/html/draft-wright-json-schema-00#section-4.2
   'boolean',

@@ -1,6 +1,6 @@
 import { BasePostmanAuthUtil } from '../utils/auth/baseAuthUtils';
 import { BasePostmanResponseUtil, BaseResponseUtil } from '../utils/responses/baseResponseUtils';
-import { PostmanJoiHelper } from './postman/helpers/joiHelper';
+import { PostmanJsonHelper } from './postman/helpers/postmanJsonHelper';
 import { RequestBodyCreator } from './postman/services/requestBodyService';
 import { formatPath, formatType, Log } from './postman/utils';
 import type { DocGenerator, ProcessedRoute, RouteMeta } from '@novice1/api-doc-definitions';
@@ -111,7 +111,7 @@ export class Postman implements DocGenerator {
   constructor(options?: PostmanOptions) {
     this.#consumes = [];
     this.#folders = [];
-    this.#helperClass = options?.helperClass || PostmanJoiHelper;
+    this.#helperClass = options?.helperClass || PostmanJsonHelper;
     this.#helperSchemaProperty = options?.helperSchemaProperty;
     this.#host = [];
     this.#result = {

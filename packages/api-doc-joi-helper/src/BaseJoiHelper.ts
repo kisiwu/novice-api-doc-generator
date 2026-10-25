@@ -1,5 +1,5 @@
-import { VALID_TYPES } from '../utils/genericUtils';
 import type { BaseHelperInterface } from '@novice1/api-doc-definitions/helpers';
+import { VALID_TYPES } from '@novice1/api-doc-definitions/values';
 import type { Schema } from 'joi';
 
 export interface JoiRule {
@@ -40,7 +40,7 @@ export type JoiSchema = Partial<Schema> & {
   'binary'
  */
 
-export class JoiHelper implements BaseHelperInterface {
+export abstract class BaseJoiHelper implements BaseHelperInterface {
   protected _joi: JoiSchema;
   protected isRoot: boolean;
 

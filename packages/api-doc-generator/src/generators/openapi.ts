@@ -1,6 +1,6 @@
 import { BaseOpenAPIAuthUtil, BaseAuthUtil, BaseContextAuthUtil } from '../utils/auth/baseAuthUtils';
 import { BaseOpenAPIResponseUtil, BaseResponseUtil } from '../utils/responses/baseResponseUtils';
-import { OpenAPIJoiHelper } from './openapi/helpers/joiHelper';
+import { OpenAPIJsonHelper } from './openapi/helpers/openAPIjsonHelper';
 import { MediaTypeCreator } from './openapi/services/mediaTypeService';
 import { ParameterCreator } from './openapi/services/parameterService';
 import { SchemaCreator } from './openapi/services/schemaService';
@@ -119,7 +119,7 @@ export class OpenAPI implements DocGenerator {
 
   constructor(options?: OpenAPIOptions) {
     this.#consumes = [];
-    this.#helperClass = options?.helperClass || OpenAPIJoiHelper;
+    this.#helperClass = options?.helperClass || OpenAPIJsonHelper;
     this.#helperSchemaProperty = options?.helperSchemaProperty;
     this.#result = {
       openapi: options?.version || '3.1.1',
