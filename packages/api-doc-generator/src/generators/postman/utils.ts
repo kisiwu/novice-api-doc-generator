@@ -1,7 +1,4 @@
 import { VALID_TYPES } from '@novice1/api-doc-definitions/values';
-import Logger from '@novice1/logger';
-
-export const Log = Logger.debugger('@novice1/api-doc-generator').extend('postman');
 
 export function formatType(type: string): { type?: string; format?: string } {
   let t: { type?: string; format?: string } = {
@@ -10,11 +7,9 @@ export function formatType(type: string): { type?: string; format?: string } {
   if (type === 'uuid' || type === 'guid') {
     t.type = 'string';
     t.format = 'uuid';
-    Log.silly('type %s to %o', type, t);
   } else if (type === 'date-time' || type === 'datetime') {
     t.type = 'string';
     t.format = 'date-time';
-    Log.silly('type %s to %o', type, t);
   } else if (
     type === 'password' ||
     type === 'email' ||
@@ -27,20 +22,16 @@ export function formatType(type: string): { type?: string; format?: string } {
   ) {
     t.type = 'string';
     t.format = type.includes('/') ? 'binary' : type;
-    Log.silly('type %s to %o', type, t);
   } else if (type === 'float' || type === 'double' || type === 'integer') {
     t.type = 'number';
     t.format = type;
-    Log.silly('type %s to %o', type, t);
   } else if (type === 'int32' || type === 'int64') {
     t.type = 'number';
     t.format = type;
-    Log.silly('type %s to %o', type, t);
   } else if (!VALID_TYPES.includes(type)) {
     t = {
       type: 'any',
     };
-    Log.silly('type %s to %o', type, t);
   }
 
   return t;

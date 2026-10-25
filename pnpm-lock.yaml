@@ -279,9 +279,6 @@ importers:
 
   packages/api-doc-generator:
     dependencies:
-      '@novice1/logger':
-        specifier: ^1.6.1
-        version: 1.6.1(supports-color@8.1.1)
       extend:
         specifier: ^3.0.2
         version: 3.0.2

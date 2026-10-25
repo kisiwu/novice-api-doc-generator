@@ -2,7 +2,7 @@ import { BasePostmanAuthUtil } from '../utils/auth/baseAuthUtils';
 import { BasePostmanResponseUtil, BaseResponseUtil } from '../utils/responses/baseResponseUtils';
 import { PostmanJsonHelper } from './postman/helpers/postmanJsonHelper';
 import { RequestBodyCreator } from './postman/services/requestBodyService';
-import { formatPath, formatType, Log } from './postman/utils';
+import { formatPath, formatType } from './postman/utils';
 import type { DocGenerator, ProcessedRoute, RouteMeta } from '@novice1/api-doc-definitions';
 import type { PostmanHelperInterface } from '@novice1/api-doc-definitions/helpers';
 import {
@@ -634,20 +634,16 @@ export class Postman implements DocGenerator {
 
     // if it shouldn't be documented
     if (undoc) {
-      Log.info('"undoc" route [%s %s]', method, path);
       return {
         path,
         method,
       };
     }
 
-    Log.debug('adding route [%s %s]', method, path);
-
     // format consumes
     if (!Array.isArray(parameters.consumes)) {
       if (parameters.consumes && typeof parameters.consumes === 'string') {
         consumes = [parameters.consumes];
-        Log.debug('overwrite "consumes": %O', consumes);
       } else {
         if (this.#consumes.length) {
           consumes = this.#consumes;
@@ -655,7 +651,6 @@ export class Postman implements DocGenerator {
       }
     } else {
       consumes = parameters.consumes;
-      Log.debug('overwrite "consumes": %O', consumes);
     }
 
     // format security
@@ -754,10 +749,9 @@ export class Postman implements DocGenerator {
     // format request
     if (auth) {
       if (!security) {
-        Log.warn('Missing "security" for "auth" route: %s %s', method, path);
+        //
       } else {
         schema.request.auth = security;
-        Log.debug('security:', security);
       }
     } else if (auth === false) {
       schema.request.auth = {
@@ -837,8 +831,6 @@ export class Postman implements DocGenerator {
       });
     }
 
-    Log.debug('added route [%s %s]: %O', method, path, schema);
-
     return {
       path,
       method,
@@ -847,10 +839,6 @@ export class Postman implements DocGenerator {
   }
 
   private _formatResponses(routeResponses: ResponseObject[]): ResponseObject[] {
-    // if empty
-    if (!routeResponses.length) {
-      Log.debug('empty responses object');
-    }
     return routeResponses;
   }
 
@@ -862,7 +850,6 @@ export class Postman implements DocGenerator {
     let res: RequestBodyObject | undefined;
     // body|files
     if (parameters.body || parameters.files) {
-      Log.debug('handle body and/or files');
       const rq = new RequestBodyCreator();
       this._pushRequestBody(parameters.body, parameters.files, consumes, rq);
       res = rq.toObject();
@@ -870,7 +857,6 @@ export class Postman implements DocGenerator {
       if (bodyHelper.isValid()) {
         const children = bodyHelper.getChildren();
         if (children.body || children.files) {
-          Log.debug('handle body and/or files');
           const rq = new RequestBodyCreator();
           this._pushRequestBody(children.body, children.files, consumes, rq);
           res = rq.toObject();
@@ -893,10 +879,8 @@ export class Postman implements DocGenerator {
     }
 
     if (parameters.headers) {
-      Log.debug('handle headers');
       this._pushHeader(parameters.headers, res);
     } else if (children && children.headers) {
-      Log.debug('handle headers');
       this._pushHeader(children.headers, res);
     }
 
@@ -939,10 +923,8 @@ export class Postman implements DocGenerator {
     }
 
     if (parameters.params) {
-      Log.debug('handle params');
       this._pushVariable(parameters.params, res);
     } else if (children && children.params) {
-      Log.debug('handle params');
       this._pushVariable(children.params, res);
     }
 
@@ -960,10 +942,8 @@ export class Postman implements DocGenerator {
     }
 
     if (parameters.query) {
-      Log.debug('handle query');
       this._pushQueryParam(parameters.query, res);
     } else if (children && children.query) {
-      Log.debug('handle query');
       this._pushQueryParam(children.query, res);
     }
 
@@ -979,7 +959,6 @@ export class Postman implements DocGenerator {
     let contentIsRequired = false;
 
     if (body) {
-      Log.debug('handle body');
       const bodyHelper = body instanceof this.#helperClass ? body : new this.#helperClass({ value: body });
       if (bodyHelper.isValid()) {
         res.setFieldsBody(bodyHelper);
@@ -1009,7 +988,6 @@ export class Postman implements DocGenerator {
     }
 
     if (files && !res.hasBody()) {
-      Log.debug('handle files');
       const filesHelper = files instanceof this.#helperClass ? files : new this.#helperClass({ value: files });
       if (filesHelper.isValid()) {
         if (!res.hasFieldsBody()) {
@@ -1137,8 +1115,6 @@ export class Postman implements DocGenerator {
         header.disabled = true;
       }
 
-      Log.debug('HeaderObject: %O', header);
-
       res.push(header);
     };
 
@@ -1219,8 +1195,6 @@ export class Postman implements DocGenerator {
         const exampleValue = helper.getExampleValue();
         variable.value = exampleValue;
       }
-
-      Log.debug('Variable: %O', variable);
 
       res.push(variable);
     };
@@ -1317,8 +1291,6 @@ export class Postman implements DocGenerator {
           queryParam.value = `<${formattedHelperType.format || formattedHelperType.type || helper.getType()}>`;
         }
       }
-
-      Log.debug('QueryParam: %O', queryParam);
 
       res.push(queryParam);
     };
