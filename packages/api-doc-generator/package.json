@@ -46,6 +46,6 @@
     "tslib": "^2.8.1"
   },
   "peerDependencies": {
-    "@novice1/api-doc-definitions": "^1.0.0"
+    "@novice1/api-doc-definitions": "workspace:^"
   }
 }

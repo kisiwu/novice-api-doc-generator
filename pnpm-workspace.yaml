@@ -9,5 +9,6 @@ versioning:
   lanes:
     '@novice1/api-doc-generator': alpha
     '@novice1/api-doc-json-helper': alpha
+    '@novice1/api-doc-zod-helper': alpha
   changelog:
     storage: repository

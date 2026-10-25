@@ -28,7 +28,7 @@
     "swagger",
     "api-doc-generator",
     "novice1",
-    "json"
+    "joi"
   ],
   "devDependencies": {
     "@novice1/api-doc-definitions": "workspace:^",
@@ -37,7 +37,7 @@
     "joi": "^18.3.0"
   },
   "peerDependencies": {
-    "@novice1/api-doc-definitions": "^1.0.0",
+    "@novice1/api-doc-definitions": "workspace:^",
     "joi": "^18.0.1"
   }
 }
