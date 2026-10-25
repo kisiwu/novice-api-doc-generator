@@ -5,6 +5,8 @@
   "main": "lib/index.js",
   "scripts": {
     "build": "pnpm exec tsc",
+    "format": "cross-env NODE_OPTIONS=--experimental-strip-types prettier --write ./src",
+    "format:check": "cross-env NODE_OPTIONS=--experimental-strip-types prettier --check ./src",
     "lint": "eslint . && pnpm exec tsc --noEmit",
     "test": "ts-node ./test/usage.test.ts"
   },
@@ -17,17 +19,20 @@
   "bugs": {
     "url": "https://github.com/kisiwu/novice-api-doc-generator/issues"
   },
-  "homepage": "https://github.com/kisiwu/novice-api-doc-generator/packages/api-doc-json-helper#readme",
+  "homepage": "https://github.com/kisiwu/novice-api-doc-generator/tree/main/packages/api-doc-json-helper#readme",
   "keywords": [
     "openapi",
     "postman",
     "swagger",
+    "api-doc-generator",
+    "novice1",
     "json"
   ],
-  "dependencies": {
+  "peerDependencies": {
     "@novice1/api-doc-definitions": "workspace:^"
   },
   "devDependencies": {
+    "@novice1/api-doc-definitions": "workspace:^",
     "@novice1/api-doc-generator": "workspace:^",
     "@novice1/routing": "^2.1.3"
   }

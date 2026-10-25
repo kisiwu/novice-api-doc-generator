@@ -1,7 +1,7 @@
 {
   "name": "@novice1/api-doc-definitions",
   "private": false,
-  "version": "1.2.6",
+  "version": "1.0.0",
   "description": "",
   "main": "lib/index.js",
   "exports": {
@@ -37,7 +37,9 @@
   "keywords": [
     "openapi",
     "postman",
-    "swagger"
+    "swagger",
+    "api-doc-generator",
+    "novice1"
   ],
   "author": "demingongo",
   "contributors": [
