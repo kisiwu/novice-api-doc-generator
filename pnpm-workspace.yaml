@@ -10,5 +10,6 @@ versioning:
     '@novice1/api-doc-generator': alpha
     '@novice1/api-doc-json-helper': alpha
     '@novice1/api-doc-zod-helper': alpha
+    novice-api-doc-generator: alpha
   changelog:
     storage: repository

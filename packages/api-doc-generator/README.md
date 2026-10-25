@@ -16,7 +16,7 @@ npm install @novice1/api-doc-generator
 
 ### Default
 
-By default it handles `joi` schemas.
+By default it handles `json` schemas.
 
 Example:
 
