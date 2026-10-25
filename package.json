@@ -4,7 +4,7 @@
   "version": "1.2.6",
   "description": "Monorepo for API documentation generator for @novice1",
   "main": "lib/index.js",
-  "homepage": "https://kisiwu.github.io/novice-api-doc-generator/latest/",
+  "homepage": "https://github.com/kisiwu/novice-api-doc-generator",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/kisiwu/novice-api-doc-generator.git"
