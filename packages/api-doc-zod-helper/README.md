@@ -123,4 +123,4 @@ const doc = postman.result();
 ## References
 
 - [@novice1/api-doc-generator](https://kisiwu.github.io/novice-api-doc-generator/latest/)
-- [@novice1/validator-zod](https://kisiwu.github.io/novice-validator-zod/latest/)
+- [zod](https://github.com/colinhacks/zod)

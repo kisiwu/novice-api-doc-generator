@@ -1,0 +1,46 @@
+{
+  "name": "examples-simple-routes",
+  "private": true,
+  "version": "0.1.0",
+  "description": "",
+  "main": "lib/index.js",
+  "scripts": {
+    "build": "pnpm exec tsc",
+    "dev": "ts-node ./src/index.ts",
+    "format": "cross-env NODE_OPTIONS=--experimental-strip-types prettier --write ./src",
+    "format:check": "cross-env NODE_OPTIONS=--experimental-strip-types prettier --check ./src",
+    "lint": "eslint . && pnpm exec tsc --noEmit",
+    "test": "kaukau -r ts-node/register -f test --ext .test.ts"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/kisiwu/novice-api-doc-generator.git"
+  },
+  "author": "demingongo",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/kisiwu/novice-api-doc-generator/issues"
+  },
+  "keywords": [
+    "openapi",
+    "postman",
+    "swagger",
+    "api-doc-generator",
+    "novice1",
+    "joi",
+    "valibot",
+    "zod"
+  ],
+  "dependencies": {
+    "@novice1/api-doc-generator": "workspace:^",
+    "@novice1/api-doc-joi-helper": "workspace:^",
+    "@novice1/api-doc-zod-helper": "workspace:^",
+    "@novice1/routing": "^2.1.3",
+    "@novice1/validator-joi": "0.11.1",
+    "@novice1/validator-json": "0.1.11",
+    "@novice1/validator-zod": "0.1.3",
+    "joi": "^18.3.0",
+    "tslib": "^2.8.1",
+    "zod": "~4.6.7"
+  }
+}
