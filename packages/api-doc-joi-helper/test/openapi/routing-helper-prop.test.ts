@@ -454,7 +454,7 @@ test.run();
     // generate result
     const result = openapi.result();
 
-    logger.silly('openapi:', result.openapi);
+    logger.trace('openapi:', result.openapi);
 
     // uncomment to test locally
     /*
@@ -467,6 +467,6 @@ test.run();
     });
     */
 
-    //logger.silly(openapi.remove('/app', 'post'));
+    //logger.trace(openapi.remove('/app', 'post'));
   });
 });

@@ -337,7 +337,7 @@ describe('api doc testpostman', function () {
     // generate result
     const result = postman.result();
 
-    logger.silly('postman:', result.info.name);
+    logger.trace('postman:', result.info.name);
 
     // uncomment to test locally
     /*
@@ -350,6 +350,6 @@ describe('api doc testpostman', function () {
     });
     */
 
-    //logger.silly(postman.remove('/app', 'post'));
+    //logger.trace(postman.remove('/app', 'post'));
   });
 });

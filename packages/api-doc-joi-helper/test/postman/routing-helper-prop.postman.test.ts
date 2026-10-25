@@ -343,7 +343,7 @@ describe('api doc testpostman (helper class property)', function () {
     // generate result
     const result = postman.result();
 
-    logger.silly('postman:', result.info.name);
+    logger.trace('postman:', result.info.name);
 
     // uncomment to test locally
     /*
@@ -356,6 +356,6 @@ describe('api doc testpostman (helper class property)', function () {
     });
     */
 
-    //logger.silly(postman.remove('/app', 'post'));
+    //logger.trace(postman.remove('/app', 'post'));
   });
 });
