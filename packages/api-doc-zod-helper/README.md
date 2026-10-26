@@ -5,7 +5,7 @@ Zod4 helpers for `@novice1/api-doc-generator` enabling compatibility with `@novi
 ## Installation
 
 ```bash
-npm install @novice1/api-doc-zod-helper zod
+npm install @novice1/api-doc-zod-helper zod@~4.6.7
 ```
 
 ## OpenAPI Specification

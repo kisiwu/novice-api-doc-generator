@@ -5,7 +5,7 @@ Joi schemas helpers for `@novice1/api-doc-generator` enabling compatibility with
 ## Installation
 
 ```bash
-npm install @novice1/api-doc-joi-helper joi
+npm install @novice1/api-doc-joi-helper joi@^18.3.0"
 ```
 
 ## OpenAPI Specification
@@ -13,10 +13,6 @@ npm install @novice1/api-doc-joi-helper joi
 [Reference](https://kisiwu.github.io/novice-api-doc-generator/latest/modules/generators_openapi.html).
 
 [OpenAPI Specification 3.1.0](https://spec.openapis.org/oas/v3.1.0).
-
-### Default
-
-By default it handles `joi` schemas.
 
 Example:
 
@@ -105,10 +101,6 @@ const doc = openapi.result();
 
 [Postman Collection Format v2.1.0](https://schema.postman.com/collection/json/v2.1.0/draft-07/docs/index.html).
 
-### Default
-
-By default it handles `joi` schemas.
-
 Example:
 
 ```ts
@@ -175,9 +167,7 @@ const doc = postman.result();
 
 ## Schema helpers
 
-### Default helper
-
-#### Types
+### Types
 
 The default helper handles the following `joi` types: `alternatives`, `any`, `array`, `boolean`, `date` `function`, `number`, `object`, `string`, `binary`.
 
@@ -209,7 +199,7 @@ Handled formats are:
 - `uri`
 - `dataUri`
 
-#### Joi.meta
+### Joi.meta
 
 You can configure multiple elements in `Joi.meta` like a [reference](https://swagger.io/specification/#reference-object) to a component. For example:
 
@@ -239,261 +229,6 @@ List of elements you can configure in `Joi.meta`:
 - `xml`
 
 The possible value for each of them is defined in the [OpenAPI Specification](https://swagger.io/specification/).
-
-### Custom helper
-
-You can create your own helper to handle another schema than `joi`.
-The helper
-
-- needs to be a class that implements
-  - [`OpenAPIHelperInterface`](https://kisiwu.github.io/novice-api-doc-generator/latest/interfaces/generators_openapi_helpers_interfaces.OpenAPIHelperInterface.html) (for `OpenAPI`)
-  - or [`PostmanHelperInterface`](https://kisiwu.github.io/novice-api-doc-generator/latest/interfaces/generators_postman_helpers_interfaces.PostmanHelperInterface.html) (for `Postman`)
-- should be given to the generator's constructor.
-
-Example:
-
-```ts
-import { CustomOpenAPIHelperClass, CustomPostmanHelperClass } from './custom';
-import { OpenAPI, Postman } from '@novice1/api-doc-generator';
-
-const openapi = new OpenAPI({ helperClass: CustomOpenAPIHelperClass });
-
-const postman = new Postman({ helperClass: CustomPostmanHelperClass });
-```
-
-## Utils
-
-As the format differs between specifications, some classes can help you generate the documentation following multiple specifications.
-
-### Auth
-
-Classes:
-
-- [`ApiKeyUtil`](https://kisiwu.github.io/novice-api-doc-generator/latest/classes/utils_auth_apiKeyUtil.ApiKeyUtil.html)
-- [`BasicAuthUtil`](https://kisiwu.github.io/novice-api-doc-generator/latest/classes/utils_auth_basicAuthUtil.BasicAuthUtil.html)
-- [`BearerUtil`](https://kisiwu.github.io/novice-api-doc-generator/latest/classes/utils_auth_bearerUtil.BearerUtil.html)
-- [`NoAuthUtil`](https://kisiwu.github.io/novice-api-doc-generator/latest/classes/utils_auth_noAuthUtil.NoAuthUtil.html)
-- [`OAuth2Util`](https://kisiwu.github.io/novice-api-doc-generator/latest/classes/utils_auth_oAuth2Util.OAuth2Util.html)
-
-Example:
-
-```ts
-import { OpenAPI, Postman, BearerUtil } from '@novice1/api-doc-generator';
-import { OpenAPIJoiHelper } from '@novice1/api-doc-joi-helper';
-import routing from '@novice1/routing';
-
-// security scheme
-const bearerAuth = new BearerUtil('bearerName');
-
-// add it to OpenAPI security schemes
-const openapi = new OpenAPI({ helperClass: OpenAPIJoiHelper });
-openapi.addSecuritySchemes(bearerAuth);
-
-// add it to Postman global authentication
-const postman = new Postman({ helperClass: OpenAPIJoiHelper });
-postman.setAuth(bearerAuth);
-
-// router
-const router = routing().get(
-  {
-    path: '/something',
-    auth: true,
-    parameters: {
-      // add security requirements for this route
-      security: bearerAuth,
-    },
-  },
-  function (req, res) {
-    // ...
-  }
-);
-```
-
-#### Context
-
-You can wrap the instance with a context to define a `scope` depending on the route. You do that with [`ContextAuthUtil`](https://kisiwu.github.io/novice-api-doc-generator/latest/classes/utils_auth_contextAuthUtils.ContextAuthUtil.html).
-
-Example:
-
-```ts
-import { OpenAPI, Postman, ContextAuthUtil, OAuth2Util, GrantType } from '@novice1/api-doc-generator';
-import { OpenAPIJoiHelper } from '@novice1/api-doc-joi-helper';
-import routing from '@novice1/routing';
-
-// OAuth2 specifications
-const oauth2 = new OAuth2Util('oAuth2AuthCode');
-oauth2
-  .setDescription('For more information, see https://api.slack.com/docs/oauth')
-  .setGrantType(GrantType.authorizationCode)
-  .setAuthUrl('https://slack.com/oauth/authorize')
-  .setAccessTokenUrl('https://slack.com/api/oauth.access')
-  .setScopes({
-    'users:read': 'Read user information',
-    'users:write': 'Modify user information',
-    'im:read': 'Read messages',
-    'im:write': 'Write messages',
-    'im:history': 'Access the message archive',
-    'search:read': 'Search messages, files, and so on',
-  });
-
-// add it to OpenAPI security schemes
-const openapi = new OpenAPI({ helperClass: OpenAPIJoiHelper });
-openapi.addSecuritySchemes(oauth2);
-
-// add it to Postman global authentication
-const postman = new Postman({ helperClass: OpenAPIJoiHelper });
-postman.setAuth(oauth2);
-
-// router
-const router = routing().get(
-  {
-    path: '/messages',
-    auth: true,
-    parameters: {
-      // add security requirements for this route
-      security: new ContextAuthUtil(
-        oauth2,
-        // OAuth2 scopes for this route
-        ['im:read']
-      ),
-    },
-  },
-  function (req, res) {
-    // ...
-  }
-);
-```
-
-#### Group
-
-You can group security schemes at your convenience with [`GroupAuthUtil`](https://kisiwu.github.io/novice-api-doc-generator/latest/classes/utils_auth_groupAuthUtil.GroupAuthUtil.html) and [`GroupContextAuthUtil`](https://kisiwu.github.io/novice-api-doc-generator/latest/classes/utils_auth_contextAuthUtils.GroupContextAuthUtil.html).
-
-Exemple:
-
-```ts
-import {
-  OpenAPI,
-  Postman,
-  BasicAuthUtil,
-  BearerUtil,
-  GroupAuthUtil,
-  GroupContextAuthUtil,
-} from '@novice1/api-doc-generator';
-import { OpenAPIJoiHelper } from '@novice1/api-doc-joi-helper';
-
-const basicAuth = new BasicAuthUtil('basicAuthName');
-const bearerAuth = new BearerUtil('bearerName');
-
-const groupAuth = new GroupAuthUtil([basicAuth, bearerAuth]);
-
-// add it to OpenAPI security schemes
-const openapi = new OpenAPI({ helperClass: OpenAPIJoiHelper });
-openapi.addSecuritySchemes(groupAuth);
-
-// add it to Postman global authentication
-const postman = new Postman({ helperClass: OpenAPIJoiHelper });
-postman.setAuth(groupAuth);
-
-const router = routing().get(
-  {
-    path: '/something',
-    auth: true,
-    parameters: {
-      // add security requirements for this route
-      security: new GroupContextAuthUtil([basicAuth, bearerAuth]),
-    },
-  },
-  function (req, res) {
-    // ...
-  }
-);
-```
-
-### Responses
-
-Classes:
-
-- [`ResponseUtil`](https://kisiwu.github.io/novice-api-doc-generator/latest/classes/utils_responses_responseUtil.ResponseUtil.html)
-- [`GroupResponseUtil`](https://kisiwu.github.io/novice-api-doc-generator/latest/classes/utils_responses_responseUtil.GroupResponseUtil.html)
-
-Example:
-
-```ts
-import { ResponseUtil, GroupResponseUtil } from '@novice1/api-doc-generator';
-
-const generalError = new ResponseUtil('GeneralError');
-generalError
-  .setDescription('General Error')
-  .addMediaType('application/json', {
-    schema: {
-      $ref: '#/components/schemas/GeneralError',
-    },
-  })
-  .setCode(500);
-
-const illegalInput = new ResponseUtil('IllegalInput');
-illegalInput.setDescription('Illegal input for operation.').setCode(400);
-
-const responses = new GroupResponseUtil([generalError, illegalInput]);
-
-openapi.setResponses(responses);
-// or
-openapi.addResponse(responses);
-// or
-openapi.addResponse(generalError).addResponse(illegalInput);
-
-// router
-const router = routing().post(
-  {
-    path: '/something',
-    auth: true,
-    parameters: {
-      body: {
-        something: Joi.string().max(14),
-      },
-      responses,
-    },
-  },
-  function (req, res) {
-    // ...
-  }
-);
-```
-
-#### Context
-
-You can wrap the instance with a context if you want to define `default`, `code`, `ref` and/or `links` depending on the route. You do that with [`ContextResponseUtil`](https://kisiwu.github.io/novice-api-doc-generator/latest/classes/utils_responses_contextResponseUtils.ContextResponseUtil.html).
-
-Example:
-
-```ts
-const generalError = new ResponseUtil('GeneralError');
-generalError.setDescription('General Error').addMediaType('application/json', {
-  schema: {
-    $ref: '#/components/schemas/GeneralError',
-  },
-});
-
-const illegalInput = new ResponseUtil('IllegalInput');
-illegalInput.setDescription('Illegal input for operation.');
-
-// router
-const router = routing().get(
-  {
-    path: '/something',
-    auth: true,
-    parameters: {
-      responses: new GroupResponseUtil([
-        new ContextResponseUtil(generalError).setCode(500).setDefault(),
-        new ContextResponseUtil(illegalInput).setCode(400),
-      ]),
-    },
-  },
-  function (req, res) {
-    // ...
-  }
-);
-```
 
 ## References
 

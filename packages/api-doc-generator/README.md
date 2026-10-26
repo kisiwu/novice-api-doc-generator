@@ -23,7 +23,6 @@ Example:
 ```ts
 import { GenerateComponentsRule, OpenAPI } from '@novice1/api-doc-generator';
 import routing from '@novice1/routing';
-import Joi from 'joi';
 
 const openapi = new OpenAPI();
 
@@ -59,7 +58,18 @@ const router = routing().get(
     tags: ['default'],
     parameters: {
       query: {
-        version: Joi.number().description('version number').min(1).max(3).default(2).example(2),
+        $schema: 'http://json-schema.org/draft-07/schema#',
+        type: 'object',
+        properties: {
+          version: {
+            type: 'string',
+            description: 'version number',
+            enum: ['1', '2', '3'],
+            default: '2',
+            examples: ['2'],
+            nullable: true,
+          },
+        },
       },
 
       operationId: 'default-app',
@@ -106,14 +116,13 @@ const doc = openapi.result();
 
 ### Default
 
-By default it handles `joi` schemas.
+By default it handles `json` schemas.
 
 Example:
 
 ```ts
 import { GenerateFoldersRule, Postman } from '@novice1/api-doc-generator';
 import routing from '@novice1/routing';
-import Joi from 'joi';
 
 const postman = new Postman();
 
@@ -143,9 +152,19 @@ const router = routing().get(
     tags: ['default'], // folders
     parameters: {
       query: {
-        version: Joi.number().description('version number').min(1).max(3).default(2).example(2),
+        $schema: 'http://json-schema.org/draft-07/schema#',
+        type: 'object',
+        properties: {
+          version: {
+            type: 'string',
+            description: 'version number',
+            enum: ['1', '2', '3'],
+            default: '2',
+            examples: ['2'],
+            nullable: true,
+          },
+        },
       },
-
       operationId: 'default-app',
 
       // override consumes
@@ -173,74 +192,9 @@ const doc = postman.result();
 
 ## Schema helpers
 
-### Default helper
-
-#### Types
-
-The default helper handles the following `joi` types: `alternatives`, `any`, `array`, `boolean`, `date` `function`, `number`, `object`, `string`, `binary`.
-
-It also handles format methods like `Joi.string().email()`, `Joi.string().url()` and more.
-
-In some cases you might have to precise the format in `Joi.meta`. For example `Joi.string().meta({format: 'password'})`, `Joi.date().meta({format: 'datetime'})` or more.
-
-Handled formats are:
-
-- `boolean`
-- `object`
-- `array`
-- `number`
-- `string`
-- `date`
-- `date-time`
-- `datetime`
-- `float`
-- `double`
-- `integer`
-- `int32`
-- `int64`
-- `byte`
-- `binary`
-- `password`
-- `email`
-- `guid`
-- `uuid`
-- `uri`
-- `dataUri`
-
-#### Joi.meta
-
-You can configure multiple elements in `Joi.meta` like a [reference](https://swagger.io/specification/#reference-object) to a component. For example:
-
-```js
-Joi.object()
-  .keys({
-    name: Joi.string().required(),
-    petType: Joi.string().required(),
-  })
-  .meta({ ref: '#/components/schemas/Pet' });
-```
-
-If the reference is local (`#`), it could automatically generate the component depending on the rule you set (see `OpenAPI.setGenerateComponentsRule`).
-
-List of elements you can configure in `Joi.meta`:
-
-- `additionalProperties`
-- `allowReserved`
-- `deprecated`
-- `discriminator`
-- `examples`
-- `explode`
-- `encoding`
-- `format`
-- `ref`
-- `style`
-- `xml`
-
-The possible value for each of them is defined in the [OpenAPI Specification](https://swagger.io/specification/).
-
 ### Custom helper
 
-You can create your own helper to handle another schema than `joi`.
+You can create your own helper to handle another schema than `json`.
 The helper
 
 - needs to be a class that implements
@@ -444,7 +398,14 @@ const router = routing().post(
     auth: true,
     parameters: {
       body: {
-        something: Joi.string().max(14),
+        $schema: 'http://json-schema.org/draft-07/schema#',
+        type: 'object',
+        properties: {
+          something: {
+            type: 'string',
+            maxLength: 14,
+          },
+        },
       },
       responses,
     },
@@ -496,5 +457,3 @@ const router = routing().get(
 - [OpenAPI Specification](https://swagger.io/specification/)
 - [Postman Collection Format v2.1.0](https://schema.postman.com/collection/json/v2.1.0/draft-07/docs/index.html)
 - [@novice1/routing](https://www.npmjs.com/package/@novice1/routing)
-- [@novice1/validator-joi](https://www.npmjs.com/package/@novice1/validator-joi)
-- [joi](https://www.npmjs.com/package/joi)
