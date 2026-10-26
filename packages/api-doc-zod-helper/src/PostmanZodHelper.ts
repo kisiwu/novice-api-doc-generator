@@ -1,6 +1,6 @@
 import { BaseZodHelper } from './BaseZodHelper';
+import { PostmanHelperInterface } from '@novice1/api-doc-definitions/helpers';
 import { XMLObject } from '@novice1/api-doc-definitions/openapi';
-import { PostmanHelperInterface } from '@novice1/api-doc-generator';
 
 export class PostmanZodHelper extends BaseZodHelper implements PostmanHelperInterface {
   getFirstItem(): PostmanZodHelper | undefined {

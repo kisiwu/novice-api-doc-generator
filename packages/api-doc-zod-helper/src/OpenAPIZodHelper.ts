@@ -1,4 +1,5 @@
 import { BaseZodHelper } from './BaseZodHelper';
+import { OpenAPIHelperInterface } from '@novice1/api-doc-definitions/helpers';
 import {
   AdditionalProperties,
   DiscriminatorObject,
@@ -7,7 +8,6 @@ import {
   ReferenceObject,
   EncodingObject,
 } from '@novice1/api-doc-definitions/openapi';
-import { OpenAPIHelperInterface } from '@novice1/api-doc-generator';
 
 export class OpenAPIZodHelper extends BaseZodHelper implements OpenAPIHelperInterface {
   getFirstItem(): OpenAPIZodHelper | undefined {
