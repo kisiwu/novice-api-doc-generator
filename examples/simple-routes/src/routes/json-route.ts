@@ -8,7 +8,7 @@ const postman = new Postman({
   helperSchemaProperty: 'schema',
 });
 
-const router = routing().get(
+export const router = routing().get(
   {
     name: 'Main app',
     path: '/app',
@@ -33,7 +33,9 @@ const router = routing().get(
     },
   },
   function (req, res) {
-    res.json(req.query.version);
+    res.json(
+      typeof req.query.version === 'string' && !isNaN(Number(req.query.version)) ? parseInt(req.query.version) : 2
+    );
   }
 );
 

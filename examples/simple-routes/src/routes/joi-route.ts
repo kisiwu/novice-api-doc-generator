@@ -14,7 +14,7 @@ const postman = new Postman({
 });
 
 // create a router
-const router = routing()
+export const router = routing()
   .setValidators(validatorJoi({}, undefined, 'schema'))
   .get(
     {

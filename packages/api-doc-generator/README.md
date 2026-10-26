@@ -97,7 +97,9 @@ const router = routing().get(
     },
   },
   function (req, res) {
-    res.json(req.query.version);
+    res.json(
+      typeof req.query.version === 'string' && !isNaN(Number(req.query.version)) ? parseInt(req.query.version) : 2
+    );
   }
 );
 
