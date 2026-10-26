@@ -25,8 +25,8 @@
     "release:test": "pnpm --filter \"./packages/*\" -r test",
     "release:version": "pnpm --filter \"./packages/*\" -r exec npm version",
     "release:publish": "pnpm --filter \"./packages/*\" -r publish --access public",
-    "release:publish:stable": "pnpm --filter \"./packages/*\" --filter \"!*alpha*\" -r publish --access public",
-    "release:publish:alpha": "pnpm --filter \"./packages/*\" --filter \"*alpha*\" -r publish --tag alpha --access public",
+    "release:publish:stable": "pnpm --filter @novice1/api-doc-definitions --filter @novice1/api-doc-joi-helper -r publish --access public",
+    "release:publish:alpha": "pnpm --filter @novice1/api-doc-generator --filter @novice1/api-doc-json-helper --filter @novice1/api-doc-zod-helper -r publish --tag alpha --access public",
     "version:patch": "pnpm --filter \"./packages/*\" -r exec npm version patch",
     "version:minor": "pnpm --filter \"./packages/*\" -r exec npm version minor",
     "version:major": "pnpm --filter \"./packages/*\" -r exec npm version major"
