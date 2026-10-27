@@ -2,19 +2,36 @@
 
 Joi schemas helpers for `@novice1/api-doc-generator` enabling compatibility with `@novice1/validator-joi`.
 
+## Table of contents
+
+- [Installation](#installation)
+- [Usage](#usage)
+- [OpenAPI](#openapi)
+- [Postman](#postman)
+- [Supported Joi features](#supported-joi-features)
+  - [Types](#types)
+  - [Formats](#formats)
+  - [Joi.meta](#joimeta)
+- [References](#references)
+
 ## Installation
 
 ```bash
-npm install @novice1/api-doc-joi-helper joi@^18.3.0"
+npm install @novice1/api-doc-joi-helper @novice1/api-doc-generator joi@^18.3.0
 ```
 
-## OpenAPI Specification
+## Usage
 
-[Reference](https://kisiwu.github.io/novice-api-doc-generator/latest/modules/generators_openapi.html).
+Give the helper matching your generator to its constructor through the `helperClass` option:
 
-[OpenAPI Specification 3.1.0](https://spec.openapis.org/oas/v3.1.0).
+| Generator | Helper             | Specification                                                                                                  | Reference                                                                                       |
+| --------- | ------------------ | -------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------- |
+| `OpenAPI` | `OpenAPIJoiHelper` | [OpenAPI Specification 3.1.0](https://spec.openapis.org/oas/v3.1.0)                                            | [API](https://kisiwu.github.io/novice-api-doc-generator/latest/modules/generators_openapi.html) |
+| `Postman` | `PostmanJoiHelper` | [Postman Collection Format v2.1.0](https://schema.postman.com/collection/json/v2.1.0/draft-07/docs/index.html) | [API](https://kisiwu.github.io/novice-api-doc-generator/latest/modules/generators_postman.html) |
 
-Example:
+Then declare your `params`, `query`, `body`, `files`, `headers` and `cookies` parameters directly with `Joi` schemas.
+
+## OpenAPI
 
 ```ts
 import { GenerateComponentsRule, OpenAPI } from '@novice1/api-doc-generator';
@@ -95,21 +112,15 @@ openapi.add(router.getMeta());
 const doc = openapi.result();
 ```
 
-## Postman Specification
-
-[Reference](https://kisiwu.github.io/novice-api-doc-generator/latest/modules/generators_postman.html).
-
-[Postman Collection Format v2.1.0](https://schema.postman.com/collection/json/v2.1.0/draft-07/docs/index.html).
-
-Example:
+## Postman
 
 ```ts
 import { GenerateFoldersRule, Postman } from '@novice1/api-doc-generator';
-import { OpenAPIJoiHelper } from '@novice1/api-doc-joi-helper';
+import { PostmanJoiHelper } from '@novice1/api-doc-joi-helper';
 import routing from '@novice1/routing';
 import Joi from 'joi';
 
-const postman = new Postman({ helperClass: OpenAPIJoiHelper });
+const postman = new Postman({ helperClass: PostmanJoiHelper });
 
 postman
   .setName('api doc')
@@ -165,43 +176,30 @@ postman.add(router.getMeta());
 const doc = postman.result();
 ```
 
-## Schema helpers
+## Supported Joi features
 
 ### Types
 
-The default helper handles the following `joi` types: `alternatives`, `any`, `array`, `boolean`, `date` `function`, `number`, `object`, `string`, `binary`.
+The helpers handle the following `joi` types: `alternatives`, `any`, `array`, `boolean`, `date`, `function`, `number`, `object`, `string`, `binary`.
 
-It also handles format methods like `Joi.string().email()`, `Joi.string().url()` and more.
+They also handle format methods like `Joi.string().email()`, `Joi.string().url()` and more.
 
-In some cases you might have to precise the format in `Joi.meta`. For example `Joi.string().meta({format: 'password'})`, `Joi.date().meta({format: 'datetime'})` or more.
+### Formats
+
+In some cases you might have to specify the format in `Joi.meta`. For example `Joi.string().meta({ format: 'password' })` or `Joi.date().meta({ format: 'datetime' })`.
 
 Handled formats are:
 
-- `boolean`
-- `object`
-- `array`
-- `number`
-- `string`
-- `date`
-- `date-time`
-- `datetime`
-- `float`
-- `double`
-- `integer`
-- `int32`
-- `int64`
-- `byte`
-- `binary`
-- `password`
-- `email`
-- `guid`
-- `uuid`
-- `uri`
-- `dataUri`
+| Category | Formats                                                                 |
+| -------- | ----------------------------------------------------------------------- |
+| Types    | `boolean`, `object`, `array`, `number`, `string`                        |
+| Numbers  | `float`, `double`, `integer`, `int32`, `int64`                          |
+| Dates    | `date`, `date-time`, `datetime`                                         |
+| Strings  | `byte`, `binary`, `password`, `email`, `guid`, `uuid`, `uri`, `dataUri` |
 
 ### Joi.meta
 
-You can configure multiple elements in `Joi.meta` like a [reference](https://swagger.io/specification/#reference-object) to a component. For example:
+You can configure multiple elements in `Joi.meta`, like a [reference](https://swagger.io/specification/#reference-object) to a component. For example:
 
 ```js
 Joi.object()
@@ -212,23 +210,23 @@ Joi.object()
   .meta({ ref: '#/components/schemas/Pet' });
 ```
 
-If the reference is local (`#`), it could automatically generate the component depending on the rule you set (see `OpenAPI.setGenerateComponentsRule`).
+If the reference is local (`#`), the component can be generated automatically depending on the rule you set (see `OpenAPI.setGenerateComponentsRule`).
 
-List of elements you can configure in `Joi.meta`:
+Elements you can configure in `Joi.meta`:
 
 - `additionalProperties`
 - `allowReserved`
 - `deprecated`
 - `discriminator`
+- `encoding`
 - `examples`
 - `explode`
-- `encoding`
 - `format`
 - `ref`
 - `style`
 - `xml`
 
-The possible value for each of them is defined in the [OpenAPI Specification](https://swagger.io/specification/).
+The possible values for each of them are defined in the [OpenAPI Specification](https://swagger.io/specification/).
 
 ## References
 
