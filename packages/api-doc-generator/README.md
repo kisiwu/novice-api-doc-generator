@@ -24,7 +24,7 @@ Example:
 import { GenerateComponentsRule, OpenAPI } from '@novice1/api-doc-generator';
 import routing from '@novice1/routing';
 
-const openapi = new OpenAPI();
+const openapi = new OpenAPI({ helperSchemaProperty: 'schema' }); // the config is optional but recommended for handling schemas correctly
 
 openapi
   .setTitle('api doc')
@@ -57,21 +57,22 @@ const router = routing().get(
     auth: true,
     tags: ['default'],
     parameters: {
-      query: {
-        $schema: 'http://json-schema.org/draft-07/schema#',
-        type: 'object',
-        properties: {
-          version: {
-            type: 'string',
-            description: 'version number',
-            enum: ['1', '2', '3'],
-            default: '2',
-            examples: ['2'],
-            nullable: true,
+      schema: {
+        query: {
+          $schema: 'http://json-schema.org/draft-07/schema#',
+          type: 'object',
+          properties: {
+            version: {
+              type: 'string',
+              description: 'version number',
+              enum: ['1', '2', '3'],
+              default: '2',
+              examples: ['2'],
+              nullable: true,
+            },
           },
         },
       },
-
       operationId: 'default-app',
       undoc: false, // set to `true` to not display the route in the documentation
 
@@ -110,6 +111,8 @@ openapi.add(router.getMeta());
 const doc = openapi.result();
 ```
 
+> The `helperSchemaProperty` configuration allows the generator to correctly interpret and handle JSON schemas within the OpenAPI documentation. The value should match the property name used in your route definitions to define the schema, which in this case is `schema`. If it is not configured, by default the generator will read the schema from the `parameters` property directly.
+
 ## Postman Specification
 
 [Reference](https://kisiwu.github.io/novice-api-doc-generator/latest/modules/generators_postman.html).
@@ -126,7 +129,7 @@ Example:
 import { GenerateFoldersRule, Postman } from '@novice1/api-doc-generator';
 import routing from '@novice1/routing';
 
-const postman = new Postman();
+const postman = new Postman({ helperSchemaProperty: 'schema' });
 
 postman
   .setName('api doc')
@@ -153,17 +156,19 @@ const router = routing().get(
     auth: true,
     tags: ['default'], // folders
     parameters: {
-      query: {
-        $schema: 'http://json-schema.org/draft-07/schema#',
-        type: 'object',
-        properties: {
-          version: {
-            type: 'string',
-            description: 'version number',
-            enum: ['1', '2', '3'],
-            default: '2',
-            examples: ['2'],
-            nullable: true,
+      schema: {
+        query: {
+          $schema: 'http://json-schema.org/draft-07/schema#',
+          type: 'object',
+          properties: {
+            version: {
+              type: 'string',
+              description: 'version number',
+              enum: ['1', '2', '3'],
+              default: '2',
+              examples: ['2'],
+              nullable: true,
+            },
           },
         },
       },
@@ -193,6 +198,11 @@ const doc = postman.result();
 ```
 
 ## Schema helpers
+
+By default, the generator provides a helper for handling `json` schemas.
+The generator uses this helper to process the schemas provided in the API documentation.
+
+The properties evaluated by the helper include `params`, `query`, `body`, `files`, `headers`, and `cookies` parameters.
 
 ### Custom helper
 
@@ -399,13 +409,15 @@ const router = routing().post(
     path: '/something',
     auth: true,
     parameters: {
-      body: {
-        $schema: 'http://json-schema.org/draft-07/schema#',
-        type: 'object',
-        properties: {
-          something: {
-            type: 'string',
-            maxLength: 14,
+      schema: {
+        body: {
+          $schema: 'http://json-schema.org/draft-07/schema#',
+          type: 'object',
+          properties: {
+            something: {
+              type: 'string',
+              maxLength: 14,
+            },
           },
         },
       },
