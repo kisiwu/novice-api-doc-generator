@@ -2,23 +2,44 @@
 
 Generate API documentation directly from application.
 
+## Table of contents
+
+- [Installation](#installation)
+- [Usage](#usage)
+- [OpenAPI](#openapi)
+- [Postman](#postman)
+- [Schema helpers](#schema-helpers)
+  - [Default helper (`json`)](#default-helper-json)
+  - [Custom helper](#custom-helper)
+- [Utils](#utils)
+  - [Auth](#auth)
+  - [Responses](#responses)
+- [References](#references)
+
 ## Installation
 
 ```bash
 npm install @novice1/api-doc-generator
 ```
 
-## OpenAPI Specification
+## Usage
 
-[Reference](https://kisiwu.github.io/novice-api-doc-generator/latest/modules/generators_openapi.html).
+Two generators are available:
 
-[OpenAPI Specification 3.1.0](https://spec.openapis.org/oas/v3.1.0).
+| Generator | Specification                                                                                                  | Reference                                                                                       |
+| --------- | -------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------- |
+| `OpenAPI` | [OpenAPI Specification 3.1.0](https://spec.openapis.org/oas/v3.1.0)                                            | [API](https://kisiwu.github.io/novice-api-doc-generator/latest/modules/generators_openapi.html) |
+| `Postman` | [Postman Collection Format v2.1.0](https://schema.postman.com/collection/json/v2.1.0/draft-07/docs/index.html) | [API](https://kisiwu.github.io/novice-api-doc-generator/latest/modules/generators_postman.html) |
 
-### Default
+Both follow the same steps:
 
-By default it handles `json` schemas.
+1. Create and configure the generator.
+2. Add the metadata of your routes with `add(router.getMeta())`.
+3. Get the documentation with `result()`.
 
-Example:
+## OpenAPI
+
+By default it handles `json` schemas (see [Schema helpers](#schema-helpers)).
 
 ```ts
 import { GenerateComponentsRule, OpenAPI } from '@novice1/api-doc-generator';
@@ -111,19 +132,9 @@ openapi.add(router.getMeta());
 const doc = openapi.result();
 ```
 
-> The `helperSchemaProperty` configuration allows the generator to correctly interpret and handle JSON schemas within the OpenAPI documentation. The value should match the property name used in your route definitions to define the schema, which in this case is `schema`. If it is not configured, by default the generator will read the schema from the `parameters` property directly.
+## Postman
 
-## Postman Specification
-
-[Reference](https://kisiwu.github.io/novice-api-doc-generator/latest/modules/generators_postman.html).
-
-[Postman Collection Format v2.1.0](https://schema.postman.com/collection/json/v2.1.0/draft-07/docs/index.html).
-
-### Default
-
-By default it handles `json` schemas.
-
-Example:
+By default it handles `json` schemas (see [Schema helpers](#schema-helpers)).
 
 ```ts
 import { GenerateFoldersRule, Postman } from '@novice1/api-doc-generator';
@@ -199,10 +210,14 @@ const doc = postman.result();
 
 ## Schema helpers
 
-By default, the generator provides a helper for handling `json` schemas.
-The generator uses this helper to process the schemas provided in the API documentation.
-
+The generator uses a helper to process the schemas provided in the API documentation.
 The properties evaluated by the helper include `params`, `query`, `body`, `files`, `headers`, and `cookies` parameters.
+
+### Default helper (`json`)
+
+By default, the generator provides a helper for handling `json` schemas.
+
+The `helperSchemaProperty` configuration allows the generator to correctly interpret and handle JSON schemas within the documentation. The value should match the property name used in your route definitions to define the schema, which in the examples above is `schema`. If it is not configured, by default the generator will read the schema from the `parameters` property directly.
 
 ### Custom helper
 
@@ -228,6 +243,9 @@ const postman = new Postman({ helperClass: CustomPostmanHelperClass });
 ## Utils
 
 As the format differs between specifications, some classes can help you generate the documentation following multiple specifications.
+
+- [Auth](#auth): security schemes and requirements
+- [Responses](#responses): reusable responses
 
 ### Auth
 
@@ -272,7 +290,7 @@ const router = routing().get(
 );
 ```
 
-#### Context
+#### Auth context
 
 You can wrap the instance with a context to define a `scope` depending on the route. You do that with [`ContextAuthUtil`](https://kisiwu.github.io/novice-api-doc-generator/latest/classes/utils_auth_contextAuthUtils.ContextAuthUtil.html).
 
@@ -326,11 +344,11 @@ const router = routing().get(
 );
 ```
 
-#### Group
+#### Auth group
 
 You can group security schemes at your convenience with [`GroupAuthUtil`](https://kisiwu.github.io/novice-api-doc-generator/latest/classes/utils_auth_groupAuthUtil.GroupAuthUtil.html) and [`GroupContextAuthUtil`](https://kisiwu.github.io/novice-api-doc-generator/latest/classes/utils_auth_contextAuthUtils.GroupContextAuthUtil.html).
 
-Exemple:
+Example:
 
 ```ts
 import {
@@ -430,7 +448,7 @@ const router = routing().post(
 );
 ```
 
-#### Context
+#### Responses context
 
 You can wrap the instance with a context if you want to define `default`, `code`, `ref` and/or `links` depending on the route. You do that with [`ContextResponseUtil`](https://kisiwu.github.io/novice-api-doc-generator/latest/classes/utils_responses_contextResponseUtils.ContextResponseUtil.html).
 
