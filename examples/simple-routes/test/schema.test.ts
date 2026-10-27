@@ -4,9 +4,9 @@ import { zodDoc } from '../src/routes/zod-route';
 import { Folder, Item, ParameterObject, QueryParam } from '@novice1/api-doc-generator';
 import { expect } from 'chai';
 
-describe('Schema Tests', () => {
+describe('Schema Tests', function () {
+  const { logger } = this.ctx.kaukau;
   //// OpenAPI
-
   describe('OpenAPI Route standard properties', () => {
     it('should have the correct OpenAPI JSON standard route properties', () => {
       const jsonPath = jsonDoc.openapi.paths['/app'].get as { parameters?: unknown[] };
@@ -21,6 +21,7 @@ describe('Schema Tests', () => {
       assertPath.to.have.property('parameters').that.is.an('array').that.has.lengthOf(1);
       // make sure it has no other properties
       assertPath.to.have.keys(['summary', 'tags', 'responses', 'parameters']);
+      logger.success('OpenAPI JSON standard route properties validated');
     });
 
     it('should have the correct OpenAPI Joi standard route properties', () => {
@@ -36,6 +37,7 @@ describe('Schema Tests', () => {
       assertPath.to.have.property('parameters').that.is.an('array').that.has.lengthOf(1);
       // make sure it has no other properties
       assertPath.to.have.keys(['summary', 'tags', 'responses', 'parameters']);
+      logger.success('OpenAPI Joi standard route properties validated');
     });
 
     it('should have the correct OpenAPI Zod standard route properties', () => {
@@ -51,6 +53,7 @@ describe('Schema Tests', () => {
       assertPath.to.have.property('parameters').that.is.an('array').that.has.lengthOf(1);
       // make sure it has no other properties
       assertPath.to.have.keys(['summary', 'tags', 'responses', 'parameters']);
+      logger.success('OpenAPI Zod standard route properties validated');
     });
   });
 
