@@ -1,5 +1,11 @@
 # @novice1/api-doc-generator
 
+## 2.0.0-alpha.1
+
+### Patch Changes
+
+- doc readme and dependencies
+
 ## 2.0.0-alpha.0
 
 ### Major Changes
