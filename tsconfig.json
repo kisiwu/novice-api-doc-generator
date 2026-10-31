@@ -2,7 +2,7 @@
   // see https://www.typescriptlang.org/tsconfig to better understand tsconfigs
   "compilerOptions": {
     "typeRoots": ["node_modules/@types", "node_modules"],
-    "types": ["node", "mocha", "kaukau"],
+    "types": ["node", "kaukau"],
     "module": "nodenext",
     "lib": ["DOM", "es2022"],
     "target": "es2022",

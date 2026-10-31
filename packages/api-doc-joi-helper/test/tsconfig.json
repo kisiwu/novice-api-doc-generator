@@ -4,7 +4,6 @@
   "include": ["./**/*.ts", "../src"],
   "compilerOptions": {
     "rootDir": "..",
-    "noEmit": true,
-    "types": ["node", "mocha"]
+    "noEmit": true
   }
 }
