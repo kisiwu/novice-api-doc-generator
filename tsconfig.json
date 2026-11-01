@@ -4,7 +4,7 @@
     "typeRoots": ["node_modules/@types", "node_modules"],
     "types": ["node", "kaukau"],
     "module": "nodenext",
-    "lib": ["DOM", "es2022"],
+    "lib": ["es2022"],
     "target": "es2022",
     "importHelpers": true,
     // output .d.ts declaration files for consumers
