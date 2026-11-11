@@ -7,11 +7,7 @@ minimumReleaseAgeExclude:
     - '@novice1/routing@2.1.3'
     - kaukau@5.1.0-alpha.0 || 5.1.0-alpha.1 || 5.1.0-alpha.2 || 6.0.0-alpha.2 || 6.0.0-alpha.3
     - '@novice1/logger@2.0.0-alpha.1 || 2.0.0 || 2.0.1-alpha.2 || 2.0.1-alpha.3'
+    - prettier@3.10.0
 versioning:
-  lanes:
-    '@novice1/api-doc-generator': alpha
-    '@novice1/api-doc-json-helper': alpha
-    '@novice1/api-doc-zod-helper': alpha
-    novice-api-doc-generator: alpha
   changelog:
     storage: repository

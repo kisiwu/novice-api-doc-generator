@@ -3,6 +3,14 @@
   "version": "2.0.0-alpha.1",
   "description": "",
   "main": "lib/index.js",
+  "types": "lib/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./lib/index.d.ts",
+      "require": "./lib/index.js",
+      "default": "./lib/index.js"
+    }
+  },
   "scripts": {
     "build": "pnpm exec tsc",
     "format": "cross-env NODE_OPTIONS=--experimental-strip-types prettier --write ./src",
