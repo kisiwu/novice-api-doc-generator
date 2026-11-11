@@ -16,6 +16,10 @@
   dir: packages/api-doc-generator
   intents:
     - fast-boxes-enjoy
+"@novice1/api-doc-generator@2.0.1":
+  dir: packages/api-doc-generator
+  intents:
+    - cool-beans-film
 "@novice1/api-doc-joi-helper@1.0.0":
   dir: packages/api-doc-joi-helper
   intents:

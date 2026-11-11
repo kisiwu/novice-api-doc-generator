@@ -1,5 +1,11 @@
 # @novice1/api-doc-generator
 
+## 2.0.1
+
+### Patch Changes
+
+- Add missing exports
+
 ## 2.0.0
 
 ### Major Changes
