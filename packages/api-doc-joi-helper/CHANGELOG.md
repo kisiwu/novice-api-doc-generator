@@ -1,5 +1,11 @@
 # @novice1/api-doc-joi-helper
 
+## 1.0.2
+
+### Patch Changes
+
+- explicit package exports
+
 ## 1.0.1
 
 ### Patch Changes

@@ -1,7 +1,7 @@
 {
   "name": "@novice1/api-doc-generator",
   "private": false,
-  "version": "2.0.0-alpha.1",
+  "version": "2.0.0",
   "description": "Quickly generate API Documentation.",
   "main": "lib/index.js",
   "types": "lib/index.d.ts",

@@ -13,6 +13,7 @@ typedoc.json
 *.config.mjs
 *.config.mts
 tsconfig.json
+CHANGELOG.md
 
 # Logs
 logs

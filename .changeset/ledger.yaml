@@ -2,6 +2,12 @@
   dir: packages/api-doc-definitions
   intents:
     - polite-rice-drop
+"@novice1/api-doc-generator@2.0.0":
+  dir: packages/api-doc-generator
+  intents:
+    - fast-boxes-enjoy
+    - heavy-bats-act
+    - polite-rice-drop
 "@novice1/api-doc-generator@2.0.0-alpha.0":
   dir: packages/api-doc-generator
   intents:
@@ -18,6 +24,16 @@
   dir: packages/api-doc-joi-helper
   intents:
     - fast-boxes-enjoy
+"@novice1/api-doc-joi-helper@1.0.2":
+  dir: packages/api-doc-joi-helper
+  intents:
+    - heavy-bats-act
+"@novice1/api-doc-json-helper@2.0.0":
+  dir: packages/api-doc-json-helper
+  intents:
+    - fast-boxes-enjoy
+    - heavy-bats-act
+    - polite-rice-drop
 "@novice1/api-doc-json-helper@2.0.0-alpha.0":
   dir: packages/api-doc-json-helper
   intents:
@@ -26,6 +42,12 @@
   dir: packages/api-doc-json-helper
   intents:
     - fast-boxes-enjoy
+"@novice1/api-doc-zod-helper@1.0.0":
+  dir: packages/api-doc-zod-helper
+  intents:
+    - fast-boxes-enjoy
+    - heavy-bats-act
+    - polite-rice-drop
 "@novice1/api-doc-zod-helper@1.0.0-alpha.0":
   dir: packages/api-doc-zod-helper
   intents:
@@ -35,6 +57,10 @@
   intents:
     - fast-boxes-enjoy
 novice-api-doc-generator@2.0.0-alpha.0:
+  dir: ""
+  intents:
+    - polite-rice-drop
+novice-api-doc-generator@3.0.0:
   dir: ""
   intents:
     - polite-rice-drop
