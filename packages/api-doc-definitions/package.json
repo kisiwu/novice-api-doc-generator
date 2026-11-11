@@ -1,0 +1,53 @@
+{
+  "name": "@novice1/api-doc-definitions",
+  "private": false,
+  "version": "1.0.0",
+  "description": "",
+  "main": "lib/index.js",
+  "exports": {
+    ".": {
+      "types": "./lib/index.d.ts",
+      "default": "./lib/index.js"
+    },
+    "./helpers": {
+      "types": "./lib/helpers.d.ts",
+      "default": "./lib/helpers.js"
+    },
+    "./openapi": {
+      "types": "./lib/generators/openapi/definitions.d.ts",
+      "default": "./lib/generators/openapi/definitions.js"
+    },
+    "./postman": {
+      "types": "./lib/generators/postman/definitions.d.ts",
+      "default": "./lib/generators/postman/definitions.js"
+    },
+    "./values": {
+      "types": "./lib/values.d.ts",
+      "default": "./lib/values.js"
+    }
+  },
+  "homepage": "https://kisiwu.github.io/novice-api-doc-generator/latest/",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/kisiwu/novice-api-doc-generator.git"
+  },
+  "scripts": {
+    "build": "pnpm exec tsc",
+    "doc": "typedoc",
+    "format": "cross-env NODE_OPTIONS=--experimental-strip-types prettier --write ./src",
+    "format:check": "cross-env NODE_OPTIONS=--experimental-strip-types prettier --check ./src",
+    "lint": "eslint . && pnpm exec tsc --noEmit"
+  },
+  "keywords": [
+    "openapi",
+    "postman",
+    "swagger",
+    "api-doc-generator",
+    "novice1"
+  ],
+  "author": "demingongo",
+  "contributors": [
+    "sbolingo"
+  ],
+  "license": "MIT"
+}

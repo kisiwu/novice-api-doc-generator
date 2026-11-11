@@ -1,0 +1,18 @@
+{
+  "entryPoints": [
+    "src/index.ts",
+    "src/utils/*",
+    "src/helpers",
+    "src/generators/openapi.ts",
+    "src/generators/openapi/helpers",
+    "src/generators/postman.ts",
+    "src/generators/postman/helpers"
+  ],
+  "out": "docs",
+
+  "entryPointStrategy": "expand",
+  "excludeInternal": true,
+  "excludePrivate": true,
+  "includeVersion": true,
+  "hideGenerator": true
+}

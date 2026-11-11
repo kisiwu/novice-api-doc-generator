@@ -1,0 +1,230 @@
+import {
+  BaseResponseUtil,
+  FullResponseUtil,
+  IOpenAPIResponseContext,
+  IPostmanResponseContext,
+} from './baseResponseUtils';
+import { MediaTypeUtil } from './mediaTypeUtil';
+import type {
+  ResponseObject as OpenAPIResponseObject,
+  ReferenceObject,
+  LinkObject,
+  MediaTypeObject,
+  HeaderObject,
+} from '@novice1/api-doc-definitions/openapi';
+import type { ResponseObject as PostmanResponseObject } from '@novice1/api-doc-definitions/postman';
+import extend from 'extend';
+
+/**
+ * {@include ../../../typedocIncludes/responses/responseUtil.md}
+ */
+export class ResponseUtil extends FullResponseUtil {
+  setName(name: string): this {
+    this.name = name;
+    return this;
+  }
+
+  setDescription(description: string): this {
+    this.description = description;
+    return this;
+  }
+
+  setCode(code: number): this {
+    this.code = code;
+    return this;
+  }
+
+  getCode(): number | undefined {
+    return this.code;
+  }
+
+  setDefault(isDefault: boolean): this {
+    this.default = isDefault;
+    return this;
+  }
+
+  isDefault(): boolean {
+    return this.default ? this.default : false;
+  }
+
+  setRef(ref: string): this {
+    this.ref = ref;
+    return this;
+  }
+
+  getRef(): string | undefined {
+    return this.ref;
+  }
+
+  removeRef(): string | undefined {
+    const r = this.ref;
+    this.ref = undefined;
+    return r;
+  }
+
+  setHeaders(headers: Record<string, HeaderObject | ReferenceObject>): this {
+    this.headers = headers;
+    return this;
+  }
+  addHeader(key: string, header: HeaderObject): this;
+  addHeader(key: string, header: ReferenceObject): this;
+  addHeader(key: string): this;
+  addHeader(key: string, header: HeaderObject | ReferenceObject = {}): this {
+    this.headers = this.headers || {};
+    this.headers[key] = header;
+    return this;
+  }
+  removeHeaders(): Record<string, HeaderObject | ReferenceObject> | undefined {
+    const r = this.headers;
+    this.headers = undefined;
+    return r;
+  }
+  removeHeader(key: string): HeaderObject | ReferenceObject | undefined {
+    let r;
+    if (this.headers) {
+      r = this.headers[key];
+      delete this.headers[key];
+    }
+    return r;
+  }
+
+  setMediaTypes(mediaTypes: Record<string, MediaTypeObject>): this {
+    this.content = mediaTypes;
+    return this;
+  }
+  addMediaType(contentType: string, mediaType: MediaTypeObject): this;
+  addMediaType(contentType: string, mediaType: MediaTypeUtil): this;
+  addMediaType(contentType: string): this;
+  addMediaType(contentType: string, mediaType: MediaTypeObject | MediaTypeUtil = {}): this {
+    this.content = this.content || {};
+    if (mediaType instanceof MediaTypeUtil) {
+      this.content[contentType] = mediaType.toObject();
+    } else {
+      this.content[contentType] = mediaType;
+    }
+    return this;
+  }
+  removeMediaTypes(): Record<string, MediaTypeObject> | undefined {
+    const r = this.content;
+    this.content = undefined;
+    return r;
+  }
+  removeMediaType(contentType: string): MediaTypeObject | undefined {
+    let r;
+    if (this.content) {
+      r = this.content[contentType];
+      delete this.content[contentType];
+    }
+    return r;
+  }
+
+  setLinks(links: Record<string, LinkObject | ReferenceObject>): this {
+    this.links = links;
+    return this;
+  }
+  addLink(key: string, link: LinkObject): this;
+  addLink(key: string, link: ReferenceObject): this;
+  addLink(key: string): this;
+  addLink(key: string, link: LinkObject | ReferenceObject = {}): this {
+    this.links = this.links || {};
+    this.links[key] = link;
+    return this;
+  }
+  removeLinks(): Record<string, LinkObject | ReferenceObject> | undefined {
+    const r = this.links;
+    this.links = undefined;
+    return r;
+  }
+  removeLink(key: string): LinkObject | ReferenceObject | undefined {
+    let r;
+    if (this.links) {
+      r = this.links[key];
+      delete this.links[key];
+    }
+    return r;
+  }
+
+  toPostman(): PostmanResponseObject[];
+  toPostman(ctxt: IPostmanResponseContext): PostmanResponseObject[];
+  toPostman(): PostmanResponseObject[] {
+    return [];
+  }
+
+  toOpenAPI(): Record<string, OpenAPIResponseObject | ReferenceObject>;
+  toOpenAPI(ctxt: IOpenAPIResponseContext): Record<string, OpenAPIResponseObject | ReferenceObject>;
+  toOpenAPI(ctxt: IOpenAPIResponseContext = {}): Record<string, OpenAPIResponseObject | ReferenceObject> {
+    let name = this.name;
+    if (this.code) {
+      name = `${this.code}`;
+    }
+    if (ctxt.code) {
+      name = `${ctxt.code}`;
+    }
+    if (ctxt.default) {
+      name = 'default';
+    }
+    if (this.default) {
+      name = 'default';
+    }
+    if (ctxt.ref) {
+      return {
+        [name]: {
+          $ref: ctxt.ref,
+        },
+      };
+    }
+    if (this.ref) {
+      return {
+        [name]: {
+          $ref: this.ref,
+        },
+      };
+    }
+    const res: OpenAPIResponseObject | ReferenceObject = {
+      description: this.description || '',
+    };
+    if (this.headers) {
+      res.headers = this.headers;
+    }
+    if (this.content) {
+      res.content = this.content;
+    }
+    if (this.links) {
+      res.links = this.links;
+    }
+    if (ctxt.links) {
+      res.links = ctxt.links;
+    }
+    return {
+      [name]: res,
+    };
+  }
+}
+
+/**
+ * {@include ../../../typedocIncludes/responses/groupResponseUtil.md}
+ */
+export class GroupResponseUtil extends BaseResponseUtil {
+  protected responseUtils: BaseResponseUtil[] = [];
+
+  constructor(responseUtils: BaseResponseUtil[]) {
+    super();
+    this.responseUtils = responseUtils;
+  }
+
+  toPostman(): PostmanResponseObject[] {
+    let r: PostmanResponseObject[] = [];
+    this.responseUtils.forEach((builder) => {
+      r = r.concat(builder.toPostman());
+    });
+    return r;
+  }
+
+  toOpenAPI(): Record<string, OpenAPIResponseObject | ReferenceObject> {
+    let r: Record<string, OpenAPIResponseObject | ReferenceObject> = {};
+    this.responseUtils.forEach((builder) => {
+      r = extend(r, builder.toOpenAPI());
+    });
+    return r;
+  }
+}

@@ -1,0 +1,82 @@
+import { FullAuthUtil } from './baseAuthUtils';
+import type { SecuritySchemeObject } from '@novice1/api-doc-definitions/openapi';
+import type { Auth } from '@novice1/api-doc-definitions/postman';
+
+function isDefined(v: unknown) {
+  return typeof v !== 'undefined';
+}
+
+/**
+ * {@include ../../../typedocIncludes/auth/basicAuthUtil.md}
+ */
+export class BasicAuthUtil extends FullAuthUtil {
+  protected password?: string;
+  protected username?: string;
+
+  setDescription(description: string): this {
+    this.description = description;
+    return this;
+  }
+
+  setPassword(password: string): this {
+    this.password = password;
+    return this;
+  }
+
+  getPassword(): string | undefined {
+    return this.password;
+  }
+
+  removePassword(): string | undefined {
+    const r = this.password;
+    this.password = undefined;
+    return r;
+  }
+
+  setUsername(username: string): this {
+    this.username = username;
+    return this;
+  }
+
+  getUsername(): string | undefined {
+    return this.username;
+  }
+
+  removeUsername(): string | undefined {
+    const r = this.username;
+    this.username = undefined;
+    return r;
+  }
+
+  toPostman(): Auth {
+    const r: Auth = {
+      type: 'basic',
+      basic: [],
+    };
+    if (isDefined(this.password)) {
+      r.basic?.push({
+        key: 'password',
+        value: this.password,
+        type: 'string',
+      });
+    }
+    if (isDefined(this.username)) {
+      r.basic?.push({
+        key: 'username',
+        value: this.username,
+        type: 'string',
+      });
+    }
+    return r;
+  }
+
+  toOpenAPI(): Record<string, SecuritySchemeObject> {
+    return {
+      [this.securitySchemeName]: {
+        type: 'http',
+        scheme: 'basic',
+        description: this.description,
+      },
+    };
+  }
+}
