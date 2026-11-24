@@ -14,7 +14,7 @@ import type {
  * JSON schema (draft-07) helper for \@novice1/api-doc-generator
  */
 export class OpenAPIJsonHelper extends BaseJsonHelper implements OpenAPIHelperInterface {
-  getFirstItem(): this | undefined {
+  getFirstItem(): OpenAPIJsonHelper | undefined {
     const schema = this._schema;
 
     if ('items' in schema && typeof schema.items === 'object') {
@@ -23,7 +23,7 @@ export class OpenAPIJsonHelper extends BaseJsonHelper implements OpenAPIHelperIn
 
     return;
   }
-  getChildren(): Record<string, this> {
+  getChildren(): Record<string, OpenAPIJsonHelper> {
     const r: Record<string, this> = {};
     const schema = this._schema;
     if ('properties' in schema && typeof schema.properties === 'object' && schema.properties) {
@@ -36,7 +36,7 @@ export class OpenAPIJsonHelper extends BaseJsonHelper implements OpenAPIHelperIn
     }
     return r;
   }
-  getAlternatives(): this[] {
+  getAlternatives(): OpenAPIJsonHelper[] {
     const r: this[] = [];
     const schema = this._schema;
     if ('oneOf' in schema && Array.isArray(schema.oneOf)) {

@@ -3,7 +3,7 @@ import type { PostmanHelperInterface } from '@novice1/api-doc-definitions/helper
 import type { XMLObject } from '@novice1/api-doc-definitions/openapi';
 
 export class PostmanJsonHelper extends BaseJsonHelper implements PostmanHelperInterface {
-  getFirstItem(): this | undefined {
+  getFirstItem(): PostmanJsonHelper | undefined {
     const schema = this._schema;
 
     if ('items' in schema && typeof schema.items === 'object') {
@@ -12,7 +12,7 @@ export class PostmanJsonHelper extends BaseJsonHelper implements PostmanHelperIn
 
     return;
   }
-  getChildren(): Record<string, this> {
+  getChildren(): Record<string, PostmanJsonHelper> {
     const r: Record<string, this> = {};
     const schema = this._schema;
     if ('properties' in schema && typeof schema.properties === 'object' && schema.properties) {
@@ -25,7 +25,7 @@ export class PostmanJsonHelper extends BaseJsonHelper implements PostmanHelperIn
     }
     return r;
   }
-  getAlternatives(): this[] {
+  getAlternatives(): PostmanJsonHelper[] {
     const r: this[] = [];
     const schema = this._schema;
     if ('oneOf' in schema && Array.isArray(schema.oneOf)) {
