@@ -1,36 +1,36 @@
-import { BaseJsonHelper } from './BaseJsonHelper';
+import { BaseJsonHelper, type SchemaConstructor } from './BaseJsonHelper';
 import type { PostmanHelperInterface } from '@novice1/api-doc-definitions/helpers';
 import type { XMLObject } from '@novice1/api-doc-definitions/openapi';
 
 export class PostmanJsonHelper extends BaseJsonHelper implements PostmanHelperInterface {
-  getFirstItem(): PostmanJsonHelper | undefined {
+  getFirstItem(): this | undefined {
     const schema = this._schema;
 
     if ('items' in schema && typeof schema.items === 'object') {
-      return new PostmanJsonHelper({ value: schema.items });
+      return new (this.constructor as SchemaConstructor<this>)({ value: schema.items });
     }
 
     return;
   }
-  getChildren(): Record<string, PostmanJsonHelper> {
-    const r: Record<string, PostmanJsonHelper> = {};
+  getChildren(): Record<string, this> {
+    const r: Record<string, this> = {};
     const schema = this._schema;
     if ('properties' in schema && typeof schema.properties === 'object' && schema.properties) {
       const properties: Record<string, unknown> = schema.properties as Record<string, unknown>;
       for (const p in properties) {
         const isRequired: boolean =
           'required' in schema && Array.isArray(schema.required) && schema.required.includes(p);
-        r[p] = new PostmanJsonHelper({ value: properties[p] }, isRequired);
+        r[p] = new (this.constructor as SchemaConstructor<this>)({ value: properties[p] }, isRequired);
       }
     }
     return r;
   }
-  getAlternatives(): PostmanJsonHelper[] {
-    const r: PostmanJsonHelper[] = [];
+  getAlternatives(): this[] {
+    const r: this[] = [];
     const schema = this._schema;
     if ('oneOf' in schema && Array.isArray(schema.oneOf)) {
       for (const p of schema.oneOf) {
-        r.push(new PostmanJsonHelper({ value: p }));
+        r.push(new (this.constructor as SchemaConstructor<this>)({ value: p }));
       }
     }
     return r;

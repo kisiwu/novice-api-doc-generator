@@ -1,4 +1,4 @@
-import { BaseJsonHelper } from './BaseJsonHelper';
+import { BaseJsonHelper, type SchemaConstructor } from './BaseJsonHelper';
 import type { OpenAPIHelperInterface } from '@novice1/api-doc-definitions/helpers';
 import type {
   AdditionalProperties,
@@ -14,34 +14,34 @@ import type {
  * JSON schema (draft-07) helper for \@novice1/api-doc-generator
  */
 export class OpenAPIJsonHelper extends BaseJsonHelper implements OpenAPIHelperInterface {
-  getFirstItem(): OpenAPIJsonHelper | undefined {
+  getFirstItem(): this | undefined {
     const schema = this._schema;
 
     if ('items' in schema && typeof schema.items === 'object') {
-      return new OpenAPIJsonHelper({ value: schema.items });
+      return new (this.constructor as SchemaConstructor<this>)({ value: schema.items });
     }
 
     return;
   }
-  getChildren(): Record<string, OpenAPIJsonHelper> {
-    const r: Record<string, OpenAPIJsonHelper> = {};
+  getChildren(): Record<string, this> {
+    const r: Record<string, this> = {};
     const schema = this._schema;
     if ('properties' in schema && typeof schema.properties === 'object' && schema.properties) {
       const properties: Record<string, unknown> = schema.properties as Record<string, unknown>;
       for (const p in properties) {
         const isRequired: boolean =
           'required' in schema && Array.isArray(schema.required) && schema.required.includes(p);
-        r[p] = new OpenAPIJsonHelper({ value: properties[p] }, isRequired);
+        r[p] = new (this.constructor as SchemaConstructor<this>)({ value: properties[p] }, isRequired);
       }
     }
     return r;
   }
-  getAlternatives(): OpenAPIJsonHelper[] {
-    const r: OpenAPIJsonHelper[] = [];
+  getAlternatives(): this[] {
+    const r: this[] = [];
     const schema = this._schema;
     if ('oneOf' in schema && Array.isArray(schema.oneOf)) {
       for (const p of schema.oneOf) {
-        r.push(new OpenAPIJsonHelper({ value: p }));
+        r.push(new (this.constructor as SchemaConstructor<this>)({ value: p }));
       }
     }
     return r;

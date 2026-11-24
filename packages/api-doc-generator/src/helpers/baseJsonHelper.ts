@@ -1,5 +1,9 @@
 import type { BaseHelperInterface } from '@novice1/api-doc-definitions/helpers';
 
+export interface SchemaConstructor<T> {
+  new (options: { value: unknown }, isRequired?: boolean): T;
+}
+
 /**
  * JSON schema (draft-07) helper for \@novice1/api-doc-generator
  */
@@ -50,7 +54,8 @@ export abstract class BaseJsonHelper implements BaseHelperInterface {
       typeof this._schema === 'object' &&
       (('type' in this._schema && typeof this._schema.type === 'string') ||
         ('oneOf' in this._schema && Array.isArray(this._schema.oneOf)) ||
-        ('anyOf' in this._schema && Array.isArray(this._schema.anyOf)))
+        ('anyOf' in this._schema && Array.isArray(this._schema.anyOf)) ||
+        ('enum' in this._schema && Array.isArray(this._schema.enum)))
     );
   }
   getType(): string {
