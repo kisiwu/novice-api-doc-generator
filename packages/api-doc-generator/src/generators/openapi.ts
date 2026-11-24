@@ -1,6 +1,5 @@
 import { BaseOpenAPIAuthUtil, BaseAuthUtil, BaseContextAuthUtil } from '../utils/auth/baseAuthUtils';
 import { BaseOpenAPIResponseUtil, BaseResponseUtil } from '../utils/responses/baseResponseUtils';
-import { OpenAPIJsonHelper } from './openapi/helpers/openAPIjsonHelper';
 import { MediaTypeCreator } from './openapi/services/mediaTypeService';
 import { ParameterCreator } from './openapi/services/parameterService';
 import { SchemaCreator } from './openapi/services/schemaService';
@@ -31,6 +30,7 @@ import {
   type OpenAPISupportedVersion,
   type SchemaObject3_1,
 } from '@novice1/api-doc-definitions/openapi';
+import { OpenAPIJsonHelper } from '@novice1/api-doc-json-helper';
 import extend from 'extend';
 
 interface ResponsesRecord {

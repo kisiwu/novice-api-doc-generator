@@ -304,6 +304,9 @@ importers:
       '@novice1/api-doc-definitions':
         specifier: workspace:^
         version: link:../api-doc-definitions
+      '@novice1/api-doc-json-helper':
+        specifier: workspace:^
+        version: link:../api-doc-json-helper
       extend:
         specifier: ^3.0.2
         version: 3.0.2
@@ -344,9 +347,6 @@ importers:
       '@novice1/api-doc-definitions':
         specifier: workspace:^
         version: link:../api-doc-definitions
-      '@novice1/api-doc-generator':
-        specifier: workspace:^
-        version: link:../api-doc-generator
       '@novice1/routing':
         specifier: ^2.1.3
         version: 2.1.3(@types/express@5.0.6)(supports-color@8.1.1)

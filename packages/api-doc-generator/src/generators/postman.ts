@@ -1,6 +1,5 @@
 import { BasePostmanAuthUtil } from '../utils/auth/baseAuthUtils';
 import { BasePostmanResponseUtil, BaseResponseUtil } from '../utils/responses/baseResponseUtils';
-import { PostmanJsonHelper } from './postman/helpers/postmanJsonHelper';
 import { RequestBodyCreator } from './postman/services/requestBodyService';
 import { formatPath, formatType } from './postman/utils';
 import type { DocGenerator, ProcessedRoute, RouteMeta } from '@novice1/api-doc-definitions';
@@ -22,6 +21,7 @@ import {
   type UrlObject,
   type Variable,
 } from '@novice1/api-doc-definitions/postman';
+import { PostmanJsonHelper } from '@novice1/api-doc-json-helper';
 import extend from 'extend';
 
 interface ResponsesRecord {

@@ -1,10 +1,9 @@
-import { OpenAPIJsonHelper } from '../src';
-import { OpenAPI } from '@novice1/api-doc-generator';
+import { OpenAPI } from '../src';
 import routing from '@novice1/routing';
 import { expect } from 'chai';
 import { before, describe, it } from 'node:test';
 
-const openapi = new OpenAPI({ helperClass: OpenAPIJsonHelper, helperSchemaProperty: 'json' });
+const openapi = new OpenAPI({ helperSchemaProperty: 'json' });
 let result = openapi.result();
 
 function getFirstItem(path: string, method = 'get') {
@@ -18,7 +17,7 @@ function getFirstItem(path: string, method = 'get') {
   };
 }
 
-describe(() => {
+describe('JSON Helper', () => {
   before(() => {
     const router = routing().get(
       {
