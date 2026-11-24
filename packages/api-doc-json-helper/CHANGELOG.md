@@ -1,5 +1,11 @@
 # @novice1/api-doc-json-helper
 
+## 2.0.2
+
+### Patch Changes
+
+- Extract `PostmanJsonHelper` and `OpenAPIJsonHelper` into a dedicated `@novice1/api-doc-json-helper` dependency
+
 ## 2.0.1
 
 ### Patch Changes
