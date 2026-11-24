@@ -1,5 +1,12 @@
 # @novice1/api-doc-json-helper
 
+## 2.0.1
+
+### Patch Changes
+
+- - Fix JSON schema validity check to allow schemas with an explicit `enum` property
+  - Improve extendability in schema helpers by preserving subclass instances (`this`) when returning nested items
+
 ## 2.0.0
 
 ### Major Changes

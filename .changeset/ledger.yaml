@@ -20,6 +20,10 @@
   dir: packages/api-doc-generator
   intents:
     - cool-beans-film
+"@novice1/api-doc-generator@2.0.2":
+  dir: packages/api-doc-generator
+  intents:
+    - large-teeth-walk
 "@novice1/api-doc-joi-helper@1.0.0":
   dir: packages/api-doc-joi-helper
   intents:
@@ -46,6 +50,10 @@
   dir: packages/api-doc-json-helper
   intents:
     - fast-boxes-enjoy
+"@novice1/api-doc-json-helper@2.0.1":
+  dir: packages/api-doc-json-helper
+  intents:
+    - large-teeth-walk
 "@novice1/api-doc-zod-helper@1.0.0":
   dir: packages/api-doc-zod-helper
   intents:
