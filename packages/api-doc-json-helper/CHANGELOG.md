@@ -1,5 +1,11 @@
 # @novice1/api-doc-json-helper
 
+## 2.0.3
+
+### Patch Changes
+
+- fix return type of method getFirstItem, getChildren and getAlternatives
+
 ## 2.0.2
 
 ### Patch Changes

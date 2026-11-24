@@ -62,6 +62,10 @@
   dir: packages/api-doc-json-helper
   intents:
     - soft-queens-judge
+"@novice1/api-doc-json-helper@2.0.3":
+  dir: packages/api-doc-json-helper
+  intents:
+    - calm-fishes-fold
 "@novice1/api-doc-zod-helper@1.0.0":
   dir: packages/api-doc-zod-helper
   intents:
